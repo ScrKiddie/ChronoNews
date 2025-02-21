@@ -1,0 +1,43 @@
+import React from "react";
+import { Button } from "primereact/button";
+import { ConfirmDialog } from "primereact/confirmdialog";
+
+interface LogoutButtonProps {
+    visible: boolean;
+    setVisible: (visible: boolean) => void;
+    onLogout: () => void;
+}
+
+const LogoutModal: React.FC<LogoutButtonProps> = ({ visible, setVisible, onLogout }) => {
+    const footer = (
+        <div className="flex justify-end gap-2">
+            <Button
+                className="flex items-center justify-center font-normal"
+                onClick={() => {
+                    setVisible(false);
+                }}
+                text
+            >Batal</Button>
+            <Button
+                className="flex items-center justify-center font-normal"
+                onClick={() => {
+                    setVisible(false);
+                    onLogout();
+                }}
+            >Logout</Button>
+        </div>
+    );
+    return (
+        <ConfirmDialog
+            visible={visible}
+            closable={false}
+            group="templating"
+            header={<h1 className="font-medium m-0 text-xl">Logout</h1>}
+            message="Apakah Anda yakin ingin logout?"
+            className="w-[94%] md:w-[40%]"
+            footer={footer}
+        />
+    );
+};
+
+export default LogoutModal;

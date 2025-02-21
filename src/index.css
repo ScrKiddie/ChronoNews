@@ -1,68 +1,291 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+small{
+    display:block;
 }
-a:hover {
-  color: #535bf2;
+
+*{
+    font-family: Poppins;
+}
+
+.p-dropdown {
+    box-shadow: none;
+}
+
+.p-dropdown-filter {
+    box-shadow: none;
+}
+
+.p-inputtext {
+    box-shadow: none;
+}
+
+.p-input {
+    box-shadow: none;
+}
+
+.p-dialog {
+    z-index: 1000 !important;
+    border: 0;
+}
+
+.p-dialog-mask {
+    z-index: 999 !important;
+}
+
+.p-toast {
+    z-index: 2000 !important;
+}
+
+.p-menu {
+    z-index: 900 !important;
+    border-radius: 10px;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Reset Paragraf */
+p {
+    margin: 0;
+    padding: 0;
+    color: inherit;
+}
+/*Custom Messages PrimeReact*/
+/*.p-message-wrapper{*/
+/*    padding: 10px;*/
+/*    padding-left: 20px;*/
+/*    padding-right: 20px;*/
+/*}*/
+
+/*.p-message-detail{*/
+/*    margin-right: 8px;*/
+/*}*/
+.p-toast-message-icon{
+    width:  25px;
+}
+.ps-sidebar-root {
+    border: none !important;
+}
+
+.css-wx7wi4 {
+    min-width: fit-content !important;
+}
+
+#cf-turnstile > div {
+    height: 64px;
+}
+.ql-editor[contenteditable="false"] {
+    background-color: rgba(205, 92, 92, 0) !important;
+    border: 0px;
+    padding: 0px;
+    font-size: 1.25rem;
+}
+.ql-disabled {
+    border: 0px !important;
+}
+
+
+.text-justify {
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.ql-editor {
+    font-family: "Poppins";
+    min-height: 320px;
+    max-height: fit-content;
+}
+
+.p-toast{
+    width: 90%;
+}
+.p-toast-detail{
+    margin-top:4px;
+    text-align: center;
+}
+.p-toast-message-text{
+    margin-left: 0px;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.ql-tooltip {
+    z-index: 1200 !important;
+    font-family: "Poppins";
+}
+.ql-blank,
+.ql-editor {
+    background-color: rgba(255, 255, 255, 0) !important;
+}
+.ql-editor.ql-blank::before {
+    color: #495057 !important;
+    content: attr(data-placeholder) !important;
+    font-style: normal !important;
+}
+body.dark .ql-editor.ql-blank::before {
+    color: #9b9fa0 !important;
+}
+body.dark .ql-tooltip,
+body.dark .ql-editing {
+    background-color: #1e1e1e !important;
+    color: #e2e2e2 !important;
+    border: 1px solid #383838 !important;
+    box-shadow: none;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+body .ql-tooltip a,
+body .ql-editing a {
+    color: #383838 !important;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+body.dark .ql-tooltip a,
+body.dark .ql-editing a {
+    color: #e2e2e2 !important;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+body.dark .ql-tooltip input,
+body.dark .ql-editing input {
+    border: 1px solid #383838 !important;
+}
+body.dark .ql-tooltip input:focus,
+body.dark .ql-editing input:focus {
+    box-shadow: none;
+    outline: none;
+}
+.ql-tooltip input:focus,
+.ql-editing input:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+
+.p-message{
+    margin:0px;
+}
+.p-calendar:not(.p-calendar-disabled).p-focus > .p-inputtext {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: none;
+}
+
+body.dark .ql-editor[contenteditable="true"] {
+    background-color: #121212 !important;
+}
+
+body.dark #editor-resizer .toolbar {
+    background-color: #1e1e1e;
+    border-color: #b0b0b0;
+    color: #b0b0b0;
+}
+
+body.dark #editor-resizer .toolbar .group a {
+    border-color: #b0b0b0;
+    color: #b0b0b0;
+}
+
+.ql-editor[contenteditable="false"] {
+    overflow: hidden;
+}
+
+.p-inputnumber-input {
+    padding: 12px;
+    width: 80% !important;
+}
+input.p-inputtext.p-component[readonly][role="combobox"] {
+    padding: 12px;
+}
+
+body.dark .logo-prbcare {
+    fill: white !important;
+}
+body .logo-prbcare {
+    fill: #495057 !important;
+}
+
+.p-password-input {
+    width: 100%;
+    padding: 12px;
+    padding-right: 3rem;
+}
+.p-password .p-icon-field {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.p-password .p-input-icon {
+    top: 46.5%;
+    margin-right: 4px;
+}
+
+.p-input-icon svg{
+    width: 20px !important;
+    height: 20px !important;
+}
+
+.p-input-icon svg:active{
+    outline: 0 none;
+}
+
+.p-input-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.rfm-marquee{
+    min-width: 100%;
+}
+.ps-menu-icon{
+    margin: 0 !important;
+}
+
+.ps-menu-label {
+    flex-grow: 0 !important;
+}
+
+
+.ps-menuitem-root{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body .bottom-navbar{
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+}
+
+body .navbar-top{
+    box-shadow: 0 4px 6px rgba(0, 4, 0, 0.1);
+}
+
+.p-column-title{
+    width: 100%;
+}
+
+#user-cropper .cropper-crop-box, #user-cropper .cropper-view-box {
+    border-radius: 50%;
+}
+
+#user-cropper .cropper-view-box {
+    box-shadow: 0 0 0 1px #39f;
+    outline: 0;
+}
+
+.p-datatable-emptymessage td{
+    text-align: center !important;
 }
