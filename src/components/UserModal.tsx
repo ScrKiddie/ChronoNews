@@ -39,31 +39,20 @@ const ModalUser = ({
                 <div className="flex flex-col p-4 gap-4">
                     {/* Avatar hanya untuk mode profile */}
                     <div className="relative w-fit mx-auto flex justify-center items-center">
-                        <div style={{
-                            border: "2.4px solid #f59e0b",
-                        }}
-                             className={`rounded-full size-[12.6rem] flex justify-center items-center`}
-                        >
-                            <img
-                                src={croppedImage || (data?.profilePicture ? `http://localhost:3000/profile_picture/${data?.profilePicture}` : `${defaultProfilePicture}`)}
-                                className=" size-[12rem] bg-[#f49f14] rounded-full"
-                                style={{
-                                    border: "2.4px solid #f59e0b",
-                                    boxShadow: "0 0 0 2.4px white",
-                                }}
-                            />
-                        </div>
+                        <img
+                            src={croppedImage || (data?.profilePicture ? `http://localhost:3000/profile_picture/${data?.profilePicture}` : `${defaultProfilePicture}`)}
+                            className=" size-[14rem] bg-[#f49f14] rounded-full"
+                            style={{
+                                border: "4px solid #f59e0b",
+                            }}
+                        />
 
                         {/* Tombol Upload Gambar */}
                         <Button
                             onClick={handleClickUploadButton}
                             icon={<i className="pi pi-image block" style={{fontSize: "1.3rem"}}></i>}
                             type="button"
-                            className="absolute bottom-2 right-3 rounded-full size-[3rem]"
-                            style={{
-                                border: "2.4px solid white",
-                                boxShadow: "0 0 0 2.4px #f59e0b",
-                            }}
+                            className="absolute bottom-3 right-3 rounded-full size-[3rem]"
                         />
                         <input
                             ref={fileInputRef}

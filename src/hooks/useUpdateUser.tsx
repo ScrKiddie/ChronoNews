@@ -85,7 +85,7 @@ export const useUpdateUser = (toastRef = null, fetchData=null) => {
             await UserService.updateUser(id, request, token);
             toastRef?.current?.show({
                 severity: "success",
-                detail: "Profil berhasil diperbarui",
+                detail: "Pengguna berhasil diperbarui",
                 life: 2000,
             });
             if (fetchData){

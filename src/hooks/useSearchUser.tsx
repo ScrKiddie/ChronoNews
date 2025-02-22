@@ -9,9 +9,8 @@ const useSearchUser = () => {
     const [users, setUsers] = useState([]);
     const [searchParams, setSearchParams] = useState({ name: "", phoneNumber: "", email: "" });
     const [page, setPage] = useState(1);
-    const [size, setSize] = useState(10);
+    const [size, setSize] = useState(5);
     const [totalItem, setTotalItem] = useState(0);
-    const [totalPage, setTotalPage] = useState(1);
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
     const [visibleLoadingConnection, setVisibleLoadingConnection] = useState(false);
 
@@ -36,7 +35,6 @@ const useSearchUser = () => {
             if (response && response.data) {
                 setUsers(response.data);
                 setTotalItem(response.pagination.totalItem);
-                setTotalPage(response.pagination.totalPage);
             }
         } catch (error) {
             if (!error.response) {
@@ -62,7 +60,6 @@ const useSearchUser = () => {
         size,
         setSize,
         totalItem,
-        totalPage,
         fetchUsers,
         handleSearch,
         visibleConnectionError,

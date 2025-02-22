@@ -81,4 +81,17 @@ export const UserService = {
             throw new Error(error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },
+    deleteUser: async (id, token) => {
+        try {
+            const response = await axios.delete(`${API_URL}/user/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            return response.data.message || "User berhasil dihapus";
+        } catch (error) {
+            throw new Error(error.response?.data?.error || "Terjadi kesalahan jaringan");
+        }
+    }
 };

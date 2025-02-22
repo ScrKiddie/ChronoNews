@@ -108,10 +108,12 @@ const SidebarResponsive = ({children}) => {
                         </div>
                     </Menu>
 
-                    <MenuItemResponsive collapsed={collapsed} icon={`pi pi-th-large`} label={"Beranda"}
+                    <MenuItemResponsive collapsed={collapsed} icon={`pi pi-qrcode`} label={"Beranda"}
                                         link={"/admin/beranda"}/>
                     <MenuItemResponsive collapsed={collapsed} icon={`pi pi-users
                     `} label={"Jurnalis"} link={"/admin/jurnalis"}/>
+                    <MenuItemResponsive collapsed={collapsed} icon={`pi pi-list
+                    `} label={"Kategori"} link={"/admin/kategori"}/>
 
                 </Menu>
             </Sidebar>
