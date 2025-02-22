@@ -8,9 +8,10 @@ import { loginSchema } from "../../schemas/authSchema";
 import { loginUser } from "../../services/authService";
 import chronoverseLogo from "../../../public/chronoverse.svg";
 import {useNavigate} from "react-router-dom";
+import {useToast} from "../../hooks/useToast.tsx";
 
 const Login: React.FC = () => {
-    const toastRef = useRef<Toast>(null);
+    const toastRef = useToast();
     const { login, token } = useAuth();
     const navigate = useNavigate();
     const [email, setEmail] = useState("");

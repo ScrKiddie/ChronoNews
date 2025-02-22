@@ -11,7 +11,6 @@ export const useSidebar = () => {
     const buttonRef = useRef(null);
     const menuContainerRef = useRef(null);
     const navigate = useNavigate();
-    const toastRef = useRef(null);
     const onLogout= () =>{
         logout();
         navigate("/login");
@@ -89,6 +88,5 @@ export const useSidebar = () => {
         isModalLogoutVisible,
         setIsModalLogoutVisible,
         onLogout,
-        toastRef
     };
 };

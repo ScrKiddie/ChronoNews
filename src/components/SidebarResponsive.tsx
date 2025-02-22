@@ -14,8 +14,11 @@ import {useProfile} from "../hooks/useProfile.tsx";
 import LogoutModal from "./LogoutModal.tsx";
 import {usePassword} from "../hooks/usePassword.tsx";
 import PasswordModal from "./PasswordModal.tsx";
+import {useToast} from "../hooks/useToast.tsx";
 
 const SidebarResponsive = ({children}) => {
+
+    const toastRef = useToast();
     const {
         collapsed,
         toggled,
@@ -31,7 +34,6 @@ const SidebarResponsive = ({children}) => {
         onLogout,
         setIsModalLogoutVisible,
         isModalLogoutVisible,
-        toastRef
     } = useSidebar();
 
     const {

@@ -39,14 +39,20 @@ const ModalUser = ({
                 <div className="flex flex-col p-4 gap-4">
                     {/* Avatar hanya untuk mode profile */}
                     <div className="relative w-fit mx-auto flex justify-center items-center">
-                        <img
-                            src={croppedImage || (data?.profilePicture ? `http://localhost:3000/profile_picture/${data?.profilePicture}`  : `${defaultProfilePicture}` ) }
-                            className="mr-2 size-[12rem] bg-[#f49f14] rounded-full"
-                            style={{
-                                border: "2.4px solid white",
-                                boxShadow: "0 0 0 2.4px #f59e0b",
-                            }}
-                        />
+                        <div style={{
+                            border: "2.4px solid #f59e0b",
+                        }}
+                             className={`rounded-full size-[12.6rem] flex justify-center items-center`}
+                        >
+                            <img
+                                src={croppedImage || (data?.profilePicture ? `http://localhost:3000/profile_picture/${data?.profilePicture}` : `${defaultProfilePicture}`)}
+                                className=" size-[12rem] bg-[#f49f14] rounded-full"
+                                style={{
+                                    border: "2.4px solid #f59e0b",
+                                    boxShadow: "0 0 0 2.4px white",
+                                }}
+                            />
+                        </div>
 
                         {/* Tombol Upload Gambar */}
                         <Button
