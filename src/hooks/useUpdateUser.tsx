@@ -2,22 +2,24 @@ import { useState } from "react";
 import { z } from "zod";
 import { useAuth } from "./useAuth.tsx";
 import { UserService } from "../services/UserService";
-import { UserCreateSchema } from "../schemas/UserSchema.tsx";
+import { UserUpdateSchema } from "../schemas/UserSchema.tsx";
 import { useCropper } from "./useCropper";
 
-export const useCreateUser = (toastRef = null, fetchData = null) => {
+export const useUpdateUser = (toastRef = null, fetchData=null) => {
     const { token } = useAuth();
 
+    const [modalLoading, setModalLoading] = useState(false);
     const [visibleModal, setVisibleModal] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
     const [data, setData] = useState({
         name: "",
-        phoneNumber: "",
         email: "",
+        phoneNumber: "",
         password: "",
     });
-    const [profilePicture,setProfilePicture] = useState(null)
     const [errors, setErrors] = useState({});
+    const [profilePicture, setProfilePicture] = useState(null);
+    const [id, setId] = useState(0)
 
     const {
         fileInputRef,
@@ -33,38 +35,59 @@ export const useCreateUser = (toastRef = null, fetchData = null) => {
         resetCropper,
     } = useCropper({ setVisibleModal, setProfilePicture, toastRef });
 
-    // Buka Modal Create User
-    const handleVisibleModal = () => {
+    // Buka Modal Update Pengguna
+    const handleVisibleModal = async (userId) => {
+        setId(userId);
         resetCropper();
         setErrors({});
+        setModalLoading(true);
         setData({ name: "", phoneNumber: "", email: "", password: ""});
         setProfilePicture(null)
-        setVisibleModal(true);
+        try {
+            const userData = await UserService.getUser(userId, token);
+            setData(userData);
+            console.log(data)
+            setVisibleModal(true);
+        } catch (error) {
+            toastRef?.current?.show({
+                severity: "error",
+                detail: error.message,
+                life: 2000,
+            });
+        }
+
+        setModalLoading(false);
     };
 
-    // Tutup Modal Create User
+    // Tutup Modal Update Pengguna
     const handleCloseModal = () => setVisibleModal(false);
 
-    // Handle Submit Create User
+    // Handle Submit Update Pengguna
     const handleSubmit = async (e) => {
+        console.log("Data sebelum validasi:", data);
         e.preventDefault();
         setSubmitLoading(true);
         setErrors({});
 
         try {
-            const validatedData = UserCreateSchema.parse(data);
+            const validatedData = UserUpdateSchema.parse({
+                name: data?.name,
+                email: data?.email,
+                phoneNumber: data?.phoneNumber,
+                password: data?.password,
+            });
+            console.log(validatedData)
             const request = {
                 ...validatedData,
-                ...(profilePicture instanceof File ? { profilePicture: profilePicture } : {}),
+                ...(profilePicture instanceof File ? { profilePicture } : {}),
             };
 
-            await UserService.createUser(request, token);
-            toastRef.current?.show({
+            await UserService.updateUser(id, request, token);
+            toastRef?.current?.show({
                 severity: "success",
-                detail: "Pengguna berhasil dibuat",
+                detail: "Profil berhasil diperbarui",
                 life: 2000,
             });
-
             if (fetchData){
                 fetchData();
             }
@@ -73,18 +96,20 @@ export const useCreateUser = (toastRef = null, fetchData = null) => {
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({ ...acc, [err.path[0]]: err.message }), {}));
             } else {
-                toastRef.current?.show({
+                toastRef?.current?.show({
                     severity: "error",
                     detail: error.message,
                     life: 2000,
                 });
             }
         }
+
         setSubmitLoading(false);
     };
 
     return {
         toastRef,
+        modalLoading,
         visibleModal,
         submitLoading,
         data,

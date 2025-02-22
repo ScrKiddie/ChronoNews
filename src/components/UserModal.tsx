@@ -139,17 +139,17 @@ const ModalUser = ({
                                 id="password"
                                 className="w-full"
                                 invalid={errors.password}
-                                placeholder={isUserEditMode ? "Kosongkan jika tidak ingin mengubah password" : "Masukkan Password"}
+                                placeholder={"Masukkan Password"}
                                 value={data?.password || ""}
                                 onChange={(e) => {
                                     setData((prev) => ({...prev, password: e.target.value}));
                                     errors.password = false;
                                 }}
                                 toggleMask
-                                feedback={isUserCreateMode} // Feedback hanya di create mode
+                                feedback={false}
                             />
                             {errors.password && <small className="p-error">{errors.password}</small>}
-                            {isUserEditMode &&
+                            {isUserEditMode && !errors.password &&
                                 <small className="text-gray-500">Kosongkan jika tidak ingin mengubah password</small>}
                         </div>
                     )}

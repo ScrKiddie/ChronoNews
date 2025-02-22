@@ -1,115 +1,194 @@
 import React from "react";
-import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
-import {useCreateUser} from "../../hooks/useCreateUser.tsx";
+import { useCreateUser } from "../../hooks/useCreateUser.tsx";
+import { useUpdateUser } from "../../hooks/useUpdateUser.tsx";
 import UserModal from "../../components/UserModal.tsx";
 import CropImageModal from "../../components/CropImageModal.tsx";
-import {useToast} from "../../hooks/useToast.tsx";
+import useSearchUser from "../../hooks/useSearchUser.tsx";
+import ReusableTable from "../../components/ReusableTable.tsx";
+import ConnectionError from "../../components/ConnectionError.tsx";
+import { useToast } from "../../hooks/useToast.tsx";
+import { Column } from "primereact/column";
+import LoadingModal from "../../components/LoadingModal.tsx";
 
 const Jurnalis = () => {
     const toastRef = useToast();
+
+    // Hook untuk pencarian dan manajemen user list
+    const {
+        users,
+        loading,
+        searchParams,
+        setSearchParams,
+        page,
+        setPage,
+        size,
+        setSize,
+        totalItem,
+        fetchUsers,
+        handleSearch,
+        visibleConnectionError,
+        visibleLoadingConnection,
+    } = useSearchUser();
+
+    // Hook untuk CREATE user baru
     const {
         visibleModal: visibleUserCreateModal,
         submitLoading: submitUserCreateLoading,
         data: dataUserCreate,
         setData: setDataUserCreate,
-        errors: profileErrors,
+        errors: createUserErrors,
         handleVisibleModal: handleVisibleUserCreateModal,
         handleCloseModal: handleCloseUserCreateModal,
-        handleSubmit,
-        croppedImage,
-        fileInputRef,
-        handleClickUploadButton,
-        handleImageChange,
-        visibleCropImageModal,
-        handleCloseCropImageModal,
-        selectedImage,
-        handleCrop,
-        cropperRef,
-        imageRef
-    } = useCreateUser(toastRef);
+        handleSubmit: handleSubmitCreateUser,
+        croppedImage: croppedImageCreate,
+        fileInputRef: fileInputRefCreate,
+        handleClickUploadButton: handleClickUploadButtonCreate,
+        handleImageChange: handleImageChangeCreate,
+        visibleCropImageModal: visibleCropImageModalCreate,
+        handleCloseCropImageModal: handleCloseCropImageModalCreate,
+        selectedImage: selectedImageCreate,
+        handleCrop: handleCropCreate,
+        cropperRef: cropperRefCreate,
+        imageRef: imageRefCreate,
+    } = useCreateUser(toastRef, fetchUsers);
 
+    // Hook untuk UPDATE user
+    const {
+        visibleModal: visibleUserUpdateModal,
+        submitLoading: submitUserUpdateLoading,
+        data: dataUserUpdate,
+        setData: setDataUserUpdate,
+        errors: updateUserErrors,
+        handleVisibleModal: handleVisibleUserUpdateModal,
+        handleCloseModal: handleCloseUserUpdateModal,
+        handleSubmit: handleSubmitUpdateUser,
+        croppedImage: croppedImageUpdate,
+        fileInputRef: fileInputRefUpdate,
+        handleClickUploadButton: handleClickUploadButtonUpdate,
+        handleImageChange: handleImageChangeUpdate,
+        visibleCropImageModal: visibleCropImageModalUpdate,
+        handleCloseCropImageModal: handleCloseCropImageModalUpdate,
+        selectedImage: selectedImageUpdate,
+        handleCrop: handleCropUpdate,
+        cropperRef: cropperRefUpdate,
+        imageRef: imageRefUpdate,
+        modalLoading
+    } = useUpdateUser(toastRef, fetchUsers);
+
+    // Template Aksi dalam Tabel
+    const actionTemplate = (rowData) => {
+        return (
+            <div className="flex items-center justify-center gap-2">
+                {/* Tombol Edit */}
+                <Button
+                    icon={<i className="pi pi-pen-to-square" style={{ fontSize: '1.25rem' }}></i>}
+                    className="size-11"
+                    onClick={() => handleVisibleUserUpdateModal(rowData.id)}
+                />
+                {/* Tombol Hapus */}
+                <Button
+                    icon={<i className="pi pi-trash" style={{ fontSize: '1.25rem' }}></i>}
+                    severity="secondary"
+                    className="size-11"
+                    onClick={() => {}}
+                />
+            </div>
+        );
+    };
 
     return (
-        <div className="m-4 min-h-full  max-h-fit bg-white rounded-xl shadow-md p-4 flex flex-col">
-            {/* Pencarian */}
-            {/*<div className="flex flex-grow items-center justify-center text-center font-medium text-3xl">*/}
-            {/*    <div>*/}
-            {/*        Connection Lost*/}
-            {/*        <p className="font-normal text-xl mb-3 mt-1">*/}
-            {/*            It seems there is an error with your internet connection.*/}
-            {/*        </p>*/}
-            {/*        <Button severity="secondary">*/}
-            {/*            Retry*/}
-            {/*        </Button>*/}
-            {/*    </div>*/}
-            {/*</div>*/}
+        <div className="m-4 min-h-full max-h-fit bg-white rounded-xl shadow-md p-4 flex flex-col">
+            {/* Jika koneksi aman, tampilkan tabel */}
+            <div className={`${(visibleLoadingConnection || visibleConnectionError) ? "hidden" : "block"}`}>
+                <ReusableTable
+                    data={users}
+                    totalRecords={totalItem}
+                    page={page}
+                    size={size}
+                    onPageChange={(newPage, newSize) => {
+                        setPage(newPage);
+                        setSize(newSize);
+                    }}
+                    actionTemplate={actionTemplate}
+                    loading={loading}
+                    sizeOptions={[5, 10, 20, 50, 100]}
+                    searchParams={searchParams}
+                    setSearchParams={setSearchParams}
+                    onSearch={handleSearch}
+                    handleVisibleCreateModal={handleVisibleUserCreateModal}
+                >
+                    <Column className="text-center" field="name" header={<p className="text-center font-medium">Nama</p>} />
+                    <Column className="text-center" field="email" header={<p className="text-center font-medium">Email</p>} />
+                    <Column className="text-center" field="phoneNumber" header={<p className="text-center font-medium">Telepon</p>} />
+                    <Column body={actionTemplate} className="text-center" header={<p className="text-center font-medium">Aksi</p>} />
+                </ReusableTable>
+            </div>
 
-            {/*<div className="flex flex-grow items-center justify-center">*/}
-            {/*    <i className="pi pi-spin pi-spinner text-[10vh]"*/}
-            {/*       style={{color: '#64748b', animationDuration: '1s'}}></i>*/}
-            {/*</div>*/}
-            <>
-                <div className="flex justify-between mb-4">
-                    <div className="p-inputgroup w-full size-11">
-                        <InputText placeholder="Search..."/>
-                        <Button icon={<i className={`pi pi-search`} style={{fontSize: '1.25rem'}}></i>}
-                                className="w-11 h-11"/>
-                    </div>
-                    <Button
-                        icon={<i className={`pi pi-user-plus`} style={{fontSize: '1.25rem'}}></i>}
-                        severity="secondary"
-                        className="ml-2 w-11 h-11 min-w-[44px] min-h-[44px]"
-                        onClick={handleVisibleUserCreateModal}
-                    />
-                </div>
-                {/*<DataTable*/}
-                {/*    value={filteredData}*/}
-                {/*    paginator*/}
-                {/*    rows={10}*/}
-                {/*    showGridlines*/}
-                {/*    size={"small"}*/}
-                {/*>*/}
-                {/*    <Column className={`text-center`} field="name"*/}
-                {/*            header={<p className="text-center font-medium">Nama</p>}/>*/}
-                {/*    <Column className={`text-center`} field="email"*/}
-                {/*            header={<p className="text-center font-medium">Email</p>}/>*/}
-                {/*    <Column className={`text-center`} field="phone"*/}
-                {/*            header={<p className="text-center font-medium">Telepon</p>}/>*/}
-                {/*    <Column body={actionTemplate} className={`text-center`} field="nomor"*/}
-                {/*            header={<p className="text-center font-medium">Aksi</p>}/>*/}
-                {/*</DataTable>*/}
-            </>
+            {/* Error koneksi */}
+            <ConnectionError
+                visibleConnectionError={visibleConnectionError}
+                onRetry={fetchUsers}
+                visibleLoadingConnection={visibleLoadingConnection}
+            />
 
-
-            {/*modal create user*/}
+            {/* Modal Create User */}
             <UserModal
                 isUserCreateMode={true}
                 visible={visibleUserCreateModal}
                 onClose={handleCloseUserCreateModal}
                 data={dataUserCreate}
-                croppedImage={croppedImage}
-                fileInputRef={fileInputRef}
-                errors={profileErrors}
+                croppedImage={croppedImageCreate}
+                fileInputRef={fileInputRefCreate}
+                errors={createUserErrors}
                 submitLoading={submitUserCreateLoading}
-                handleSubmit={handleSubmit}
-                handleClickUploadButton={handleClickUploadButton}
-                handleImageChange={handleImageChange}
+                handleSubmit={handleSubmitCreateUser}
+                handleClickUploadButton={handleClickUploadButtonCreate}
+                handleImageChange={handleImageChangeCreate}
                 setData={setDataUserCreate}
             />
 
-            {/*modal cropper*/}
-            <CropImageModal
-                id={"user-cropper"}
-                visible={visibleCropImageModal}
-                onClose={handleCloseCropImageModal}
-                selectedImage={selectedImage}
-                onCrop={handleCrop}
-                cropperRef={cropperRef}
-                imageRef={imageRef}
+            {/*modal loading*/}
+            <LoadingModal
+                modalLoading={modalLoading}
+            />
+            {/* Modal Update User */}
+            <UserModal
+                isUserEditMode={true}
+                visible={visibleUserUpdateModal}
+                onClose={handleCloseUserUpdateModal}
+                data={dataUserUpdate}
+                croppedImage={croppedImageUpdate}
+                fileInputRef={fileInputRefUpdate}
+                errors={updateUserErrors}
+                submitLoading={submitUserUpdateLoading}
+                handleSubmit={handleSubmitUpdateUser}
+                handleClickUploadButton={handleClickUploadButtonUpdate}
+                handleImageChange={handleImageChangeUpdate}
+                setData={setDataUserUpdate}
             />
 
+            {/* Modal Cropper untuk Create */}
+            <CropImageModal
+                id="user-cropper"
+                visible={visibleCropImageModalCreate}
+                onClose={handleCloseCropImageModalCreate}
+                selectedImage={selectedImageCreate}
+                onCrop={handleCropCreate}
+                cropperRef={cropperRefCreate}
+                imageRef={imageRefCreate}
+            />
 
+            {/* Modal Cropper untuk Update */}
+            <CropImageModal
+                id="user-cropper"
+                visible={visibleCropImageModalUpdate}
+                onClose={handleCloseCropImageModalUpdate}
+                selectedImage={selectedImageUpdate}
+                onCrop={handleCropUpdate}
+                cropperRef={cropperRefUpdate}
+                imageRef={imageRefUpdate}
+            />
         </div>
     );
 };
