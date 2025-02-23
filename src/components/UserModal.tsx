@@ -3,7 +3,7 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import defaultProfilePicture from "../../public/profilepicture.svg";
-const ModalUser = ({
+const UserModal = ({
                        visible,
                        onClose,
                        data,
@@ -17,7 +17,6 @@ const ModalUser = ({
                        handleImageChange,
                        isUserCreateMode,
                        isUserEditMode,
-                       isProfileMode,
                    }) => {
     return (
         <Dialog
@@ -160,4 +159,4 @@ const ModalUser = ({
     );
 };
 
-export default ModalUser;
+export default UserModal;

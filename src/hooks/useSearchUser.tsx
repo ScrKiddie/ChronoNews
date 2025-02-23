@@ -6,7 +6,7 @@ import { useAuth } from "./useAuth.tsx";
 const useSearchUser = () => {
     const toastRef = useToast();
     const { token } = useAuth();
-    const [users, setUsers] = useState([]);
+    const [data, setData] = useState([]);
     const [searchParams, setSearchParams] = useState({ name: "", phoneNumber: "", email: "" });
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(5);
@@ -15,10 +15,10 @@ const useSearchUser = () => {
     const [visibleLoadingConnection, setVisibleLoadingConnection] = useState(false);
 
     useEffect(() => {
-        fetchUsers();
+        fetchData();
     }, [page, size]);
 
-    const fetchUsers = async () => {
+    const fetchData = async () => {
         setVisibleConnectionError(false);
         setVisibleLoadingConnection(true);
         try {
@@ -33,7 +33,7 @@ const useSearchUser = () => {
             const response = await UserService.searchUser(token, filters);
 
             if (response && response.data) {
-                setUsers(response.data);
+                setData(response.data);
                 setTotalItem(response.pagination.totalItem);
             }
         } catch (error) {
@@ -48,11 +48,11 @@ const useSearchUser = () => {
 
     const handleSearch = () => {
         setPage(1);
-        fetchUsers();
+        fetchData();
     };
 
     return {
-        users,
+        data,
         searchParams,
         setSearchParams,
         page,
@@ -60,7 +60,7 @@ const useSearchUser = () => {
         size,
         setSize,
         totalItem,
-        fetchUsers,
+        fetchData,
         handleSearch,
         visibleConnectionError,
         visibleLoadingConnection,

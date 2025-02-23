@@ -1,0 +1,171 @@
+import { useEffect, useState } from "react";
+import { z } from "zod";
+import { useAuth } from "./useAuth";
+import { CategoryService } from "../services/CategoryService";
+import { CategorySchema } from "../schemas/CategorySchema";
+
+export const useCategory = (toastRef = null) => {
+    const { token } = useAuth();
+
+    // State untuk modal dan form
+    const [modalLoading, setModalLoading] = useState(false);
+    const [visibleModal, setVisibleModal] = useState(false);
+    const [submitLoading, setSubmitLoading] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [id, setId] = useState(null);
+    const [data, setData] = useState({ name: "" }); // Data kategori yang sedang dibuat/diedit
+    const [errors, setErrors] = useState({});
+    const [visibleDeleteModal, setVisibleDeleteModal] = useState(false)
+    // State untuk daftar kategori
+    const [listData, setListData] = useState([]); // Daftar kategori dari API
+    const [visibleConnectionError, setVisibleConnectionError] = useState(false);
+    const [visibleLoadingConnection, setVisibleLoadingConnection] = useState(false);
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const handleOpenCreateModal = () => {
+        setIsEditMode(false);
+        setErrors({});
+        setData({ name: "" }); // Reset form
+        setId(null);
+        setVisibleModal(true);
+    };
+
+    const handleOpenEditModal = async (id) => {
+        setIsEditMode(true);
+        setId(id);
+        setErrors({});
+        setModalLoading(true);
+        setData({ name: "" });
+
+        try {
+            const categoryData = await CategoryService.getCategory(id, token);
+            if (categoryData) {
+                setData(categoryData);
+            }
+            setVisibleModal(true);
+        } catch (error) {
+            toastRef?.current?.show({
+                severity: "error",
+                detail: error.message,
+                life: 2000,
+            });
+        }
+
+        setModalLoading(false);
+    };
+
+    const handleVisibleDeleteModal = (id)=>{
+        setId(id);
+        setVisibleDeleteModal(true)
+    }
+
+
+
+    const handleCloseModal = () => {
+        setVisibleModal(false);
+        setData({ name: "" }); // Reset form saat modal ditutup
+    };
+
+    const fetchData = async () => {
+        setVisibleConnectionError(false);
+        setVisibleLoadingConnection(true);
+        try {
+            const response = await CategoryService.listCategories(token);
+            if (response && Array.isArray(response.data)) {
+                setListData(response.data); // Simpan daftar kategori di listData
+            }
+        } catch (error) {
+            if (!error.response) {
+                setVisibleConnectionError(true);
+            } else {
+                toastRef?.current?.show({
+                    severity: "error",
+                    detail: error.message,
+                    life: 2000,
+                });
+            }
+        }
+        setVisibleLoadingConnection(false);
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setSubmitLoading(true);
+        setErrors({});
+
+        try {
+            const validatedData = CategorySchema.parse(data);
+            if (isEditMode) {
+                await CategoryService.updateCategory(id, validatedData, token);
+                toastRef?.current?.show({
+                    severity: "success",
+                    detail: "Kategori berhasil diperbarui",
+                    life: 2000,
+                });
+            } else {
+                await CategoryService.createCategory(validatedData, token);
+                toastRef?.current?.show({
+                    severity: "success",
+                    detail: "Kategori berhasil dibuat",
+                    life: 2000,
+                });
+            }
+
+            fetchData(); // Refresh list setelah submit
+            setVisibleModal(false);
+        } catch (error) {
+            if (error instanceof z.ZodError) {
+                setErrors(error.errors.reduce((acc, err) => ({ ...acc, [err.path[0]]: err.message }), {}));
+            } else {
+                toastRef?.current?.show({
+                    severity: "error",
+                    detail: error.message,
+                    life: 2000,
+                });
+            }
+        }
+        setSubmitLoading(false);
+    };
+
+    const handleSubmitDelete = async () => {
+        setSubmitLoading(true);
+        try {
+            await CategoryService.deleteCategory(id, token);
+            toastRef?.current?.show({ severity: "success", detail: "Kategori berhasil dihapus" });
+            if (fetchData){
+                fetchData()
+            }
+            setVisibleDeleteModal(false)
+        } catch (error) {
+            toastRef?.current?.show({ severity: "error", detail: error.message });
+        } finally {
+            setSubmitLoading(false);
+        }
+    };
+
+    return {
+        toastRef,
+        modalLoading,
+        visibleModal,
+        submitLoading,
+        data,
+        listData, // Daftar kategori yang benar
+        errors,
+        isEditMode,
+        handleOpenCreateModal,
+        handleOpenEditModal,
+        handleCloseModal,
+        handleSubmit,
+        setData,
+        visibleLoadingConnection,
+        visibleConnectionError,
+        fetchData,
+        handleVisibleDeleteModal,
+        setVisibleDeleteModal,
+        visibleDeleteModal,
+        handleSubmitDelete
+    };
+};

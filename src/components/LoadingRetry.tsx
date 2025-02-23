@@ -7,7 +7,7 @@ interface ConnectionErrorProps {
     onRetry?: () => void;
 }
 
-const ConnectionError: React.FC<ConnectionErrorProps> = ({visibleConnectionError, onRetry, visibleLoadingConnection}) => {
+const LoadingRetry: React.FC<ConnectionErrorProps> = ({visibleConnectionError, onRetry, visibleLoadingConnection}) => {
     if (!visibleConnectionError && !visibleLoadingConnection ) return null;
 
     return (
@@ -44,4 +44,4 @@ const ConnectionError: React.FC<ConnectionErrorProps> = ({visibleConnectionError
 
 };
 
-export default ConnectionError;
+export default LoadingRetry;

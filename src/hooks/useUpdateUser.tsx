@@ -44,8 +44,8 @@ export const useUpdateUser = (toastRef = null, fetchData=null) => {
         setData({ name: "", phoneNumber: "", email: "", password: ""});
         setProfilePicture(null)
         try {
-            const userData = await UserService.getUser(userId, token);
-            setData(userData);
+            const response = await UserService.getUser(userId, token);
+            setData(response);
             console.log(data)
             setVisibleModal(true);
         } catch (error) {

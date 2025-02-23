@@ -5,20 +5,20 @@ import {useUpdateUser} from "../../hooks/useUpdateUser.tsx";
 import UserModal from "../../components/UserModal.tsx";
 import CropImageModal from "../../components/CropImageModal.tsx";
 import useSearchUser from "../../hooks/useSearchUser.tsx";
-import ReusableTable from "../../components/ReusableTable.tsx";
-import ConnectionError from "../../components/ConnectionError.tsx";
+import ReusableLazyTable from "../../components/ReusableLazyTable.tsx";
+import LoadingRetry from "../../components/LoadingRetry.tsx";
 import {useToast} from "../../hooks/useToast.tsx";
 import {Column} from "primereact/column";
 import LoadingModal from "../../components/LoadingModal.tsx";
 import {useDeleteUser} from "../../hooks/useDeleteUser.tsx";
 import DeleteModal from "../../components/DeleteModal.tsx";
 
-const Jurnalis = () => {
+const Journalist = () => {
     const toastRef = useToast();
 
     // Hook untuk pencarian dan manajemen user list
     const {
-        users,
+        data,
         searchParams,
         setSearchParams,
         page,
@@ -26,7 +26,7 @@ const Jurnalis = () => {
         size,
         setSize,
         totalItem,
-        fetchUsers,
+        fetchData,
         handleSearch,
         visibleConnectionError,
         visibleLoadingConnection,
@@ -52,7 +52,7 @@ const Jurnalis = () => {
         handleCrop: handleCropCreate,
         cropperRef: cropperRefCreate,
         imageRef: imageRefCreate,
-    } = useCreateUser(toastRef, fetchUsers);
+    } = useCreateUser(toastRef, fetchData);
 
     // Hook untuk UPDATE user
     const {
@@ -75,7 +75,7 @@ const Jurnalis = () => {
         cropperRef: cropperRefUpdate,
         imageRef: imageRefUpdate,
         modalLoading
-    } = useUpdateUser(toastRef, fetchUsers);
+    } = useUpdateUser(toastRef, fetchData);
 
     const {
         handleSubmit: handleSubmitDeleteUser,
@@ -83,7 +83,7 @@ const Jurnalis = () => {
         visibleModal: visibleUserDeleteModal,
         handleVisibleModal: handleVisibleUserDeleteModal,
         setVisibleModal: setVisibleUserDeleteModal
-    } = useDeleteUser(toastRef, fetchUsers);
+    } = useDeleteUser(toastRef, fetchData);
 
     // Template Aksi dalam Tabel
     const actionTemplate = (rowData) => {
@@ -91,7 +91,7 @@ const Jurnalis = () => {
             <div className="flex items-center justify-center gap-2">
                 {/* Tombol Edit */}
                 <Button
-                    icon={<i className="pi pi-pen-to-square" style={{fontSize: '1.25rem'}}></i>}
+                    icon={<i className="pi pi-pen-to-square" style={{ fontSize: '1.4rem' }}></i>}
                     className="size-11"
                     onClick={() => handleVisibleUserUpdateModal(rowData.id)}
                 />
@@ -112,8 +112,8 @@ const Jurnalis = () => {
         <div className="m-4 min-h-full max-h-fit bg-white rounded-xl shadow-md p-4 flex flex-col">
             {/* Jika koneksi aman, tampilkan tabel */}
             <div className={`${(visibleLoadingConnection || visibleConnectionError) ? "hidden" : "block"}`}>
-                <ReusableTable
-                    data={users}
+                <ReusableLazyTable
+                    data={data}
                     totalItem={totalItem}
                     page={page}
                     size={size}
@@ -121,8 +121,6 @@ const Jurnalis = () => {
                         setPage(newPage);
                         setSize(newSize);
                     }}
-                    actionTemplate={actionTemplate}
-                    sizeOptions={[5, 10, 20, 50, 100]}
                     searchParams={searchParams}
                     setSearchParams={setSearchParams}
                     onSearch={handleSearch}
@@ -136,13 +134,13 @@ const Jurnalis = () => {
                             header={<p className="text-center font-medium">Telepon</p>}/>
                     <Column body={actionTemplate} className="text-center"
                             header={<p className="text-center font-medium">Aksi</p>}/>
-                </ReusableTable>
+                </ReusableLazyTable>
             </div>
 
             {/* Error koneksi */}
-            <ConnectionError
+            <LoadingRetry
                 visibleConnectionError={visibleConnectionError}
-                onRetry={fetchUsers}
+                onRetry={fetchData}
                 visibleLoadingConnection={visibleLoadingConnection}
             />
 
@@ -215,4 +213,4 @@ const Jurnalis = () => {
     );
 };
 
-export default Jurnalis;
+export default Journalist;

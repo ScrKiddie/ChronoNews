@@ -1,75 +1,50 @@
-import React from "react";
+import React, { useState } from "react";
 import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 
 const ReusableTable = ({
                            handleVisibleCreateModal,
                            data,
-                           totalItem,
-                           page,
-                           size,
-                           onPageChange,
-                           actionTemplate,
-                           sizeOptions,
-                           searchParams,
-                           setSearchParams,
-                           onSearch,
-                            children
-
+                           children
                        }) => {
+    const [globalFilter, setGlobalFilter] = useState("");
     return (
         <div>
             {/* Search Input */}
             <div className="flex justify-between mb-4 md:flex-row flex-col gap-2">
-                <div className="flex justify-end  gap-2" >
-                <div className="p-inputgroup w-full size-11">
-                    <InputText
-                        placeholder="Search..."
-                        value={searchParams.name || searchParams.email || searchParams.phoneNumber}
-                        onChange={(e) => {
-                            setSearchParams({
-                                ...searchParams,
-                                email: e.target.value,
-                                name: e.target.value,
-                                phoneNumber: e.target.value
-                            });
-                        }}
-                    />
+                <div className="flex justify-end gap-2">
+                    <div className="p-inputgroup w-full size-11">
+                        <InputText
+                            placeholder="Search"
+                            value={globalFilter}
+                            onChange={(e) => setGlobalFilter(e.target.value)}
+                        />
+
+                    </div>
                     <Button
-                        icon={<i className="pi pi-sync" style={{fontSize: '1.25rem'}}></i>}
-                        className="w-11 h-11"
-                        onClick={onSearch}
+                        icon={<i className="pi pi-plus-circle" style={{ fontSize: '1.45rem' }}></i>}
+                        severity="secondary"
+                        className="w-11 h-11 min-w-[44px] min-h-[44px]"
+                        onClick={handleVisibleCreateModal}
                     />
                 </div>
-                <Button
-                    icon={<i className="pi pi-plus-circle" style={{fontSize: '1.45rem'}}></i>}
-                    severity="secondary"
-                    className="w-11 h-11 min-w-[44px] min-h-[44px]"
-                    onClick={handleVisibleCreateModal}
-                />
             </div>
-        </div>
 
-    {/* Data Table */
-    }
-    <DataTable
-        value={data}
-        paginator
-        rows={size}
-        totalRecords={totalItem}
-        lazy
-        first={(page - 1) * size}
-        onPage={(e) => onPageChange(e.page + 1, e.rows)}
-        showGridlines
+            {/* Data Table */}
+            <DataTable
+                value={data}
+                paginator
+                showGridlines
                 size={"small"}
+                rows={5}
+                globalFilter={globalFilter}
+                filterDisplay="menu"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                rowsPerPageOptions={sizeOptions}
-        currentPageReportTemplate={`Menampilkan ${totalItem == 0 ? 0 : Math.min((page - 1) * size + 1, totalItem)} hingga ${Math.min(page * size, totalItem)} dari ${totalItem} data`}
+                rowsPerPageOptions={[5, 10, 20, 50, 100]}
+                currentPageReportTemplate={`Menampilkan {first} hingga {last} dari {totalRecords} data`}
             >
-        {children}
-
+                {children}
             </DataTable>
         </div>
     );

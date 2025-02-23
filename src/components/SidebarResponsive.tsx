@@ -123,12 +123,12 @@ const SidebarResponsive = ({children}) => {
                     <div className="flex py-[17px] w-full items-center gap-4 justify-between">
                         <Button severity="secondary" onClick={() => setCollapsed(!collapsed)} text rounded
                                 className={`size-8 hidden md:flex`}
-                                icon={<i className={`pi ${collapsed ? "pi-arrow-right" : "pi-arrow-left"} text-md`}/>}/>
+                                icon={<i className={`pi ${collapsed ? "pi-arrow-right" : "pi-arrow-left"} text-xl`}/>}/>
                         <Button severity="secondary" onClick={() => setToggled(!toggled)} text rounded
                                 className={`size-8 flex md:hidden`}
                                 icon={<i className={`pi pi-arrow-right text-md`}/>}/>
                         <Button ref={buttonRef} severity="secondary" onClick={toggleMenuVisibility} text rounded
-                                className={`size-8`} icon={<i className={`pi pi-bars text-md`}/>}/>
+                                className={`size-8`} icon={<i className={`pi pi-bars text-xl`}/>}/>
                         <div ref={menuContainerRef} className={`absolute top-0 right-0`}>
                             <PrimeMenu
                                 key={key}
@@ -179,7 +179,6 @@ const SidebarResponsive = ({children}) => {
 
             {/*modal update profile*/}
             <UserModal
-                isProfileMode={true}
                 visible={visibleProfileModal}
                 onClose={handleCloseProfileModal}
                 data={dataProfile}

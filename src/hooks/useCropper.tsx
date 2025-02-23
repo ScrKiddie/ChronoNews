@@ -7,7 +7,7 @@ export const useCropper = ({ setVisibleModal = () => {}, setProfilePicture = nul
     const [croppedImage, setCroppedImage] = useState(null);
     const imageRef = useRef(null);
     const cropperRef = useRef(null);
-
+    const [imageFormat, setImageFormat] = useState("image/jpeg");
     // Handle Upload Gambar
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -40,6 +40,8 @@ export const useCropper = ({ setVisibleModal = () => {}, setProfilePicture = nul
             e.target.value = "";
             return;
         }
+
+        setImageFormat(file.type);
 
         const reader = new FileReader();
         reader.onload = () => {
@@ -79,15 +81,16 @@ export const useCropper = ({ setVisibleModal = () => {}, setProfilePicture = nul
 
                     setCroppedImage(URL.createObjectURL(blob));
 
-                    if(setProfilePicture){
-                        const file = new File([blob], "profile.jpg", {
-                            type: "image/jpeg",
+                    if (setProfilePicture) {
+                        const fileExtension = imageFormat.split("/")[1]; // Ambil ekstensi dari format
+                        const file = new File([blob], `profile.${fileExtension}`, {
+                            type: imageFormat, // Gunakan format asli
                         });
                         setProfilePicture(file);
                     }
 
                 }
-            }, "image/jpeg", 0.9);
+            }, imageFormat);
 
         }
 

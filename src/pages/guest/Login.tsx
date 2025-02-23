@@ -34,8 +34,6 @@ const Login: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        toastRef.current?.clear();
-
 
         const result = loginSchema.safeParse({ email, password });
 
