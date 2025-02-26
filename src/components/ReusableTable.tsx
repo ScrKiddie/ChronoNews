@@ -24,7 +24,6 @@ const ReusableTable = ({
                     </div>
                     <Button
                         icon={<i className="pi pi-plus-circle" style={{ fontSize: '1.45rem' }}></i>}
-                        severity="secondary"
                         className="w-11 h-11 min-w-[44px] min-h-[44px]"
                         onClick={handleVisibleCreateModal}
                     />

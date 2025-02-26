@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "./useAuth.tsx";
 import {useNavigate} from "react-router-dom";
+import {useToast} from "./useToast.tsx";
 export const useSidebar = () => {
+    const toastRef = useToast();
     const [collapsed, setCollapsed] = useState(false);
     const [toggled, setToggled] = useState(false);
     const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -13,18 +15,16 @@ export const useSidebar = () => {
     const navigate = useNavigate();
     const onLogout= () =>{
         logout();
+        toastRef.current?.show({ severity: "success", detail: "Berhasil keluar dari sistem", life: 2000 });
         navigate("/login");
     }
-    // Mengatur visibilitas label menu sidebar
+
     useEffect(() => {
         document.querySelectorAll('.ps-menu-label').forEach((menuLabel) => {
             menuLabel.style.display = collapsed ? "none" : "block";
         });
     }, [collapsed]);
 
-
-
-    // Menyesuaikan sidebar berdasarkan ukuran layar
     useEffect(() => {
         const checkViewportWidth = () => {
             if (window.innerWidth <= 768) {

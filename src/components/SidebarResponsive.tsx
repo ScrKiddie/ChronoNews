@@ -59,13 +59,13 @@ const SidebarResponsive = ({children}) => {
     } = useProfile(toastRef);
 
     const {
-            submitLoading: submitPasswordLoading,
-            errors: passwordErrors,
-            data: passwordData,
-            handleVisibleModal: handleVisiblePasswordModal,
-            handleCloseModal: handleClosePasswordModal,
-            handleSubmit: handlePasswordSubmit,
-            setData: setPasswordData,
+        submitLoading: submitPasswordLoading,
+        errors: passwordErrors,
+        data: passwordData,
+        handleVisibleModal: handleVisiblePasswordModal,
+        handleCloseModal: handleClosePasswordModal,
+        handleSubmit: handlePasswordSubmit,
+        setData: setPasswordData,
         visibleModal: visiblePasswordModal
     } = usePassword(toastRef);
 
@@ -112,8 +112,10 @@ const SidebarResponsive = ({children}) => {
                                         link={"/admin/beranda"}/>
                     <MenuItemResponsive collapsed={collapsed} icon={`pi pi-users
                     `} label={"Jurnalis"} link={"/admin/jurnalis"}/>
-                    <MenuItemResponsive collapsed={collapsed} icon={`pi pi-list
+                    <MenuItemResponsive collapsed={collapsed} icon={`pi pi-paperclip
                     `} label={"Kategori"} link={"/admin/kategori"}/>
+                    <MenuItemResponsive collapsed={collapsed} icon={`pi pi-file
+                    `} label={"Berita"} link={"/admin/berita"}/>
 
                 </Menu>
             </Sidebar>
@@ -151,11 +153,12 @@ const SidebarResponsive = ({children}) => {
                                         }
 
                                     },
-                                    {label: "Keluar", icon: <i className="pi pi-sign-out pr-3"/>,
-                                    command() {
-                                        setIsMenuVisible(false);
-                                        setIsModalLogoutVisible(true);
-                                    }
+                                    {
+                                        label: "Keluar", icon: <i className="pi pi-sign-out pr-3"/>,
+                                        command() {
+                                            setIsMenuVisible(false);
+                                            setIsModalLogoutVisible(true);
+                                        }
                                     },
                                 ]}
                             />
@@ -173,9 +176,6 @@ const SidebarResponsive = ({children}) => {
                 </div>
 
             </nav>
-
-            {/*toast ini*/}
-            <Toast ref={toastRef} position="top-center"/>
 
             {/*modal update profile*/}
             <UserModal

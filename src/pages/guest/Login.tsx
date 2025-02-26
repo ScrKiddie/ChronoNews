@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
 import { useAuth } from "../../hooks/useAuth.tsx";
 import { loginSchema } from "../../schemas/authSchema";
 import { loginUser } from "../../services/authService";
@@ -25,11 +24,6 @@ const Login: React.FC = () => {
         }
     }, [token, navigate]);
 
-    const showToast = (severity: "error" | "success", detail: string) => {
-        if (toastRef.current) {
-            toastRef.current.show({ severity, detail, life: 2000 });
-        }
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -53,9 +47,10 @@ const Login: React.FC = () => {
         try {
             const response = await loginUser({ email, password });
             login(response.data);
+            toastRef.current?.show({ severity:"success", detail:"Berhasil masuk ke sistem", life: 2000 });
             navigate("/admin/beranda");
-        } catch (error: any) {
-            showToast("error", error.message);
+        } catch (error) {
+            toastRef.current?.show({ severity:"error", detail:error.message, life: 2000 });
         } finally {
             setLoading(false);
         }
@@ -63,8 +58,6 @@ const Login: React.FC = () => {
 
     return (
         <div className="flex justify-center flex-col items-center h-screen bg-cover bg-center md:bg-[#f2f2f2]">
-            <Toast ref={toastRef} position="top-center" />
-
             <div className="md:w-[90%] md:h-[90%] lg:w-[40%] flex items-center justify-center bg-white flex-col rounded-xl md:shadow-md">
                 <div className="md:w-[80%] lg:w-[80%]">
                     <div className="flex items-center justify-center flex-col">

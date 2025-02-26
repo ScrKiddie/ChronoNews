@@ -17,6 +17,7 @@
     "cropperjs": "^1.6.2",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
+    "lodash": "^4.17.21",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.2",
     "react": "^19.0.0",
