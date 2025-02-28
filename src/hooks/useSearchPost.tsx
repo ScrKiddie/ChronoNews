@@ -5,7 +5,7 @@ import { useAuth } from "./useAuth.tsx";
 
 const useSearchPost = () => {
     const toastRef = useToast();
-    const { token } = useAuth();
+    const { token, sub , role } = useAuth();
     const [data, setData] = useState([]);
     const [searchParams, setSearchParams] = useState({
         title: "",
@@ -39,7 +39,9 @@ const useSearchPost = () => {
                 page: page.toString(),
                 size: size.toString(),
             };
-
+            if (role == "journalist"){
+                filters.userID = sub
+            }
             const response = await PostService.searchPost(token, filters);
 
             if (response && response.data) {

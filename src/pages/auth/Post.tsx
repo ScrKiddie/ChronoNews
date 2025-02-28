@@ -53,7 +53,8 @@ const Journalist = () => {
         imageRef: imageRefCreate,
         modalLoading: modalCreateLoading,
         categoryOptions:categoryOptionsCreate,
-        userOptions:userOptionsCreate
+        userOptions:userOptionsCreate,
+        role:roleCreate
     } = useCreatePost(toastRef, fetchData);
 
     // Hook untuk UPDATE post
@@ -78,7 +79,8 @@ const Journalist = () => {
         imageRef: imageRefUpdate,
         modalLoading: modalUpdateLoading,
         categoryOptions: categoryOptionsUpdate,
-        userOptions:userOptionsUpdate
+        userOptions:userOptionsUpdate,
+        role: roleUpdate,
     } = useUpdatePost(toastRef, fetchData);
 
     const {
@@ -87,7 +89,7 @@ const Journalist = () => {
         visibleModal: visiblePostDeleteModal,
         handleVisibleModal: handleVisiblePostDeleteModal,
         setVisibleModal: setVisiblePostDeleteModal
-    } = useDeletePost(toastRef, fetchData);
+    } = useDeletePost(toastRef, fetchData, page, setPage, totalItem, size);
 
     // Template Aksi dalam Tabel
     const actionTemplate = (rowData) => {
@@ -170,6 +172,7 @@ const Journalist = () => {
 
             {/* Modal Create Post */}
             <PostModal
+                role={roleCreate}
                 userOptions={userOptionsCreate}
                 categoryOptions={categoryOptionsCreate}
                 isEditMode={false}
@@ -205,6 +208,7 @@ const Journalist = () => {
 
             {/*/!* Modal Update Post *!/*/}
             <PostModal
+                role={roleUpdate}
                 userOptions={userOptionsUpdate}
                 isEditMode={true}
                 visible={visiblePostUpdateModal}

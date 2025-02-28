@@ -82,7 +82,7 @@ const Journalist = () => {
         visibleModal: visibleUserDeleteModal,
         handleVisibleModal: handleVisibleUserDeleteModal,
         setVisibleModal: setVisibleUserDeleteModal
-    } = useDeleteUser(toastRef, fetchData);
+    } = useDeleteUser(toastRef, fetchData, page, setPage, totalItem, size);
 
     // Template Aksi dalam Tabel
     const actionTemplate = (rowData) => {

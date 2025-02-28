@@ -8,7 +8,7 @@ import { useCropper } from "./useCropper";
 import {UserService} from "../services/UserService.tsx";
 
 export const useCreatePost = (toastRef = null, fetchData = null) => {
-    const { token } = useAuth();
+    const { token, role } = useAuth();
 
     const [visibleModal, setVisibleModal] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
@@ -57,16 +57,19 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
                     value: category.id,
                 })));
             }
-            const responseUsers = await UserService.searchUser(token);
-            if (responseUsers && Array.isArray(responseUsers.data)) {
-                setUserOptions([
-                    { label: "Posting Sebagai Diri Sendiri", value: 0 },
-                    ...responseUsers.data.map(user => ({
-                        label: `${user.name} - ${user.phoneNumber} - ${user.email} - ${user.role}`,
-                        value: user.id,
-                    })),
-                ]);
+            if (role == "admin"){
+                const responseUsers = await UserService.searchUser(token);
+                if (responseUsers && Array.isArray(responseUsers.data)) {
+                    setUserOptions([
+                        { label: "Posting Sebagai Diri Sendiri", value: 0 },
+                        ...responseUsers.data.map(user => ({
+                            label: `${user.name} - ${user.phoneNumber} - ${user.email} - ${user.role}`,
+                            value: user.id,
+                        })),
+                    ]);
+                }
             }
+
 
             setVisibleModal(true);
         } catch (error) {
@@ -146,5 +149,6 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
         handleImageChange,
         handleCloseCropImageModal,
         handleClickUploadButton,
+        role
     };
 };

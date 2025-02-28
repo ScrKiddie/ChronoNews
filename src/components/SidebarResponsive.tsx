@@ -15,9 +15,10 @@ import LogoutModal from "./LogoutModal.tsx";
 import {usePassword} from "../hooks/usePassword.tsx";
 import PasswordModal from "./PasswordModal.tsx";
 import {useToast} from "../hooks/useToast.tsx";
+import {useAuth} from "../hooks/useAuth.tsx";
 
 const SidebarResponsive = ({children}) => {
-
+    const { role } = useAuth();
     const toastRef = useToast();
     const {
         collapsed,
@@ -110,10 +111,12 @@ const SidebarResponsive = ({children}) => {
 
                     <MenuItemResponsive collapsed={collapsed} icon={`pi pi-qrcode`} label={"Beranda"}
                                         link={"/admin/beranda"}/>
-                    <MenuItemResponsive collapsed={collapsed} icon={`pi pi-users
+                    {role == "admin" ?  (<>
+                        <MenuItemResponsive collapsed={collapsed} icon={`pi pi-users
                     `} label={"Jurnalis"} link={"/admin/jurnalis"}/>
-                    <MenuItemResponsive collapsed={collapsed} icon={`pi pi-paperclip
+                        <MenuItemResponsive collapsed={collapsed} icon={`pi pi-paperclip
                     `} label={"Kategori"} link={"/admin/kategori"}/>
+                    </>) : ""}
                     <MenuItemResponsive collapsed={collapsed} icon={`pi pi-file
                     `} label={"Berita"} link={"/admin/post"}/>
 

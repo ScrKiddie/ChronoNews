@@ -8,7 +8,7 @@ import { useCropper } from "./useCropper";
 import {UserService} from "../services/UserService.tsx";
 
 export const useUpdatePost = (toastRef = null, fetchData = null) => {
-    const { token } = useAuth();
+    const { token,role } = useAuth();
 
     const [modalLoading, setModalLoading] = useState(false);
     const [visibleModal, setVisibleModal] = useState(false);
@@ -95,7 +95,7 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
                     value: category.id,
                 })));
             }
-
+            if (role == "admin"){
             const responseUsers = await UserService.searchUser(token);
             if (responseUsers && Array.isArray(responseUsers.data)) {
                 setUserOptions([
@@ -105,6 +105,7 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
                         value: user.id,
                     })),
                 ]);
+            }
             }
 
             // Ambil data post berdasarkan ID
@@ -214,5 +215,6 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         handleImageChange,
         handleCloseCropImageModal,
         handleClickUploadButton,
+        role
     };
 };

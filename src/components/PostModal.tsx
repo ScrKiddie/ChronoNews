@@ -22,6 +22,7 @@ const PostModal = ({
                        categoryOptions = [],
                        userOptions = [],
                        isEditMode,
+                       role="admin"
                    }) => {
 
     useQuillConfig();
@@ -75,29 +76,33 @@ const PostModal = ({
                         />
                         {errors.title && <small className="p-error">{errors.title}</small>}
                     </div>
+                    {
+                        role == "admin" ? (
+                            <div className="w-full">
+                                <label htmlFor="userID" className="block mb-1 font-medium">
+                                    Penulis
+                                </label>
 
-                    <div className="w-full">
-                        <label htmlFor="userID" className="block mb-1 font-medium">
-                            Penulis
-                        </label>
+                                <Dropdown
+                                    id="userID"
+                                    className="w-full"
+                                    filter
+                                    invalid={!!errors.userID}
+                                    placeholder="Posting Sebagai Diri Sendiri"
+                                    value={data?.userID || null}
+                                    options={userOptions}
+                                    onChange={(e) => {
+                                        setData((prev) => ({...prev, userID: e.value}));
+                                        console.log(data)
+                                        console.log(e.value)
+                                        errors.userID = false;
+                                    }}
+                                />
+                                {errors.userID && <small className="p-error">{errors.userID}</small>}
+                            </div>
+                        ) : ""
+                    }
 
-                        <Dropdown
-                            id="userID"
-                            className="w-full"
-                            filter
-                            invalid={!!errors.userID}
-                            placeholder="Posting Sebagai Diri Sendiri"
-                            value={data?.userID || null}
-                            options={userOptions}
-                            onChange={(e) => {
-                                setData((prev) => ({...prev, userID: e.value}));
-                                console.log(data)
-                                console.log(e.value)
-                                errors.userID = false;
-                            }}
-                        />
-                        {errors.userID && <small className="p-error">{errors.userID}</small>}
-                    </div>
 
                     <div className="w-full flex flex-col ">
                         <label htmlFor="name" className="block mb-1 font-medium">

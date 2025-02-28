@@ -20,6 +20,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [token, setToken] = useState<string | null>(null);
+    const [sub, setSub] = useState<number | null>(null);
     const [role, setRole] = useState<string | null>(null);
     const [isAuthChecked, setIsAuthChecked] = useState(false);
 
@@ -35,6 +36,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 } else {
                     setToken(savedToken);
                     setRole(decoded.role);
+                    setSub(decoded.sub);
                 }
             } catch (error) {
                 console.error("Token tidak valid", error);
@@ -50,6 +52,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             setToken(token);
             setRole(decoded.role);
+            setSub(decoded.sub);
             setIsAuthChecked(true);
 
             const currentTime = Math.floor(Date.now() / 1000);
@@ -71,11 +74,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const logout = () => {
         setToken(null);
         setRole(null);
+        setSub(null)
         Cookies.remove("token");
     };
 
     return (
-        <AuthContext.Provider value={{ token, role, isAuthChecked, login, logout }}>
+        <AuthContext.Provider value={{ sub, token, role, isAuthChecked, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
