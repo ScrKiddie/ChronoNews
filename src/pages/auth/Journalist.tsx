@@ -27,7 +27,6 @@ const Journalist = () => {
         setSize,
         totalItem,
         fetchData,
-        handleSearch,
         visibleConnectionError,
         visibleLoadingConnection,
     } = useSearchUser();
@@ -123,7 +122,6 @@ const Journalist = () => {
                     }}
                     searchParams={searchParams}
                     setSearchParams={setSearchParams}
-                    onSearch={handleSearch}
                     handleVisibleCreateModal={handleVisibleUserCreateModal}
                 >
                     <Column className="text-center" field="name"
@@ -132,6 +130,8 @@ const Journalist = () => {
                             header={<p className="text-center font-medium">Email</p>}/>
                     <Column className="text-center" field="phoneNumber"
                             header={<p className="text-center font-medium">Telepon</p>}/>
+                    <Column className="text-center" field="role"
+                            header={<p className="text-center font-medium">Role</p>}/>
                     <Column body={actionTemplate} className="text-center"
                             header={<p className="text-center font-medium">Aksi</p>}/>
                 </ReusableLazyTable>

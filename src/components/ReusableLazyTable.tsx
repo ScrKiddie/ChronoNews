@@ -26,7 +26,12 @@ const ReusableLazyTable = ({
                     ...prev,
                     email: value,
                     name: value,
-                    phoneNumber: value
+                    phoneNumber: value,
+                    title: value,
+                    categoryName: value,
+                    userName: value,
+                    summary: value,
+                    role: value
                 };
             });
         }, 300), // 300ms delay
@@ -35,12 +40,9 @@ const ReusableLazyTable = ({
 
     const handleSearchChange = (e) => {
         setSearchValue(e.target.value);
+        console.log(e.target.value)
         debouncedSearch(e.target.value);
     };
-
-    useEffect(() => {
-        onSearch();
-    }, [searchParams]);
 
     return (
         <div>

@@ -13,6 +13,7 @@ export const useUpdateUser = (toastRef = null, fetchData=null) => {
     const [submitLoading, setSubmitLoading] = useState(false);
     const [data, setData] = useState({
         name: "",
+        role: "",
         email: "",
         phoneNumber: "",
         password: "",
@@ -41,7 +42,7 @@ export const useUpdateUser = (toastRef = null, fetchData=null) => {
         resetCropper();
         setErrors({});
         setModalLoading(true);
-        setData({ name: "", phoneNumber: "", email: "", password: ""});
+        setData({ name: "", role: "", phoneNumber: "", email: "", password: ""});
         setProfilePicture(null)
         try {
             const response = await UserService.getUser(userId, token);
@@ -70,12 +71,7 @@ export const useUpdateUser = (toastRef = null, fetchData=null) => {
         setErrors({});
 
         try {
-            const validatedData = UserUpdateSchema.parse({
-                name: data?.name,
-                email: data?.email,
-                phoneNumber: data?.phoneNumber,
-                password: data?.password,
-            });
+            const validatedData = UserUpdateSchema.parse(data);
             console.log(validatedData)
             const request = {
                 ...validatedData,

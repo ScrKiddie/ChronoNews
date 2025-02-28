@@ -96,6 +96,22 @@ export const UserCreateSchema = z.object({
             });
         }
     }),
+    role: z.string().superRefine((value, ctx) => {
+        if (value.trim().length === 0) {
+            ctx.addIssue({
+                code: "custom",
+                message: "Role tidak boleh kosong",
+            });
+            return;
+        }
+
+        if (!["admin", "journalist"].includes(value)) {
+            ctx.addIssue({
+                code: "custom",
+                message: 'Role harus salah satu dari "admin" atau "jurnalis"',
+            });
+        }
+    }),
 });
 
 export const UserUpdateSchema = z.object({
@@ -190,6 +206,22 @@ export const UserUpdateSchema = z.object({
             });
         }
     }).optional(),
+    role: z.string().superRefine((value, ctx) => {
+        if (value.trim().length === 0) {
+            ctx.addIssue({
+                code: "custom",
+                message: "Role tidak boleh kosong",
+            });
+            return;
+        }
+
+        if (!["admin", "journalist"].includes(value)) {
+            ctx.addIssue({
+                code: "custom",
+                message: 'Role harus salah satu dari "admin" atau "jurnalis"',
+            });
+        }
+    }),
 });
 
 

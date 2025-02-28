@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 
-export const useCropper = ({ setVisibleModal = () => {}, setProfilePicture = null, toastRef = null } = {}) => {
+export const useCropper = ({ setVisibleModal = () => {}, setProfilePicture = null, toastRef = null, width = 320, height=320 } = {}) => {
     const fileInputRef = useRef(null);
     const [selectedImage, setSelectedImage] = useState(null);
     const [visibleCropImageModal, setVisibleCropImageModal] = useState(false);
@@ -74,13 +74,13 @@ export const useCropper = ({ setVisibleModal = () => {}, setProfilePicture = nul
     // Handle Crop Gambar
     const handleCrop = () => {
         if (cropperRef.current) {
-            const canvas = cropperRef.current.getCroppedCanvas({ width: 320, height: 320 });
+            const canvas = cropperRef.current.getCroppedCanvas({ width: width, height: height });
 
             canvas.toBlob((blob) => {
                 if (blob) {
 
                     setCroppedImage(URL.createObjectURL(blob));
-
+                    console.log(setProfilePicture)
                     if (setProfilePicture) {
                         const fileExtension = imageFormat.split("/")[1]; // Ambil ekstensi dari format
                         const file = new File([blob], `profile.${fileExtension}`, {

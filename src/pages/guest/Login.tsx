@@ -63,7 +63,7 @@ const Login: React.FC = () => {
                     <div className="flex items-center justify-center flex-col">
                         <img src={chronoverseLogo} className="md:w-1/3 w-1/2" alt="Chronoverse Logo"/>
                         <h1 className="m-0 text-[#475569] font-extrabold">
-                            CHRONO <span className="text-[#f59e0b]">VERSE</span>
+                            CHRONO<span className="text-[#f59e0b]">VERSE</span>
                         </h1>
                     </div>
 

@@ -100,7 +100,21 @@ p {
 .text-justify {
     overflow-wrap: break-word;
     word-break: break-word;
+
 }
+
+.ql-snow .ql-tooltip{
+    box-shadow: none !important;
+    border-radius: 4px;
+    color: black !important;
+    z-index: 9999999 !important;
+}
+
+.ql-tooltip input{
+    border: 1px solid #d1d5db !important;
+    border-radius: 4px;
+}
+
 
 .ql-editor {
     font-family: "Poppins";
@@ -125,7 +139,7 @@ body {
     overflow-y: auto;
 }
 .ql-tooltip {
-    z-index: 1200 !important;
+    z-index: 10000 !important;
     font-family: "Poppins";
 }
 .ql-blank,
@@ -133,7 +147,7 @@ body {
     background-color: rgba(255, 255, 255, 0) !important;
 }
 .ql-editor.ql-blank::before {
-    color: #495057 !important;
+    color: #747b88 !important;
     content: attr(data-placeholder) !important;
     font-style: normal !important;
 }
@@ -293,4 +307,16 @@ body .navbar-top{
 }
 .p-confirm-dialog-message{
     font-size: 18px;
+}
+
+.ql-formats{
+    margin-right: 0px !important;
+}
+.ql-container{
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+.ql-toolbar{
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
 }

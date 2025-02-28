@@ -7,6 +7,7 @@ import NotFound from "../pages/guest/NotFound";
 import Loading from "../pages/guest/Loading.tsx";
 import SidebarResponsive from "../components/SidebarResponsive";
 import Category from "../pages/auth/Category.tsx";
+import Post from "../pages/auth/Post.tsx";
 
 const GuestRoutes = () => {
     const { token, isAuthChecked } = useAuth();
@@ -24,6 +25,7 @@ const GuestRoutes = () => {
                 <Route path="/beranda" element={<SidebarResponsive><Beranda /></SidebarResponsive>} />
                 <Route path="/jurnalis" element={<SidebarResponsive><Journalist /></SidebarResponsive>} />
                 <Route path="/kategori" element={<SidebarResponsive><Category /></SidebarResponsive>} />
+                <Route path="/post" element={<SidebarResponsive><Post /></SidebarResponsive>} />
                 <Route path="/*" element={<NotFound />} />
             </Routes>
     );

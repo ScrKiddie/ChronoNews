@@ -3,6 +3,8 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import defaultProfilePicture from "../../public/profilepicture.svg";
+import React from "react";
+import {Dropdown} from "primereact/dropdown";
 const UserModal = ({
                        visible,
                        onClose,
@@ -18,6 +20,10 @@ const UserModal = ({
                        isUserCreateMode,
                        isUserEditMode,
                    }) => {
+    const roleOptions = [
+        { label: "Admin", value: "admin" },
+        { label: "Journalist", value: "journalist" },
+    ];
     return (
         <Dialog
             header={
@@ -38,30 +44,34 @@ const UserModal = ({
                 <div className="flex flex-col p-4 gap-4">
                     {/* Avatar hanya untuk mode profile */}
                     <div className="relative w-fit mx-auto flex justify-center items-center">
+                        {/* Gambar Profil Bulat */}
                         <img
-                            src={croppedImage || (data?.profilePicture ? `http://localhost:3000/profile_picture/${data?.profilePicture}` : `${defaultProfilePicture}`)}
-                            className=" size-[14rem] bg-[#f49f14] rounded-full"
-                            style={{
-                                border: "4px solid #f59e0b",
-                            }}
+                            src={
+                                croppedImage ||
+                                (data?.profilePicture
+                                    ? `http://localhost:3000/profile_picture/${data?.profilePicture}`
+                                    : `${defaultProfilePicture}`)
+                            }
+                            className="size-[14rem] rounded-full "
+                            style={{border: "1px solid #d1d5db"}}
                         />
 
                         {/* Tombol Upload Gambar */}
                         <Button
                             onClick={handleClickUploadButton}
-                            icon={<i className="pi pi-image block" style={{fontSize: "1.3rem"}}></i>}
                             type="button"
-                            className="absolute bottom-3 right-3 rounded-full size-[3rem]"
-                        />
-                        <input
-                            ref={fileInputRef}
-                            id="file-upload"
-                            type="file"
-                            accept="image/png, image/jpeg, image/jpg"
-                            onChange={handleImageChange}
-                            className="hidden"
+                            className="absolute inset-0 w-full h-full bg-transparent flex items-center justify-center hover:bg-black/20 transition rounded-full"
                         />
                     </div>
+
+                    <input
+                        ref={fileInputRef}
+                        id="file-upload"
+                        type="file"
+                        accept="image/png, image/jpeg, image/jpg"
+                        onChange={handleImageChange}
+                        className="hidden"
+                    />
 
                     <div className="w-full">
                         <label htmlFor="name" className="block mb-1 font-medium">
@@ -81,6 +91,26 @@ const UserModal = ({
                         {errors.name && <small className="p-error">{errors.name}</small>}
                     </div>
 
+                    {(isUserCreateMode || isUserEditMode) && (
+                        <div className="w-full">
+                            <label htmlFor="role" className="block mb-1 font-medium">
+                                Role
+                            </label>
+                            <Dropdown
+                                id="role"
+                                className="w-full"
+                                options={roleOptions}
+                                value={data?.role || null}
+                                onChange={(e) => {
+                                    setData((prev) => ({ ...prev, role: e.value }));
+                                    errors.role = false;
+                                }}
+                                invalid={errors.role}
+                                placeholder="Pilih Role"
+                            />
+                            {errors.role && <small className="p-error">{errors.role}</small>}
+                        </div>
+                    )}
                     <div className="w-full">
                         <label htmlFor="email" className="block mb-1 font-medium">
                             Email

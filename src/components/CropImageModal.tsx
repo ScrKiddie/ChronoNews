@@ -5,6 +5,7 @@ import { Button } from "primereact/button";
 
 const CropImageModal = ({
                             id="",
+                            aspectRatio=1,
                              visible,
                              onClose,
                              selectedImage,
@@ -28,7 +29,7 @@ const CropImageModal = ({
                     cropperRef.current === null
                 ) {
                     cropperRef.current = new Cropper(imageRef.current, {
-                        aspectRatio: 1,
+                        aspectRatio: aspectRatio,
                         viewMode: 1,
                         autoCropArea: 1,
                         movable: true,

@@ -15,6 +15,7 @@ export const useCreateUser = (toastRef = null, fetchData = null) => {
         phoneNumber: "",
         email: "",
         password: "",
+        role: ""
     });
     const [profilePicture,setProfilePicture] = useState(null)
     const [errors, setErrors] = useState({});
@@ -37,7 +38,7 @@ export const useCreateUser = (toastRef = null, fetchData = null) => {
     const handleVisibleModal = () => {
         resetCropper();
         setErrors({});
-        setData({ name: "", phoneNumber: "", email: "", password: ""});
+        setData({ name: "", phoneNumber: "", email: "", password: "", role: ""});
         setProfilePicture(null)
         setVisibleModal(true);
     };

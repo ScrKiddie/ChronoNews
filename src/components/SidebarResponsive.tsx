@@ -115,7 +115,7 @@ const SidebarResponsive = ({children}) => {
                     <MenuItemResponsive collapsed={collapsed} icon={`pi pi-paperclip
                     `} label={"Kategori"} link={"/admin/kategori"}/>
                     <MenuItemResponsive collapsed={collapsed} icon={`pi pi-file
-                    `} label={"Berita"} link={"/admin/berita"}/>
+                    `} label={"Berita"} link={"/admin/post"}/>
 
                 </Menu>
             </Sidebar>

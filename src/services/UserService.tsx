@@ -10,6 +10,7 @@ export const UserService = {
             formData.append("phoneNumber", data.phoneNumber);
             formData.append("email", data.email);
             formData.append("password", data.password);
+            formData.append("role", data.role);
             if (data.profilePicture) {
                 formData.append("profilePicture", data.profilePicture);
             }
@@ -28,8 +29,8 @@ export const UserService = {
     },
     searchUser: async (token, filters = {}) => {
         try {
-            const { name = "", phoneNumber = "", email = "", page = "", size = "" } = filters;
-            const queryParams = new URLSearchParams({ name, phoneNumber, email, page, size }).toString();
+            const { name = "", phoneNumber = "", email = "", page = "", size = "",role="" } = filters;
+            const queryParams = new URLSearchParams({ name, phoneNumber, email, page, size,role }).toString();
             const url = `${API_URL}/user?${queryParams}`;
 
             const response = await axios.get(url, {
@@ -62,6 +63,7 @@ export const UserService = {
             formData.append("name", data.name);
             formData.append("phoneNumber", data.phoneNumber);
             formData.append("email", data.email);
+            formData.append("role", data.role);
             if (data.password) {
                 formData.append("password", data.password);
             }
