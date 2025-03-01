@@ -8,6 +8,7 @@ html, body {
     min-height: 100vh;
     width: 100%;
     overflow-x: hidden;
+    background-color: #f2f2f2;
 }
 
 small{
@@ -51,6 +52,7 @@ small{
     z-index: 900 !important;
     border-radius: 10px;
 }
+
 h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     margin: 0;
@@ -319,4 +321,35 @@ body .navbar-top{
 .ql-toolbar{
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
+}
+.p-tabmenu-nav, .p-menuitem-link{
+    font-weight: 500;
+    border-radius: 0px;
+}
+
+.menu-news span{
+    color: #6b7280 !important;
+}
+
+.grid-custom .p-grid{
+    display:flex;
+    gap: 14px;
+    justify-content: center;
+
+}
+
+@media screen and (max-width: 768px) {
+    .grid-custom .p-grid {
+        display: grid;}}
+
+@media (min-width: 1024px) {
+    .p-tabmenu-nav {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+.p-dataview-emptymessage{
+    text-align: center;
 }
