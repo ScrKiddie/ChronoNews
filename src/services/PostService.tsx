@@ -57,13 +57,9 @@ export const PostService = {
         }
     },
 
-    getPost: async (id, token) => {
+    getPost: async (id) => {
         try {
-            const response = await axios.get(`${API_URL}/post/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
+            const response = await axios.get(`${API_URL}/post/${id}`);
 
             return response.data.data;
         } catch (error) {

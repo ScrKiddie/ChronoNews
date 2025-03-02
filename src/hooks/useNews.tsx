@@ -1,10 +1,14 @@
 import { useState, useEffect, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Menu } from "primereact/menu";
 import { PostService } from "../services/PostService";
 import { CategoryService } from "../services/CategoryService"; // Import service kategori
 
 const useNews = () => {
-    const [activeIndex, setActiveIndex] = useState(0);
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    const [activeIndex, setActiveIndex] = useState(-1);
     const [searchQuery, setSearchQuery] = useState("");
 
     const [headlineNews, setHeadlineNews] = useState(null);
@@ -31,6 +35,19 @@ const useNews = () => {
     const [error, setError] = useState("");
 
     const token = localStorage.getItem("token");
+
+    const [headlineMode, setHeadlineMode] = useState(true);
+
+    useEffect(() => {
+        const handleScroll = (event: Event) => {
+            menuRef.current?.hide(event);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+        };
+    }, []);
 
     // Fetch daftar kategori dari API
     const fetchCategories = async () => {
@@ -116,33 +133,65 @@ const useNews = () => {
         fetchCategories();
     }, []);
 
-    // Handle perubahan kategori
+    // **Menentukan active index berdasarkan path**
+    useEffect(() => {
+        const path = location.pathname.replace("/", ""); // Ambil path tanpa "/"
+
+        // Cek apakah path berupa angka integer > 0
+        if (!isNaN(Number(path)) && Number(path) > 0) {
+            setHeadlineMode(false);
+            setActiveIndex(-1);
+            return;
+        }else {
+            setHeadlineMode(true);
+        }
+
+        // Cek apakah path kosong (beranda)
+        if (!path) {
+            setActiveIndex(0);
+            return;
+        }
+
+        // Cek kategori utama
+        const primaryCategories = categories.slice(0, 3);
+        const remainingCategories = categories.slice(3);
+
+        let foundIndex = primaryCategories.findIndex(cat => cat.name.toLowerCase() === path.toLowerCase());
+
+        if (foundIndex !== -1) {
+            setActiveIndex(foundIndex + 1); // Karena index 0 adalah "Home"
+            return;
+        }
+
+        // Cek kategori di "Lainnya"
+        const isInMoreCategories = remainingCategories.some(cat => cat.name.toLowerCase() === path.toLowerCase());
+
+        if (isInMoreCategories) {
+            setActiveIndex(4);
+            return;
+        }
+
+        // Jika tidak cocok dengan kategori mana pun, kembali ke Home (0)
+        setActiveIndex(0);
+    }, [location.pathname, categories]);
+
+    // Handle perubahan kategori dengan mengubah path URL
     const handleCategoryChange = (category: string) => {
         setSelectedCategory(category);
         setHeadlinePage(1);
         setTopNewsPage(1);
         setNewsPage(1);
+
+        navigate(`/${category.toLowerCase()}`);
     };
 
-    // Sembunyikan menu saat scroll
-    useEffect(() => {
-        const handleScroll = (event: Event) => {
-            menuRef.current?.hide(event);
-        };
-
-        window.addEventListener("scroll", handleScroll);
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-        };
-    }, []);
-
     // Maksimal 3 kategori utama selain "Home", sisanya masuk ke dropdown "Lainnya"
-    const primaryCategories = categories.slice(0, 3); // Ambil 3 kategori pertama
-    const remainingCategories = categories.slice(3); // Sisanya masuk ke menu "Lainnya"
+    const primaryCategories = categories.slice(0, 3);
+    const remainingCategories = categories.slice(3);
 
     const allCategories = [
         { label: "Home", command: () => handleCategoryChange("Home") },
-        ...primaryCategories.map((cat) => ({
+        ...primaryCategories.map((cat, index) => ({
             label: cat.name,
             command: () => handleCategoryChange(cat.name),
         })),
@@ -154,8 +203,8 @@ const useNews = () => {
     const moreCategories = remainingCategories.map((cat) => ({
         label: cat.name,
         command: () => {
-            handleCategoryChange(cat.name)
-            setActiveIndex(4)
+            handleCategoryChange(cat.name);
+            setActiveIndex(4);
         },
     }));
 
@@ -185,7 +234,9 @@ const useNews = () => {
         handleCategoryChange,
         topNewsSize,
         headlineSize,
-        newsSize
+        newsSize,
+        headlineMode,
+        setHeadlineMode
     };
 };
 

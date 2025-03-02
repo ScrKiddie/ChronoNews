@@ -215,6 +215,7 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         handleImageChange,
         handleCloseCropImageModal,
         handleClickUploadButton,
-        role
+        role,
+        processContent
     };
 };

@@ -38,13 +38,13 @@ const PostHeadline: React.FC<PostHeadlineProps> = ({
                             src={news.thumbnail ? `http://localhost:3000/post_picture/${news.thumbnail}` : thumbnail}
                             alt={news.title}
                             className="w-full md:h-[480px] h-[240px] object-cover rounded-t-lg bg-[#f59e0b] cursor-pointer"
-                            onClick={() => navigate(`/news/${news.id}`)}
+                            onClick={() => navigate(`/${news.id}`)}
                         />
 
                         <div className="p-4 min-h-[240px] md:min-h-[160px]">
                             <h3
                                 className="text-2xl font-semibold w-fit text-[#4b5563] cursor-pointer"
-                                onClick={() => navigate(`/news/${news.id}`)}
+                                onClick={() => navigate(`/${news.id}`)}
                             >
                                 {truncateText(news.title, 50)}
                             </h3>
