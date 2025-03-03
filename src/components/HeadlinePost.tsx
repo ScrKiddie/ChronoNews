@@ -12,7 +12,7 @@ interface PostHeadlineProps {
     headlineSize: number;
 }
 
-const PostHeadline: React.FC<PostHeadlineProps> = ({
+const HeadlinePost: React.FC<PostHeadlineProps> = ({
                                                        headlineNews,
                                                        headlinePage,
                                                        setHeadlinePage,
@@ -49,7 +49,7 @@ const PostHeadline: React.FC<PostHeadlineProps> = ({
                                 {truncateText(news.title, 50)}
                             </h3>
                             <p className="text-gray-600">{news.user.name} - {news.publishedDate}</p>
-                            <p className="text-gray-600 mt-2">
+                            <p className="text-gray-600 mt-1">
                                 {truncateText(news.summary, 150)}
                             </p>
                         </div>
@@ -70,4 +70,4 @@ const PostHeadline: React.FC<PostHeadlineProps> = ({
     );
 };
 
-export default PostHeadline;
+export default HeadlinePost;

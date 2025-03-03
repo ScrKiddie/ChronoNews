@@ -1,6 +1,6 @@
 import {Sidebar, Menu} from "react-pro-sidebar";
 import chronoverseLogo from "../../public/chronoverse.svg";
-import React from "react";
+import React, {useEffect, useRef} from "react";
 import MenuItemResponsive from "./MenuItemResponsive.tsx";
 import {Button} from "primereact/button";
 import {Menu as PrimeMenu} from "primereact/menu";
@@ -16,6 +16,7 @@ import {usePassword} from "../hooks/usePassword.tsx";
 import PasswordModal from "./PasswordModal.tsx";
 import {useToast} from "../hooks/useToast.tsx";
 import {useAuth} from "../hooks/useAuth.tsx";
+import {useLocation} from "react-router-dom";
 
 const SidebarResponsive = ({children}) => {
     const { role } = useAuth();
@@ -69,6 +70,15 @@ const SidebarResponsive = ({children}) => {
         setData: setPasswordData,
         visibleModal: visiblePasswordModal
     } = usePassword(toastRef);
+
+    const scrollRef = useRef(null);
+
+    const { pathname } = useLocation();
+    useEffect(() => {
+        if (scrollRef.current ) {
+            scrollRef.current.scrollTop = 0;
+        }
+    }, [pathname]);
 
     return (
         <div className="flex h-screen w-full">
@@ -168,7 +178,7 @@ const SidebarResponsive = ({children}) => {
                         </div>
                     </div>
                 </div>
-                <div className="flex-grow bg-[#f2f2f2] overflow-y-scroll w-full overflow-x-auto ">
+                <div ref={scrollRef} className="flex-grow bg-[#f2f2f2] overflow-y-auto w-full overflow-x-hidden ">
                     {children}
                     <footer
                         className=" border-t-[1px] flex flex-col gap-4 bg-white border-[#aeb0b5] py-2 md:pr-2 md:text-end text-sm pr-0 text-center">
