@@ -3,7 +3,6 @@ import {useLocation, useNavigate, useParams} from "react-router-dom";
 import { Menu } from "primereact/menu";
 import { PostService } from "../services/PostService";
 import { CategoryService } from "../services/CategoryService";
-import NotFound from "../pages/guest/NotFound.tsx";
 import {useUpdatePost} from "./useUpdatePost.tsx";
 
 const getRelativeTime = (timestamp: number) => {
@@ -82,8 +81,8 @@ const useNews = () => {
     const menuRef = useRef<Menu>(null);
     const [selectedCategory, setSelectedCategory] = useState("");
     const [categories, setCategories] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
 
     const token = localStorage.getItem("token");
 
@@ -109,6 +108,10 @@ const useNews = () => {
     });
 
     const [notFound, setNotFound] = useState(false);
+    const [retry, setRetry] = useState(0);
+    const handleRetry = () => {
+        setRetry(prevRetry => prevRetry + 1);
+    };
 
     const getSearchQueryFromUrl = () => {
         const params = new URLSearchParams(location.search);
@@ -128,18 +131,29 @@ const useNews = () => {
 
     // Fetch daftar kategori dari API
     const fetchCategories = async () => {
+        setError(false)
+        setLoading(true)
         try {
             const response = await CategoryService.listCategories(token);
             if (Array.isArray(response.data)) {
                 setCategories(response.data);
             }
         } catch (error) {
-            console.error("Error fetching categories:", error);
+            if (!error.response) {
+                console.log(error)
+                setError(true)
+            } else {
+               console.log(error)
+            }
+        }finally {
+            setLoading(false)
         }
     };
 
     // Fetch berita headline
     const fetchHeadlineNews = async (category = "") => {
+        setLoading(true);
+        setError(false)
         try {
             const filters = {
                 categoryName: category !== "Home" ? category : "",
@@ -157,13 +171,20 @@ const useNews = () => {
 
             setHeadlinePagination(pagination);
         } catch (error) {
-            console.error("Error fetching headline news:", error);
+            if (!error.response) {
+                console.log(error)
+                setError(true)
+            } else {
+                console.log(error)
+            }
+        }finally {
+            setLoading(false);
         }
     };
 
     const fetchSearchNews = async (query = "", category = "") => {
         setLoading(true);
-        setError("");
+        setError(false);
 
         try {
             const filters = {
@@ -185,8 +206,12 @@ const useNews = () => {
 
             setSearchNewsPagination(pagination);
         } catch (error) {
-            setError("Gagal memuat berita.");
-            console.error("Error fetching news:", error);
+            if (!error.response) {
+                console.log(error)
+                setError(true)
+            } else {
+                console.log(error)
+            }
         } finally {
             setLoading(false);
         }
@@ -195,6 +220,8 @@ const useNews = () => {
 
     // Fetch berita top news
     const fetchTopNews = async (category = "") => {
+        setError(false)
+        setLoading(true);
         try {
             const filters = {
                 categoryName: category !== "Home" ? category : "",
@@ -210,14 +237,21 @@ const useNews = () => {
             })));
             setTopNewsPagination(pagination);
         } catch (error) {
-            console.error("Error fetching top news:", error);
+            if (!error.response) {
+                console.log(error)
+                setError(true)
+            } else {
+                console.log(error)
+            }
+        }finally {
+            setLoading(false)
         }
     };
 
     // Fetch berita reguler
     const fetchNews = async (category = "") => {
         setLoading(true);
-        setError("");
+        setError(false);
 
         try {
             const filters = {
@@ -234,8 +268,12 @@ const useNews = () => {
             })));
             setNewsPagination(pagination);
         } catch (error) {
-            setError("Gagal memuat berita. Silakan coba lagi.");
-            console.error("Error fetching news:", error);
+            if (!error.response) {
+                console.log(error)
+                setError(true)
+            } else {
+                console.log(error)
+            }
         } finally {
             setLoading(false);
         }
@@ -246,11 +284,13 @@ const useNews = () => {
         if (headlineMode){
             fetchHeadlineNews(selectedCategory);
         }
-    }, [selectedCategory, headlinePage, headlineMode]);
+    }, [selectedCategory, headlinePage, headlineMode, retry]);
 
     useEffect(() => {
-        fetchTopNews(selectedCategory);
-    }, [selectedCategory, topNewsPage]);
+        if (!searchMode){
+            fetchTopNews(selectedCategory);
+        }
+    }, [selectedCategory, topNewsPage, retry]);
 
     useEffect(() => {
         fetchNews(selectedCategory);
@@ -283,6 +323,8 @@ const useNews = () => {
             setHeadlineMode(false);
             setActiveIndex(-1);
             const fetchPost = async () => {
+                setLoading(true);
+                setError(false)
                 try {
                     const post = await PostService.getPost(id);
                     setPost(prevPost => ({
@@ -300,8 +342,16 @@ const useNews = () => {
                     setSelectedCategory("")
                     setNotFound(false);
                 } catch (error) {
-                    console.error("Gagal mengambil data post:", error.message);
-                    setNotFound(true);
+                    if (!error.response) {
+                        console.log(error)
+                        setError(true)
+                    } else {
+                        console.log(error)
+                        setNotFound(true);
+                    }
+
+                }finally {
+                    setLoading(false)
                 }
             };
             fetchPost();
@@ -338,7 +388,7 @@ const useNews = () => {
         // Jika tidak cocok dengan kategori mana pun, kembali ke Home (0)
         setActiveIndex(0);
 
-    }, [id, categories,location.search, newsPage]);
+    }, [id, categories,location.search, newsPage, retry]);
 
 
 
@@ -419,7 +469,8 @@ const useNews = () => {
         searchNewsPage,
         searchNewsPagination,
         searchNewsSize,
-        setSearchNewsPage
+        setSearchNewsPage,
+        handleRetry
     };
 };
 

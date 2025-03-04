@@ -24,6 +24,8 @@ import NotFound from "./NotFound.tsx";
 import MainPost from "../../components/MainPost.tsx";
 import TopPost from "../../components/TopPost.tsx";
 import RegularPost from "../../components/RegularPost.tsx";
+import Loading from "./Loading.tsx";
+import LoadingRetry from "../../components/LoadingRetry.tsx";
 
 const News: React.FC = () => {
     const {
@@ -65,7 +67,8 @@ const News: React.FC = () => {
         searchNewsSize,
         searchNewsPagination,
         searchNewsPage,
-        setSearchNewsPage
+        setSearchNewsPage,
+        handleRetry
     } = useNews();
 
     const navigate = useNavigate();
@@ -148,62 +151,68 @@ const News: React.FC = () => {
             {/* Content */}
             {/* Content */}
             <div className="p-4 mx-auto max-w-4xl bg-white lg:pt-20 pt-32 rounded-md min-h-screen">
-                {/* Jika dalam mode pencarian, hanya tampilkan RegularPost */}
-                {searchMode ? (
-                    <>
-                        <h3 className={`text-[#4b5563] lg:mb-2 font-medium`}>Hasil Pencarian Untuk
-                            : {getSearchQueryFromUrl()}</h3>
-                        <RegularPost
-                            classKu = "mt-2"
-                            posts={searchNews}
-                            postPage={searchNewsPage}
-                            setPostPage={setSearchNewsPage}
-                            postSize={searchNewsSize}
-                            postPagination={searchNewsPagination}
-                            truncateText={truncateText}
-                        /></>
-                ) : (
-                    <>
-                        {/* Jika dalam mode headline, tampilkan HeadlinePost */}
-                        {headlineMode ? (
-                            <HeadlinePost
-                                headlineNews={headlineNews}
-                                headlinePage={headlinePage}
-                                setHeadlinePage={setHeadlinePage}
-                                headlinePagination={headlinePagination}
-                                headlineSize={headlineSize}
+            {(error || loading) ?
+                <LoadingRetry visibleConnectionError={error} visibleLoadingConnection={loading} onRetry={handleRetry}/>
+                :
+                <>
+                    {/* Jika dalam mode pencarian, hanya tampilkan RegularPost */}
+                    {searchMode ? (
+                        <>
+                            <h3 className={`text-[#4b5563] lg:mb-2 font-medium`}>Hasil Pencarian Untuk
+                                : {getSearchQueryFromUrl()}</h3>
+                            <RegularPost
+                                classKu="mt-2"
+                                posts={searchNews}
+                                postPage={searchNewsPage}
+                                setPostPage={setSearchNewsPage}
+                                postSize={searchNewsSize}
+                                postPagination={searchNewsPagination}
+                                truncateText={truncateText}
+                            /></>
+                    ) : (
+                        <>
+                            {/* Jika dalam mode headline, tampilkan HeadlinePost */}
+                            {headlineMode ? (
+                                <HeadlinePost
+                                    headlineNews={headlineNews}
+                                    headlinePage={headlinePage}
+                                    setHeadlinePage={setHeadlinePage}
+                                    headlinePagination={headlinePagination}
+                                    headlineSize={headlineSize}
+                                />
+                            ) : (
+                                <>
+                                    {/* Jika bukan mode headline, tampilkan MainPost */}
+                                    <MainPost post={post}/>
+                                    <h3 className="text-[#4b5563]">Berita Lainnya</h3>
+                                </>
+                            )}
+
+                            {/* Top News - hanya tampil jika bukan searchMode */}
+                            <TopPost
+                                topPosts={topNews}
+                                topPostPage={topNewsPage}
+                                setTopPostPage={setTopNewsPage}
+                                topPostSize={topNewsSize}
+                                topPostPagination={topNewsPagination}
+                                truncateText={truncateText}
                             />
-                        ) : (
-                            <>
-                                {/* Jika bukan mode headline, tampilkan MainPost */}
-                                <MainPost post={post}/>
-                                <h3 className="text-[#4b5563]">Berita Lainnya</h3>
-                            </>
-                        )}
 
-                        {/* Top News - hanya tampil jika bukan searchMode */}
-                        <TopPost
-                            topPosts={topNews}
-                            topPostPage={topNewsPage}
-                            setTopPostPage={setTopNewsPage}
-                            topPostSize={topNewsSize}
-                            topPostPagination={topNewsPagination}
-                            truncateText={truncateText}
-                        />
-
-                        {/* Regular News - hanya tampil jika bukan searchMode */}
-                        <RegularPost
-                            posts={news}
-                            postPage={newsPage}
-                            setPostPage={setNewsPage}
-                            postSize={newsSize}
-                            postPagination={newsPagination}
-                            truncateText={truncateText}
-                            classKu={"mt-4"}
-                        />
-                    </>
-                )}
-            </div>
+                            {/* Regular News - hanya tampil jika bukan searchMode */}
+                            <RegularPost
+                                posts={news}
+                                postPage={newsPage}
+                                setPostPage={setNewsPage}
+                                postSize={newsSize}
+                                postPagination={newsPagination}
+                                truncateText={truncateText}
+                                classKu={"mt-4"}
+                            />
+                        </>
+                    )}
+                </>
+            }
+</div>
 
 
             <GuestFooter/>
