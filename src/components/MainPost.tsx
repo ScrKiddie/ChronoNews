@@ -78,7 +78,7 @@ const MainPost: React.FC<MainPostProps> = ({ post }) => {
             <div className="w-full my-4 opacity-30" style={{borderTop: "1px solid #8496af"}}></div>
 
             {/* Konten Post */}
-            <Editor className="content-view" headerTemplate={<></>} value={post.content} readOnly/>
+            <Editor key={post.id} className="content-view" headerTemplate={<></>} value={post.content} readOnly/>
 
             <div className="w-full my-4 opacity-30" style={{borderTop: "1px solid #8496af"}}></div>
         </main>

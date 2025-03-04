@@ -61,19 +61,23 @@ const useNews = () => {
     const [headlineNews, setHeadlineNews] = useState(null);
     const [topNews, setTopNews] = useState([]);
     const [news, setNews] = useState([]);
+    const [searchNews, setSearchNews] = useState([]);
 
     // Pagination state
     const [headlinePage, setHeadlinePage] = useState(1);
     const [topNewsPage, setTopNewsPage] = useState(1);
     const [newsPage, setNewsPage] = useState(1);
+    const [searchNewsPage, setSearchNewsPage] = useState(1);
 
     const [headlinePagination, setHeadlinePagination] = useState({ totalItem: 0, totalPage: 1 });
     const [topNewsPagination, setTopNewsPagination] = useState({ totalItem: 0, totalPage: 1 });
     const [newsPagination, setNewsPagination] = useState({ totalItem: 0, totalPage: 1 });
+    const [searchNewsPagination, setSearchNewsPagination] = useState({ totalItem: 0, totalPage: 1 });
 
     const headlineSize = 1;
     const topNewsSize = 3;
     const newsSize = 5;
+    const searchNewsSize = 5
 
     const menuRef = useRef<Menu>(null);
     const [selectedCategory, setSelectedCategory] = useState("");
@@ -106,6 +110,10 @@ const useNews = () => {
 
     const [notFound, setNotFound] = useState(false);
 
+    const getSearchQueryFromUrl = () => {
+        const params = new URLSearchParams(location.search);
+        return params.get("q") || "";
+    };
 
     useEffect(() => {
         const handleScroll = (event: Event) => {
@@ -152,6 +160,38 @@ const useNews = () => {
             console.error("Error fetching headline news:", error);
         }
     };
+
+    const fetchSearchNews = async (query = "", category = "") => {
+        setLoading(true);
+        setError("");
+
+        try {
+            const filters = {
+                title: query,         // Pencarian di judul
+                categoryName: query,  // Pencarian di kategori
+                userName: query,      // Pencarian di penulis berita
+                summary: query,       // Pencarian di ringkasan berita
+                page: searchNewsPage,
+                size: searchNewsSize,
+            };
+
+            const response = await PostService.searchPost(token, filters);
+            const { data, pagination } = response;
+
+            setSearchNews(data.map(item => ({
+                ...item,
+                publishedDate: getRelativeTime(item.publishedDate),
+            })));
+
+            setSearchNewsPagination(pagination);
+        } catch (error) {
+            setError("Gagal memuat berita.");
+            console.error("Error fetching news:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     // Fetch berita top news
     const fetchTopNews = async (category = "") => {
@@ -203,8 +243,10 @@ const useNews = () => {
 
     // Fetch data saat kategori atau paginasi berubah
     useEffect(() => {
-        fetchHeadlineNews(selectedCategory);
-    }, [selectedCategory, headlinePage]);
+        if (headlineMode){
+            fetchHeadlineNews(selectedCategory);
+        }
+    }, [selectedCategory, headlinePage, headlineMode]);
 
     useEffect(() => {
         fetchTopNews(selectedCategory);
@@ -221,8 +263,21 @@ const useNews = () => {
 
     const { id } = useParams();
     const { processContent } = useUpdatePost();
+    const [searchMode,setSearchMode] = useState(false)
     // **Menentukan active index berdasarkan path**
     useEffect(() => {
+        const query = getSearchQueryFromUrl();
+        if(query != ""){
+            setSearchQuery(query);
+        }
+        if (searchQuery !== "" && query !== "") {
+            setActiveIndex(-1);
+            setSearchMode(true)
+            fetchSearchNews(searchQuery);
+            return;// Cari di semua bidang (title, categoryName, userName, summary)
+        }else{
+            setSearchMode(false)
+        }
         // Cek apakah path berupa angka integer > 0
         if (!isNaN(Number(id)) && Number(id) > 0) {
             setHeadlineMode(false);
@@ -242,6 +297,7 @@ const useNews = () => {
                         publishedDate: formatDate(post.publishedDate),
                         lastUpdated: post.lastUpdated ? formatDate(post.lastUpdated) : "",
                     }));
+                    setSelectedCategory("")
                     setNotFound(false);
                 } catch (error) {
                     console.error("Gagal mengambil data post:", error.message);
@@ -255,7 +311,7 @@ const useNews = () => {
         }
 
         // Cek apakah id kosong (beranda)
-        if (!id) {
+        if (!id ) {
             setActiveIndex(0);
             return;
         }
@@ -282,7 +338,7 @@ const useNews = () => {
         // Jika tidak cocok dengan kategori mana pun, kembali ke Home (0)
         setActiveIndex(0);
 
-    }, [id, categories]);
+    }, [id, categories,location.search, newsPage]);
 
 
 
@@ -324,7 +380,6 @@ const useNews = () => {
     }, [id]);
 
 
-
     return {
         activeIndex,
         setActiveIndex,
@@ -358,6 +413,13 @@ const useNews = () => {
         truncateText,
         post,
         notFound,
+        searchMode,
+        getSearchQueryFromUrl,
+        searchNews,
+        searchNewsPage,
+        searchNewsPagination,
+        searchNewsSize,
+        setSearchNewsPage
     };
 };
 

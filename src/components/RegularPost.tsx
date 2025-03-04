@@ -13,11 +13,11 @@ interface RegularPostProps {
     truncateText: (text: string, maxLength: number) => string;
 }
 
-const RegularPost: React.FC<RegularPostProps> = ({ posts, postPage, setPostPage, postSize, postPagination, truncateText }) => {
+const RegularPost: React.FC<RegularPostProps> = ({ posts, postPage, setPostPage, postSize, postPagination, truncateText, classKu = "" }) => {
     const navigate = useNavigate();
 
     return (
-        <div className="mt-4">
+        <div className={`${classKu}`}>
             <DataView
                 value={posts}
                 layout="list"

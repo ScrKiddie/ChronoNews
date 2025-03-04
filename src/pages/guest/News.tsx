@@ -59,10 +59,22 @@ const News: React.FC = () => {
         truncateText,
         post,
         notFound,
+        searchMode,
+        getSearchQueryFromUrl,
+        searchNews,
+        searchNewsSize,
+        searchNewsPagination,
+        searchNewsPage,
+        setSearchNewsPage
     } = useNews();
 
     const navigate = useNavigate();
     useQuillConfig();
+    const handleSearch = () => {
+        if (searchQuery !== ""){
+            navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+        }
+    };
 
     if (notFound){
         return <NotFound/>
@@ -86,8 +98,14 @@ const News: React.FC = () => {
 
                         <div className="h-full flex items-center w-full justify-center lg:hidden pl-2 pr-3">
                             <div className="p-inputgroup  rounded-md h-10 w-full">
-                                <InputText placeholder="Cari Berita"/>
-                                <Button icon="pi pi-search" className={`size-10`}/>
+                                <InputText placeholder="Cari Berita" onChange={(e) => setSearchQuery(e.target.value)}
+                                           onKeyDown={(e) => {
+                                               if (e.key === "Enter") {
+                                                   handleSearch();
+                                               }
+                                           }}
+                                           value={searchQuery || ""}/>
+                                <Button icon="pi pi-search" onClick={handleSearch} className={`size-10`}/>
                             </div>
                         </div>
                     </div>
@@ -100,8 +118,15 @@ const News: React.FC = () => {
                     {/* Search Bar */}
                     <div className="lg:flex hidden h-full w-fit  items-center justify-center">
                         <div className="p-inputgroup  rounded-md mr-2 h-9 w-52">
-                            <InputText  placeholder="Cari Berita"/>
-                            <Button icon="pi pi-search" className={`size-9`}/>
+                            <InputText placeholder="Cari Berita" onChange={(e) => setSearchQuery(e.target.value)}
+                                       onKeyDown={(e) => {
+                                           if (e.key === "Enter") {
+                                               handleSearch();
+                                           }
+                                       }}
+                                       value={searchQuery || ""}
+                            />
+                            <Button icon="pi pi-search" className={`size-9`} onClick={handleSearch}/>
                         </div>
                     </div>
                 </nav>
@@ -123,36 +148,61 @@ const News: React.FC = () => {
             {/* Content */}
             {/* Content */}
             <div className="p-4 mx-auto max-w-4xl bg-white lg:pt-20 pt-32 rounded-md min-h-screen">
-                {/* Main Post */}
-                {!headlineMode ?
-                (<>
-                    <MainPost post={post} />
-                    <h3 className={`text-[#4b5563]`}>Berita Lainnya</h3>
+                {/* Jika dalam mode pencarian, hanya tampilkan RegularPost */}
+                {searchMode ? (
+                    <>
+                        <h3 className={`text-[#4b5563] lg:mb-2 font-medium`}>Hasil Pencarian Untuk
+                            : {getSearchQueryFromUrl()}</h3>
+                        <RegularPost
+                            classKu = "mt-2"
+                            posts={searchNews}
+                            postPage={searchNewsPage}
+                            setPostPage={setSearchNewsPage}
+                            postSize={searchNewsSize}
+                            postPagination={searchNewsPagination}
+                            truncateText={truncateText}
+                        /></>
+                ) : (
+                    <>
+                        {/* Jika dalam mode headline, tampilkan HeadlinePost */}
+                        {headlineMode ? (
+                            <HeadlinePost
+                                headlineNews={headlineNews}
+                                headlinePage={headlinePage}
+                                setHeadlinePage={setHeadlinePage}
+                                headlinePagination={headlinePagination}
+                                headlineSize={headlineSize}
+                            />
+                        ) : (
+                            <>
+                                {/* Jika bukan mode headline, tampilkan MainPost */}
+                                <MainPost post={post}/>
+                                <h3 className="text-[#4b5563]">Berita Lainnya</h3>
+                            </>
+                        )}
 
+                        {/* Top News - hanya tampil jika bukan searchMode */}
+                        <TopPost
+                            topPosts={topNews}
+                            topPostPage={topNewsPage}
+                            setTopPostPage={setTopNewsPage}
+                            topPostSize={topNewsSize}
+                            topPostPagination={topNewsPagination}
+                            truncateText={truncateText}
+                        />
 
-                </>)
-
-                    :
-                <HeadlinePost
-                    headlineNews={headlineNews}
-                    headlinePage={headlinePage}
-                    setHeadlinePage={setHeadlinePage}
-                    headlinePagination={headlinePagination}
-                    headlineSize={headlineSize}
-                />
-                }
-
-                {/* Top News */}
-                <TopPost topPosts={topNews} topPostPage={topNewsPage} setTopPostPage={setTopNewsPage} topPostSize={topNewsSize} topPostPagination={topNewsPagination} truncateText={truncateText} />
-                {/* Regular News */}
-                <RegularPost
-                    posts={news}
-                    postPage={newsPage}
-                    setPostPage={setNewsPage}
-                    postSize={newsSize}
-                    postPagination={newsPagination}
-                    truncateText={truncateText}
-                />
+                        {/* Regular News - hanya tampil jika bukan searchMode */}
+                        <RegularPost
+                            posts={news}
+                            postPage={newsPage}
+                            setPostPage={setNewsPage}
+                            postSize={newsSize}
+                            postPagination={newsPagination}
+                            truncateText={truncateText}
+                            classKu={"mt-4"}
+                        />
+                    </>
+                )}
             </div>
 
 
