@@ -10,7 +10,7 @@ export const loginSchema = z.object({
             return;
         }
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]+[a-zA-Z0-9]*[a-zA-Z]$/;
         if (!emailRegex.test(value)) {
             ctx.addIssue({
                 code: "custom",
@@ -47,7 +47,7 @@ export const loginSchema = z.object({
         if (value.length === 0) {
             ctx.addIssue({
                 code: "custom",
-                message: "Token CAPTCHA tidak boleh kosong",
+                message: "Selesaikan CAPTCHA terlebih dulu",
             });
             return;
         }
@@ -55,7 +55,7 @@ export const loginSchema = z.object({
         if (value.length < 10) {
             ctx.addIssue({
                 code: "custom",
-                message: "Token CAPTCHA tidak valid",
+                message: "Selesaikan CAPTCHA terlebih dulu",
             });
         }
 

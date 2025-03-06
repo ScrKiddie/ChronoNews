@@ -35,7 +35,7 @@ const TopPost = ({
                             <div className="p-3">
                                 <h3 className="text-md font-semibold cursor-pointer w-fit"
                                     onClick={() => navigate(`/${post.id}`)}>
-                                    {truncateText(post.title, 40)}
+                                    {truncateText(post.title, 30)}
                                 </h3>
                                 <p className="text-gray-600 text-xs sm:text-sm mb-1"><span
                                     className="no-underline text-gray-600 hover:text-gray-600 cursor-pointer"

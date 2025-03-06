@@ -51,7 +51,7 @@ export const UserCreateSchema = z.object({
             return;
         }
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]+[a-zA-Z0-9]*[a-zA-Z]$/;
         if (!emailRegex.test(value)) {
             ctx.addIssue({
                 code: "custom",
@@ -165,7 +165,7 @@ export const UserUpdateSchema = z.object({
             return;
         }
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]+[a-zA-Z0-9]*[a-zA-Z]$/;
         if (!emailRegex.test(value)) {
             ctx.addIssue({
                 code: "custom",

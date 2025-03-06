@@ -15,7 +15,7 @@ export const useCropper = ({
         const file = e.target.files[0];
         if (!file) return;
 
-        const validFormats = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+        const validFormats = ["image/png", "image/jpeg", "image/jpg"];
 
         if (!validFormats.includes(file.type)) {
             if (toastRef) {

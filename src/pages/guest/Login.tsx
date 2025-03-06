@@ -57,6 +57,8 @@ const Login: React.FC = () => {
         } catch (error) {
             toastRef.current?.show({severity: "error", detail: error.message, life: 2000});
         } finally {
+            setTokenCaptcha("");
+            ref.current?.reset();
             setLoading(false);
         }
     };
@@ -64,18 +66,18 @@ const Login: React.FC = () => {
     return (
         <div className="flex justify-center flex-col items-center h-screen bg-cover bg-center bg-white md:bg-[#f2f2f2]">
             <div
-                className="md:w-[90%] md:h-[95%] lg:w-[40%] flex items-center justify-center bg-white flex-col rounded-xl md:shadow-md">
-                <div className="md:w-[80%] lg:w-[80%]">
+                className="w-fit  flex items-center justify-center bg-white flex-col rounded-xl md:shadow-md">
+                <div className="w-fit m-10">
                     <div className="flex items-center justify-center flex-col">
-                        <img src={chronoverseLogo} className="md:w-[35%] w-1/2" alt="Chronoverse Logo"/>
+                        <img src={chronoverseLogo} className="w-1/2" alt="Chronoverse Logo"/>
                         <h1 className="m-0 font-extrabold" style={{color: 'var(--surface-600)'}}>
                             CHRONO<span style={{color: 'var(--primary-500)'}}>VERSE</span>
                         </h1>
                     </div>
 
                     <form onSubmit={handleSubmit} className="w-full">
-                        <div className="mb-2">
-                            <label htmlFor="email" className="block mb-1 font-medium">Email</label>
+                        <div className="mb-2 mt-2">
+                            <label htmlFor="email" className="block mb-1 font-medium text-[#48525f]">Email</label>
                             <InputText
                                 id="email"
                                 className={`w-full`}
@@ -91,7 +93,7 @@ const Login: React.FC = () => {
                         </div>
 
                         <div className="mb-2">
-                            <label htmlFor="password" className="block mb-1 font-medium">Password</label>
+                            <label htmlFor="password" className="block mb-1 font-medium text-[#48525f]">Password</label>
                             <Password
                                 id="password"
                                 className={`w-full`}
@@ -109,6 +111,9 @@ const Login: React.FC = () => {
                         </div>
                         <Turnstile
                             ref={ref}
+                            options={{
+                                language: 'id',
+                            }}
                             siteKey={turnstileSiteKey}
                             className="md:mx-0  mx-auto w-fit border-red-1 rounded-md "
                             style={errors.tokenCaptcha ? {
