@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
-import { UserService } from "../services/UserService";
-import { useToast } from "./useToast.tsx";
-import { useAuth } from "./useAuth.tsx";
+import {useState, useEffect} from "react";
+import {UserService} from "../services/UserService";
+import {useToast} from "./useToast.tsx";
+import {useAuth} from "./useAuth.tsx";
 
 const useSearchUser = () => {
     const toastRef = useToast();
-    const { token } = useAuth();
+    const {token} = useAuth();
     const [data, setData] = useState([]);
-    const [searchParams, setSearchParams] = useState({ name: "", phoneNumber: "", email: "" , role: ""});
+    const [searchParams, setSearchParams] = useState({name: "", phoneNumber: "", email: "", role: ""});
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(5);
     const [totalItem, setTotalItem] = useState(0);
@@ -16,11 +16,11 @@ const useSearchUser = () => {
 
     useEffect(() => {
         setPage(1);
-    }, [searchParams,size]);
+    }, [searchParams, size]);
 
     useEffect(() => {
         fetchData();
-    }, [page,searchParams,size]);
+    }, [page, searchParams, size]);
 
     const fetchData = async () => {
         setVisibleConnectionError(false);
@@ -45,7 +45,7 @@ const useSearchUser = () => {
             if (!error.response) {
                 setVisibleConnectionError(true);
             } else {
-                toastRef.current.show({ severity: "error", detail: error.message });
+                toastRef.current.show({severity: "error", detail: error.message});
             }
         }
         setVisibleLoadingConnection(false);

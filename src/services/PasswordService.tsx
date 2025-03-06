@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api/user/current/password";
+const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
 
 export const PasswordService = {
     updatePassword: async (data, token) => {
         try {
-            const response = await axios.patch(API_URL, data, {
+            const response = await axios.patch(apiUri+"/api/user/current/password", data, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json",

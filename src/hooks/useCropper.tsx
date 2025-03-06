@@ -1,6 +1,9 @@
-import { useState, useRef } from "react";
+import {useState, useRef} from "react";
 
-export const useCropper = ({ setVisibleModal = () => {}, setProfilePicture = null, toastRef = null, width = 320, height=320 } = {}) => {
+export const useCropper = ({
+                               setVisibleModal = () => {
+                               }, setProfilePicture = null, toastRef = null, width = 320, height = 320
+                           } = {}) => {
     const fileInputRef = useRef(null);
     const [selectedImage, setSelectedImage] = useState(null);
     const [visibleCropImageModal, setVisibleCropImageModal] = useState(false);
@@ -8,7 +11,6 @@ export const useCropper = ({ setVisibleModal = () => {}, setProfilePicture = nul
     const imageRef = useRef(null);
     const cropperRef = useRef(null);
     const [imageFormat, setImageFormat] = useState("image/jpeg");
-    // Handle Upload Gambar
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -16,7 +18,7 @@ export const useCropper = ({ setVisibleModal = () => {}, setProfilePicture = nul
         const validFormats = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
 
         if (!validFormats.includes(file.type)) {
-            if(toastRef){
+            if (toastRef) {
                 toastRef.current?.show({
                     severity: "error",
                     detail: "Format gambar tidak valid",
@@ -29,7 +31,7 @@ export const useCropper = ({ setVisibleModal = () => {}, setProfilePicture = nul
         }
 
         if (file.size > 500 * 1024) {
-            if(toastRef){
+            if (toastRef) {
                 toastRef.current?.show({
                     severity: "error",
                     detail: "Ukuran gambar melebihi 500KB",
@@ -45,7 +47,7 @@ export const useCropper = ({ setVisibleModal = () => {}, setProfilePicture = nul
 
         const reader = new FileReader();
         reader.onload = () => {
-            if (setVisibleModal){
+            if (setVisibleModal) {
                 setVisibleModal(false)
             }
             setVisibleCropImageModal(true);
@@ -55,36 +57,31 @@ export const useCropper = ({ setVisibleModal = () => {}, setProfilePicture = nul
         reader.readAsDataURL(file);
     };
 
-    // Tutup Modal Crop Image
     const handleCloseCropImageModal = () => {
-        if (setVisibleModal){
+        if (setVisibleModal) {
             setVisibleModal(true)
         }
         setVisibleCropImageModal(false);
         setSelectedImage(null);
-        destroyCropper(); // Hancurkan instance cropper
+        destroyCropper();
         if (fileInputRef.current) {
             fileInputRef.current.value = null;
         }
     };
 
-    // Handle Button Upload
     const handleClickUploadButton = () => fileInputRef.current?.click();
 
-    // Handle Crop Gambar
     const handleCrop = () => {
         if (cropperRef.current) {
-            const canvas = cropperRef.current.getCroppedCanvas({ width: width, height: height });
+            const canvas = cropperRef.current.getCroppedCanvas({width: width, height: height});
 
             canvas.toBlob((blob) => {
                 if (blob) {
-
                     setCroppedImage(URL.createObjectURL(blob));
-                    console.log(setProfilePicture)
                     if (setProfilePicture) {
-                        const fileExtension = imageFormat.split("/")[1]; // Ambil ekstensi dari format
+                        const fileExtension = imageFormat.split("/")[1];
                         const file = new File([blob], `profile.${fileExtension}`, {
-                            type: imageFormat, // Gunakan format asli
+                            type: imageFormat,
                         });
                         setProfilePicture(file);
                     }
@@ -95,12 +92,11 @@ export const useCropper = ({ setVisibleModal = () => {}, setProfilePicture = nul
         }
 
         setVisibleCropImageModal(false);
-        if (setVisibleModal){
+        if (setVisibleModal) {
             setVisibleModal(true)
         }
     };
 
-    // Hancurkan Cropper Jika Ada
     const destroyCropper = () => {
         if (cropperRef.current) {
             cropperRef.current.destroy();
@@ -108,7 +104,6 @@ export const useCropper = ({ setVisibleModal = () => {}, setProfilePicture = nul
         }
     };
 
-    // Reset Cropper Data
     const resetCropper = () => {
         setCroppedImage(null);
         setSelectedImage(null);

@@ -11,11 +11,11 @@ html, body {
     background-color: #f2f2f2;
 }
 
-small{
-    display:block;
+small {
+    display: block;
 }
 
-*{
+* {
     font-family: Poppins;
 }
 
@@ -64,19 +64,11 @@ p {
     padding: 0;
     color: inherit;
 }
-/*Custom Messages PrimeReact*/
-/*.p-message-wrapper{*/
-/*    padding: 10px;*/
-/*    padding-left: 20px;*/
-/*    padding-right: 20px;*/
-/*}*/
 
-/*.p-message-detail{*/
-/*    margin-right: 8px;*/
-/*}*/
-.p-toast-message-icon{
-    width:  25px;
+.p-toast-message-icon {
+    width: 25px;
 }
+
 .ps-sidebar-root {
     border: none !important;
 }
@@ -88,12 +80,14 @@ p {
 #cf-turnstile > div {
     height: 64px;
 }
+
 .ql-editor[contenteditable="false"] {
     background-color: rgba(205, 92, 92, 0) !important;
     border: 0px;
     padding: 0px;
     font-size: 1.25rem;
 }
+
 .ql-disabled {
     border: 0px !important;
 }
@@ -105,14 +99,14 @@ p {
 
 }
 
-.ql-snow .ql-tooltip{
+.ql-snow .ql-tooltip {
     box-shadow: none !important;
     border-radius: 4px;
     color: black !important;
     z-index: 9999999 !important;
 }
 
-.ql-tooltip input{
+.ql-tooltip input {
     border: 1px solid #d1d5db !important;
     border-radius: 4px;
 }
@@ -124,14 +118,16 @@ p {
     max-height: fit-content;
 }
 
-.p-toast{
+.p-toast {
     width: 90%;
 }
-.p-toast-detail{
-    margin-top:4px;
+
+.p-toast-detail {
+    margin-top: 4px;
     text-align: center;
 }
-.p-toast-message-text{
+
+.p-toast-message-text {
     margin-left: 0px;
 }
 
@@ -140,49 +136,29 @@ body {
     overflow-x: hidden;
     overflow-y: auto;
 }
+
 .ql-tooltip {
     z-index: 10000 !important;
     font-family: "Poppins";
 }
+
 .ql-blank,
 .ql-editor {
     background-color: rgba(255, 255, 255, 0) !important;
 }
+
 .ql-editor.ql-blank::before {
     color: #747b88 !important;
     content: attr(data-placeholder) !important;
     font-style: normal !important;
 }
-body.dark .ql-editor.ql-blank::before {
-    color: #9b9fa0 !important;
-}
-body.dark .ql-tooltip,
-body.dark .ql-editing {
-    background-color: #1e1e1e !important;
-    color: #e2e2e2 !important;
-    border: 1px solid #383838 !important;
-    box-shadow: none;
-}
+
 
 body .ql-tooltip a,
 body .ql-editing a {
     color: #383838 !important;
 }
 
-body.dark .ql-tooltip a,
-body.dark .ql-editing a {
-    color: #e2e2e2 !important;
-}
-
-body.dark .ql-tooltip input,
-body.dark .ql-editing input {
-    border: 1px solid #383838 !important;
-}
-body.dark .ql-tooltip input:focus,
-body.dark .ql-editing input:focus {
-    box-shadow: none;
-    outline: none;
-}
 .ql-tooltip input:focus,
 .ql-editing input:focus {
     box-shadow: none;
@@ -190,28 +166,14 @@ body.dark .ql-editing input:focus {
 }
 
 
-.p-message{
-    margin:0px;
+.p-message {
+    margin: 0px;
 }
+
 .p-calendar:not(.p-calendar-disabled).p-focus > .p-inputtext {
     outline: 0 none;
     outline-offset: 0;
     box-shadow: none;
-}
-
-body.dark .ql-editor[contenteditable="true"] {
-    background-color: #121212 !important;
-}
-
-body.dark #editor-resizer .toolbar {
-    background-color: #1e1e1e;
-    border-color: #b0b0b0;
-    color: #b0b0b0;
-}
-
-body.dark #editor-resizer .toolbar .group a {
-    border-color: #b0b0b0;
-    color: #b0b0b0;
 }
 
 .ql-editor[contenteditable="false"] {
@@ -222,39 +184,36 @@ body.dark #editor-resizer .toolbar .group a {
     padding: 12px;
     width: 80% !important;
 }
+
 input.p-inputtext.p-component[readonly][role="combobox"] {
     padding: 12px;
 }
 
-body.dark .logo-prbcare {
-    fill: white !important;
-}
-body .logo-prbcare {
-    fill: #495057 !important;
-}
 
 .p-password-input {
     width: 100%;
     padding: 12px;
     padding-right: 3rem;
 }
+
 .p-password .p-icon-field {
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
+
 .p-password .p-input-icon {
     top: 46.5%;
     margin-right: 4px;
 }
 
-.p-input-icon svg{
+.p-input-icon svg {
     width: 20px !important;
     height: 20px !important;
 }
 
-.p-input-icon svg:active{
+.p-input-icon svg:active {
     outline: 0 none;
 }
 
@@ -263,10 +222,12 @@ body .logo-prbcare {
     align-items: center;
     justify-content: center;
 }
-.rfm-marquee{
+
+.rfm-marquee {
     min-width: 100%;
 }
-.ps-menu-icon{
+
+.ps-menu-icon {
     margin: 0 !important;
 }
 
@@ -275,21 +236,21 @@ body .logo-prbcare {
 }
 
 
-.ps-menuitem-root{
+.ps-menuitem-root {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-body .bottom-navbar{
+body .bottom-navbar {
     box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
 }
 
-body .navbar-top{
+body .navbar-top {
     box-shadow: 0 4px 6px rgba(0, 4, 0, 0.1);
 }
 
-.p-column-title{
+.p-column-title {
     width: 100%;
 }
 
@@ -302,37 +263,41 @@ body .navbar-top{
     outline: 0;
 }
 
-.p-datatable-emptymessage td,.p-paginator-current{
+.p-datatable-emptymessage td, .p-paginator-current {
     text-align: center !important;
     font-size: 16px;
     cursor: default;
 }
-.p-confirm-dialog-message{
+
+.p-confirm-dialog-message {
     font-size: 18px;
 }
 
-.ql-formats{
+.ql-formats {
     margin-right: 0px !important;
 }
-.ql-container{
+
+.ql-container {
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
 }
-.ql-toolbar{
+
+.ql-toolbar {
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
 }
-.p-tabmenu-nav, .p-menuitem-link{
+
+.p-tabmenu-nav, .p-menuitem-link {
     font-weight: 500;
     border-radius: 0px;
 }
 
-.menu-news span{
+.menu-news span {
     color: #6b7280 !important;
 }
 
-.grid-custom .p-grid{
-    display:flex;
+.grid-custom .p-grid {
+    display: flex;
     gap: 14px;
     justify-content: center;
 
@@ -340,7 +305,9 @@ body .navbar-top{
 
 @media screen and (max-width: 768px) {
     .grid-custom .p-grid {
-        display: grid;}}
+        display: grid;
+    }
+}
 
 @media (min-width: 1024px) {
     .p-tabmenu-nav {
@@ -350,15 +317,15 @@ body .navbar-top{
     }
 }
 
-.p-dataview-emptymessage{
+.p-dataview-emptymessage {
     text-align: center;
 }
 
-.content-view .p-editor-toolbar{
+.content-view .p-editor-toolbar {
     display: none;
 }
 
-.p-breadcrumb{
+.p-breadcrumb {
     padding: 0px;
     font-size: 1.2rem;
     margin-bottom: 8px;
@@ -367,5 +334,4 @@ body .navbar-top{
 
 .orange {
     color: #f59e0b !important;
-
 }

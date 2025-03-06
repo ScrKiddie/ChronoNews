@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api";
+const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
 
 export const PostService = {
     createPost: async (data, token) => {
@@ -17,8 +17,7 @@ export const PostService = {
             if (data.thumbnail) {
                 formData.append("thumbnail", data.thumbnail);
             }
-
-            const response = await axios.post(`${API_URL}/post`, formData, {
+            const response = await axios.post(`${apiUri}/api/post`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data"
@@ -43,7 +42,7 @@ export const PostService = {
                 size = ""
             } = filters;
             const queryParams = new URLSearchParams({ userID, title, categoryName, userName, summary, page, size }).toString();
-            const url = `${API_URL}/post?${queryParams}`;
+            const url = `${apiUri}/api/post?${queryParams}`;
 
             const response = await axios.get(url, {
                 headers: {
@@ -59,7 +58,7 @@ export const PostService = {
 
     getPost: async (id) => {
         try {
-            const response = await axios.get(`${API_URL}/post/${id}`);
+            const response = await axios.get(`${apiUri}/api/post/${id}`);
 
             return response.data.data;
         } catch (error) {
@@ -81,7 +80,7 @@ export const PostService = {
                 formData.append("thumbnail", data.thumbnail);
             }
 
-            const response = await axios.put(`${API_URL}/post/${id}`, formData, {
+            const response = await axios.put(`${apiUri}/api/post/${id}`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data"
@@ -96,7 +95,7 @@ export const PostService = {
 
     deletePost: async (id, token) => {
         try {
-            const response = await axios.delete(`${API_URL}/post/${id}`, {
+            const response = await axios.delete(`${apiUri}/api/post/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

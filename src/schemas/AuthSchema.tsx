@@ -1,4 +1,4 @@
-import { z } from "zod";
+import {z} from "zod";
 
 export const loginSchema = z.object({
     email: z.string().superRefine((value, ctx) => {
@@ -41,6 +41,24 @@ export const loginSchema = z.object({
                 message: "Format password tidak valid",
             });
         }
+    }),
+
+    tokenCaptcha: z.string().superRefine((value, ctx) => {
+        if (value.length === 0) {
+            ctx.addIssue({
+                code: "custom",
+                message: "Token CAPTCHA tidak boleh kosong",
+            });
+            return;
+        }
+
+        if (value.length < 10) {
+            ctx.addIssue({
+                code: "custom",
+                message: "Token CAPTCHA tidak valid",
+            });
+        }
+
     }),
 });
 

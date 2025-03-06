@@ -1,20 +1,20 @@
-import { useState,  } from "react";
-import { z } from "zod";
-import { useAuth } from "./useAuth.tsx";
-import { ProfileService } from "../services/ProfileService";
-import { ProfileSchema } from "../schemas/ProfileSchema.tsx";
-import { useCropper } from "./useCropper";
+import {useState,} from "react";
+import {z} from "zod";
+import {useAuth} from "./useAuth.tsx";
+import {ProfileService} from "../services/ProfileService";
+import {ProfileSchema} from "../schemas/ProfileSchema.tsx";
+import {useCropper} from "./useCropper";
 
-export const useProfile = (toastRef=null) => {
+export const useProfile = (toastRef = null) => {
 
-    const { token } = useAuth();
+    const {token} = useAuth();
 
     const [modalLoading, setModalLoading] = useState(false);
     const [visibleModal, setVisibleModal] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
     const [data, setData] = useState(null);
     const [errors, setErrors] = useState({});
-    const [profilePicture,setProfilePicture] = useState(null)
+    const [profilePicture, setProfilePicture] = useState(null)
     const {
         fileInputRef,
         selectedImage,
@@ -27,9 +27,8 @@ export const useProfile = (toastRef=null) => {
         handleClickUploadButton,
         handleCrop,
         resetCropper,
-    } = useCropper({ setVisibleModal: setVisibleModal, setProfilePicture: setProfilePicture,toastRef });
+    } = useCropper({setVisibleModal: setVisibleModal, setProfilePicture: setProfilePicture, toastRef});
 
-    // Buka Modal Profil
     const handleVisibleModal = async () => {
         resetCropper();
         setErrors({});
@@ -50,10 +49,8 @@ export const useProfile = (toastRef=null) => {
         setModalLoading(false);
     };
 
-    // Tutup Modal Profil
     const handleCloseModal = () => setVisibleModal(false);
 
-    // Handle Submit Profile
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitLoading(true);
@@ -68,7 +65,7 @@ export const useProfile = (toastRef=null) => {
 
             const request = {
                 ...validatedData,
-                ...(profilePicture instanceof File ? { profilePicture: profilePicture } : {}),
+                ...(profilePicture instanceof File ? {profilePicture: profilePicture} : {}),
             };
 
             await ProfileService.updateCurrentUser(request, token);
@@ -81,7 +78,7 @@ export const useProfile = (toastRef=null) => {
             setVisibleModal(false);
         } catch (error) {
             if (error instanceof z.ZodError) {
-                setErrors(error.errors.reduce((acc, err) => ({ ...acc, [err.path[0]]: err.message }), {}));
+                setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
                 toastRef.current?.show({
                     severity: "error",
@@ -107,7 +104,7 @@ export const useProfile = (toastRef=null) => {
         setData,
         setVisibleModal,
 
-        // Props dari useCropper
+        // props dari useCropper
         fileInputRef,
         selectedImage,
         visibleCropImageModal,

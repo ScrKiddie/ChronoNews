@@ -1,13 +1,13 @@
-import { useState, useEffect, useRef } from "react";
+import {useState, useEffect, useRef} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
-import { Menu } from "primereact/menu";
-import { PostService } from "../services/PostService";
-import { CategoryService } from "../services/CategoryService";
+import {Menu} from "primereact/menu";
+import {PostService} from "../services/PostService";
+import {CategoryService} from "../services/CategoryService";
 import {useUpdatePost} from "./useUpdatePost.tsx";
 
 const getRelativeTime = (timestamp: number) => {
     const now = new Date();
-    const past = new Date(timestamp * 1000); // Konversi detik ke milidetik
+    const past = new Date(timestamp * 1000);
     const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
 
     const minutes = Math.floor(diffInSeconds / 60);
@@ -32,20 +32,20 @@ const truncateText = (text, maxLength) => {
 };
 
 const formatDate = (timestamp: number) => {
-    if (!timestamp) return ""; // Jika 0, return string kosong
-    const date = new Date(timestamp * 1000); // Convert detik ke milidetik
+    if (!timestamp) return "";
+    const date = new Date(timestamp * 1000);
 
     const formattedDate = date.toLocaleDateString("id-ID", {
         day: "numeric",
         month: "short",
         year: "numeric",
-    }).replace(".", ""); // Hapus titik di bulan (misal: "Jan." -> "Jan")
+    }).replace(".", "");
 
     const formattedTime = date.toLocaleTimeString("id-ID", {
         hour: "2-digit",
         minute: "2-digit",
-        hour12: false, // Format 24 jam
-    }).replace(".", ":"); // Pastikan pemisah jam ke menit adalah ":"
+        hour12: false,
+    }).replace(".", ":");
 
     return `${formattedDate}, ${formattedTime}`;
 };
@@ -62,16 +62,15 @@ const useNews = () => {
     const [news, setNews] = useState([]);
     const [searchNews, setSearchNews] = useState([]);
 
-    // Pagination state
     const [headlinePage, setHeadlinePage] = useState(1);
     const [topNewsPage, setTopNewsPage] = useState(1);
     const [newsPage, setNewsPage] = useState(1);
     const [searchNewsPage, setSearchNewsPage] = useState(1);
 
-    const [headlinePagination, setHeadlinePagination] = useState({ totalItem: 0, totalPage: 1 });
-    const [topNewsPagination, setTopNewsPagination] = useState({ totalItem: 0, totalPage: 1 });
-    const [newsPagination, setNewsPagination] = useState({ totalItem: 0, totalPage: 1 });
-    const [searchNewsPagination, setSearchNewsPagination] = useState({ totalItem: 0, totalPage: 1 });
+    const [headlinePagination, setHeadlinePagination] = useState({totalItem: 0, totalPage: 1});
+    const [topNewsPagination, setTopNewsPagination] = useState({totalItem: 0, totalPage: 1});
+    const [newsPagination, setNewsPagination] = useState({totalItem: 0, totalPage: 1});
+    const [searchNewsPagination, setSearchNewsPagination] = useState({totalItem: 0, totalPage: 1});
 
     const headlineSize = 1;
     const topNewsSize = 3;
@@ -129,7 +128,6 @@ const useNews = () => {
         };
     }, []);
 
-    // Fetch daftar kategori dari API
     const fetchCategories = async () => {
         setError(false)
         setLoading(true)
@@ -140,17 +138,15 @@ const useNews = () => {
             }
         } catch (error) {
             if (!error.response) {
-                console.log(error)
                 setError(true)
             } else {
-               console.log(error)
+                console.log(error)
             }
-        }finally {
+        } finally {
             setLoading(false)
         }
     };
 
-    // Fetch berita headline
     const fetchHeadlineNews = async (category = "") => {
         setLoading(true);
         setError(false)
@@ -162,11 +158,11 @@ const useNews = () => {
             };
 
             const response = await PostService.searchPost(token, filters);
-            const { data, pagination } = response;
+            const {data, pagination} = response;
 
             setHeadlineNews(data.length > 0 ? {
                 ...data[0],
-                publishedDate: getRelativeTime(data[0].publishedDate) // Tambahkan waktu relatif
+                publishedDate: getRelativeTime(data[0].publishedDate)
             } : null);
 
             setHeadlinePagination(pagination);
@@ -177,7 +173,7 @@ const useNews = () => {
             } else {
                 console.log(error)
             }
-        }finally {
+        } finally {
             setLoading(false);
         }
     };
@@ -188,16 +184,16 @@ const useNews = () => {
 
         try {
             const filters = {
-                title: query,         // Pencarian di judul
-                categoryName: query,  // Pencarian di kategori
-                userName: query,      // Pencarian di penulis berita
-                summary: query,       // Pencarian di ringkasan berita
+                title: query,
+                categoryName: query,
+                userName: query,
+                summary: query,
                 page: searchNewsPage,
                 size: searchNewsSize,
             };
 
             const response = await PostService.searchPost(token, filters);
-            const { data, pagination } = response;
+            const {data, pagination} = response;
 
             setSearchNews(data.map(item => ({
                 ...item,
@@ -218,7 +214,6 @@ const useNews = () => {
     };
 
 
-    // Fetch berita top news
     const fetchTopNews = async (category = "") => {
         setError(false)
         setLoading(true);
@@ -230,7 +225,7 @@ const useNews = () => {
             };
 
             const response = await PostService.searchPost(token, filters);
-            const { data, pagination } = response;
+            const {data, pagination} = response;
             setTopNews(data.map(item => ({
                 ...item,
                 publishedDate: getRelativeTime(item.publishedDate)
@@ -243,12 +238,11 @@ const useNews = () => {
             } else {
                 console.log(error)
             }
-        }finally {
+        } finally {
             setLoading(false)
         }
     };
 
-    // Fetch berita reguler
     const fetchNews = async (category = "") => {
         setLoading(true);
         setError(false);
@@ -261,10 +255,10 @@ const useNews = () => {
             };
 
             const response = await PostService.searchPost(token, filters);
-            const { data, pagination } = response;
+            const {data, pagination} = response;
             setNews(data.map(item => ({
                 ...item,
-                publishedDate: getRelativeTime(item.publishedDate) // Konversi waktu langsung
+                publishedDate: getRelativeTime(item.publishedDate)
             })));
             setNewsPagination(pagination);
         } catch (error) {
@@ -279,15 +273,14 @@ const useNews = () => {
         }
     };
 
-    // Fetch data saat kategori atau paginasi berubah
     useEffect(() => {
-        if (headlineMode){
+        if (headlineMode) {
             fetchHeadlineNews(selectedCategory);
         }
     }, [selectedCategory, headlinePage, headlineMode, retry]);
 
     useEffect(() => {
-        if (!searchMode){
+        if (!searchMode) {
             fetchTopNews(selectedCategory);
         }
     }, [selectedCategory, topNewsPage, retry]);
@@ -296,29 +289,26 @@ const useNews = () => {
         fetchNews(selectedCategory);
     }, [selectedCategory, newsPage]);
 
-    // Fetch kategori saat komponen pertama kali dimuat
     useEffect(() => {
         fetchCategories();
     }, []);
 
-    const { id } = useParams();
-    const { processContent } = useUpdatePost();
-    const [searchMode,setSearchMode] = useState(false)
-    // **Menentukan active index berdasarkan path**
+    const {id} = useParams();
+    const {processContent} = useUpdatePost();
+    const [searchMode, setSearchMode] = useState(false)
     useEffect(() => {
         const query = getSearchQueryFromUrl();
-        if(query != ""){
+        if (query != "") {
             setSearchQuery(query);
         }
         if (searchQuery !== "" && query !== "") {
             setActiveIndex(-1);
             setSearchMode(true)
             fetchSearchNews(searchQuery);
-            return;// Cari di semua bidang (title, categoryName, userName, summary)
-        }else{
+            return;
+        } else {
             setSearchMode(false)
         }
-        // Cek apakah path berupa angka integer > 0
         if (!isNaN(Number(id)) && Number(id) > 0) {
             setHeadlineMode(false);
             setActiveIndex(-1);
@@ -350,7 +340,7 @@ const useNews = () => {
                         setNotFound(true);
                     }
 
-                }finally {
+                } finally {
                     setLoading(false)
                 }
             };
@@ -360,24 +350,21 @@ const useNews = () => {
             setHeadlineMode(true);
         }
 
-        // Cek apakah id kosong (beranda)
-        if (!id ) {
+        if (!id) {
             setActiveIndex(0);
             return;
         }
 
-        // Cek kategori utama
         const primaryCategories = categories.slice(0, 3);
         const remainingCategories = categories.slice(3);
 
         let foundIndex = primaryCategories.findIndex(cat => cat.name.toLowerCase() === id.toLowerCase());
 
         if (foundIndex !== -1) {
-            setActiveIndex(foundIndex + 1); // Karena index 0 adalah "Home"
+            setActiveIndex(foundIndex + 1);
             return;
         }
 
-        // Cek kategori di "Lainnya"
         const isInMoreCategories = remainingCategories.some(cat => cat.name.toLowerCase() === id.toLowerCase());
 
         if (isInMoreCategories) {
@@ -385,14 +372,11 @@ const useNews = () => {
             return;
         }
 
-        // Jika tidak cocok dengan kategori mana pun, kembali ke Home (0)
         setActiveIndex(0);
 
-    }, [id, categories,location.search, newsPage, retry]);
+    }, [id, categories, location.search, newsPage, retry]);
 
 
-
-    // Handle perubahan kategori dengan mengubah path URL
     const handleCategoryChange = (category: string) => {
         setSelectedCategory(category);
         setHeadlinePage(1);
@@ -402,18 +386,17 @@ const useNews = () => {
         navigate(`/${category.toLowerCase()}`);
     };
 
-    // Maksimal 3 kategori utama selain "Home", sisanya masuk ke dropdown "Lainnya"
     const primaryCategories = categories.slice(0, 3);
     const remainingCategories = categories.slice(3);
 
     const allCategories = [
-        { label: "Home", command: () => handleCategoryChange("Home") },
+        {label: "Home", command: () => handleCategoryChange("Home")},
         ...primaryCategories.map((cat, index) => ({
             label: cat.name,
             command: () => handleCategoryChange(cat.name),
         })),
         ...(remainingCategories.length > 0
-            ? [{ label: "Lainnya", command: (e) => menuRef.current?.toggle(e.originalEvent) }]
+            ? [{label: "Lainnya", command: (e) => menuRef.current?.toggle(e.originalEvent)}]
             : []),
     ];
 
@@ -426,7 +409,7 @@ const useNews = () => {
     }));
 
     useEffect(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        window.scrollTo({top: 0, left: 0, behavior: 'auto'});
     }, [id]);
 
 

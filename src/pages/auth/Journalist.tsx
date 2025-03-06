@@ -16,7 +16,6 @@ import DeleteModal from "../../components/DeleteModal.tsx";
 const Journalist = () => {
     const toastRef = useToast();
 
-    // Hook untuk pencarian dan manajemen user list
     const {
         data,
         searchParams,
@@ -31,7 +30,6 @@ const Journalist = () => {
         visibleLoadingConnection,
     } = useSearchUser();
 
-    // Hook untuk CREATE user baru
     const {
         visibleModal: visibleUserCreateModal,
         submitLoading: submitUserCreateLoading,
@@ -53,7 +51,6 @@ const Journalist = () => {
         imageRef: imageRefCreate,
     } = useCreateUser(toastRef, fetchData);
 
-    // Hook untuk UPDATE user
     const {
         visibleModal: visibleUserUpdateModal,
         submitLoading: submitUserUpdateLoading,
@@ -84,17 +81,14 @@ const Journalist = () => {
         setVisibleModal: setVisibleUserDeleteModal
     } = useDeleteUser(toastRef, fetchData, page, setPage, totalItem, size);
 
-    // Template Aksi dalam Tabel
     const actionTemplate = (rowData) => {
         return (
             <div className="flex items-center justify-center gap-2">
-                {/* Tombol Edit */}
                 <Button
-                    icon={<i className="pi pi-pen-to-square" style={{ fontSize: '1.4rem' }}></i>}
+                    icon={<i className="pi pi-pen-to-square" style={{fontSize: '1.4rem'}}></i>}
                     className="size-11"
                     onClick={() => handleVisibleUserUpdateModal(rowData.id)}
                 />
-                {/* Tombol Hapus */}
                 <Button
                     icon={<i className="pi pi-trash" style={{fontSize: '1.25rem'}}></i>}
                     severity="secondary"
@@ -109,7 +103,6 @@ const Journalist = () => {
 
     return (
         <div className="m-4 min-h-full max-h-fit bg-white rounded-xl shadow-md p-4 flex flex-col">
-            {/* Jika koneksi aman, tampilkan tabel */}
             <div className={`${(visibleLoadingConnection || visibleConnectionError) ? "hidden" : "block"}`}>
                 <ReusableLazyTable
                     data={data}
@@ -137,14 +130,14 @@ const Journalist = () => {
                 </ReusableLazyTable>
             </div>
 
-            {/* Error koneksi */}
+            {/* error koneksi */}
             <LoadingRetry
                 visibleConnectionError={visibleConnectionError}
                 onRetry={fetchData}
                 visibleLoadingConnection={visibleLoadingConnection}
             />
 
-            {/* Modal Create User */}
+            {/* modal create user */}
             <UserModal
                 isUserCreateMode={true}
                 visible={visibleUserCreateModal}
@@ -164,7 +157,7 @@ const Journalist = () => {
             <LoadingModal
                 modalLoading={modalLoading}
             />
-            {/* Modal Update User */}
+            {/* modal update user */}
             <UserModal
                 isUserEditMode={true}
                 visible={visibleUserUpdateModal}
@@ -180,7 +173,7 @@ const Journalist = () => {
                 setData={setDataUserUpdate}
             />
 
-            {/* Modal Cropper untuk Create */}
+            {/* modal cropper untuk create */}
             <CropImageModal
                 id="user-cropper"
                 visible={visibleCropImageModalCreate}
@@ -191,7 +184,7 @@ const Journalist = () => {
                 imageRef={imageRefCreate}
             />
 
-            {/* Modal Cropper untuk Update */}
+            {/* modal cropper untuk update */}
             <CropImageModal
                 id="user-cropper"
                 visible={visibleCropImageModalUpdate}
@@ -202,7 +195,7 @@ const Journalist = () => {
                 imageRef={imageRefUpdate}
             />
 
-            {/* Modal Delete User */}
+            {/* modal delete user */}
             <DeleteModal
                 submitLoading={submitUserDeleteLoading}
                 visibleModal={visibleUserDeleteModal}

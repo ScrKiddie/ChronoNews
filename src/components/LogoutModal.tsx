@@ -1,14 +1,8 @@
 import React from "react";
-import { Button } from "primereact/button";
-import { ConfirmDialog } from "primereact/confirmdialog";
+import {Button} from "primereact/button";
+import {ConfirmDialog} from "primereact/confirmdialog";
 
-interface LogoutButtonProps {
-    visible: boolean;
-    setVisible: (visible: boolean) => void;
-    onLogout: () => void;
-}
-
-const LogoutModal: React.FC<LogoutButtonProps> = ({ visible, setVisible, onLogout }) => {
+const LogoutModal = ({visible, setVisible, onLogout}) => {
     const footer = (
         <div className="flex justify-end gap-2">
             <Button

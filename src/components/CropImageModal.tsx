@@ -1,18 +1,18 @@
 import Cropper from "cropperjs";
 import "cropperjs/dist/cropper.css";
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
+import {Dialog} from "primereact/dialog";
+import {Button} from "primereact/button";
 
 const CropImageModal = ({
-                            id="",
-                            aspectRatio=1,
-                             visible,
-                             onClose,
-                             selectedImage,
-                             onCrop,
+                            id = "",
+                            aspectRatio = 1,
+                            visible,
+                            onClose,
+                            selectedImage,
+                            onCrop,
                             imageRef,
                             cropperRef
-                         }) => {
+                        }) => {
 
     return (
         <Dialog

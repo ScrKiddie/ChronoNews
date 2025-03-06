@@ -1,23 +1,23 @@
-import { useEffect, useState } from "react";
-import { z } from "zod";
-import { useAuth } from "./useAuth";
-import { CategoryService } from "../services/CategoryService";
-import { CategorySchema } from "../schemas/CategorySchema";
+import {useEffect, useState} from "react";
+import {z} from "zod";
+import {useAuth} from "./useAuth";
+import {CategoryService} from "../services/CategoryService";
+import {CategorySchema} from "../schemas/CategorySchema";
 
 export const useCategory = (toastRef = null) => {
-    const { token } = useAuth();
+    const {token} = useAuth();
 
-    // State untuk modal dan form
+
     const [modalLoading, setModalLoading] = useState(false);
     const [visibleModal, setVisibleModal] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [id, setId] = useState(null);
-    const [data, setData] = useState({ name: "" }); // Data kategori yang sedang dibuat/diedit
+    const [data, setData] = useState({name: ""});
     const [errors, setErrors] = useState({});
     const [visibleDeleteModal, setVisibleDeleteModal] = useState(false)
-    // State untuk daftar kategori
-    const [listData, setListData] = useState([]); // Daftar kategori dari API
+
+    const [listData, setListData] = useState([]);
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
     const [visibleLoadingConnection, setVisibleLoadingConnection] = useState(false);
 
@@ -28,7 +28,7 @@ export const useCategory = (toastRef = null) => {
     const handleOpenCreateModal = () => {
         setIsEditMode(false);
         setErrors({});
-        setData({ name: "" }); // Reset form
+        setData({name: ""});
         setId(null);
         setVisibleModal(true);
     };
@@ -38,7 +38,7 @@ export const useCategory = (toastRef = null) => {
         setId(id);
         setErrors({});
         setModalLoading(true);
-        setData({ name: "" });
+        setData({name: ""});
 
         try {
             const categoryData = await CategoryService.getCategory(id, token);
@@ -57,16 +57,15 @@ export const useCategory = (toastRef = null) => {
         setModalLoading(false);
     };
 
-    const handleVisibleDeleteModal = (id)=>{
+    const handleVisibleDeleteModal = (id) => {
         setId(id);
         setVisibleDeleteModal(true)
     }
 
 
-
     const handleCloseModal = () => {
         setVisibleModal(false);
-        setData({ name: "" }); // Reset form saat modal ditutup
+        setData({name: ""});
     };
 
     const fetchData = async () => {
@@ -75,7 +74,7 @@ export const useCategory = (toastRef = null) => {
         try {
             const response = await CategoryService.listCategories(token);
             if (response && Array.isArray(response.data)) {
-                setListData(response.data); // Simpan daftar kategori di listData
+                setListData(response.data);
             }
         } catch (error) {
             if (!error.response) {
@@ -114,11 +113,11 @@ export const useCategory = (toastRef = null) => {
                 });
             }
 
-            fetchData(); // Refresh list setelah submit
+            fetchData();
             setVisibleModal(false);
         } catch (error) {
             if (error instanceof z.ZodError) {
-                setErrors(error.errors.reduce((acc, err) => ({ ...acc, [err.path[0]]: err.message }), {}));
+                setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
                 toastRef?.current?.show({
                     severity: "error",
@@ -134,13 +133,13 @@ export const useCategory = (toastRef = null) => {
         setSubmitLoading(true);
         try {
             await CategoryService.deleteCategory(id, token);
-            toastRef?.current?.show({ severity: "success", detail: "Kategori berhasil dihapus" });
-            if (fetchData){
+            toastRef?.current?.show({severity: "success", detail: "Kategori berhasil dihapus"});
+            if (fetchData) {
                 fetchData()
             }
             setVisibleDeleteModal(false)
         } catch (error) {
-            toastRef?.current?.show({ severity: "error", detail: error.message });
+            toastRef?.current?.show({severity: "error", detail: error.message});
         } finally {
             setSubmitLoading(false);
         }
@@ -152,7 +151,7 @@ export const useCategory = (toastRef = null) => {
         visibleModal,
         submitLoading,
         data,
-        listData, // Daftar kategori yang benar
+        listData,
         errors,
         isEditMode,
         handleOpenCreateModal,

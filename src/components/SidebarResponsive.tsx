@@ -4,7 +4,6 @@ import React, {useEffect, useRef} from "react";
 import MenuItemResponsive from "./MenuItemResponsive.tsx";
 import {Button} from "primereact/button";
 import {Menu as PrimeMenu} from "primereact/menu";
-import {Toast} from "primereact/toast";
 import "cropperjs/dist/cropper.css";
 import CropImageModal from "./CropImageModal.tsx";
 import UserModal from "./UserModal.tsx";
@@ -19,7 +18,7 @@ import {useAuth} from "../hooks/useAuth.tsx";
 import {useLocation} from "react-router-dom";
 
 const SidebarResponsive = ({children}) => {
-    const { role } = useAuth();
+    const {role} = useAuth();
     const toastRef = useToast();
     const {
         collapsed,
@@ -36,6 +35,7 @@ const SidebarResponsive = ({children}) => {
         onLogout,
         setIsModalLogoutVisible,
         isModalLogoutVisible,
+        lastPath
     } = useSidebar();
 
     const {
@@ -73,9 +73,9 @@ const SidebarResponsive = ({children}) => {
 
     const scrollRef = useRef(null);
 
-    const { pathname } = useLocation();
+    const {pathname} = useLocation();
     useEffect(() => {
-        if (scrollRef.current ) {
+        if (scrollRef.current) {
             scrollRef.current.scrollTop = 0;
         }
     }, [pathname]);
@@ -121,14 +121,14 @@ const SidebarResponsive = ({children}) => {
 
                     <MenuItemResponsive collapsed={collapsed} icon={`pi pi-qrcode`} label={"Beranda"}
                                         link={"/admin/beranda"}/>
-                    {role == "admin" ?  (<>
+                    {role == "admin" ? (<>
                         <MenuItemResponsive collapsed={collapsed} icon={`pi pi-users
                     `} label={"Jurnalis"} link={"/admin/jurnalis"}/>
                         <MenuItemResponsive collapsed={collapsed} icon={`pi pi-paperclip
                     `} label={"Kategori"} link={"/admin/kategori"}/>
                     </>) : ""}
                     <MenuItemResponsive collapsed={collapsed} icon={`pi pi-file
-                    `} label={"Berita"} link={"/admin/post"}/>
+                    `} label={"Berita"} link={"/admin/berita"}/>
 
                 </Menu>
             </Sidebar>
@@ -136,18 +136,24 @@ const SidebarResponsive = ({children}) => {
             <nav className="flex flex-col w-full overflow-hidden">
                 <div className="flex items-center px-4 w-full z-40 shadow-md bg-white text-black">
                     <div className="flex py-[17px] w-full items-center gap-4 justify-between">
-                        <Button severity="secondary" onClick={() => setCollapsed(!collapsed)} text rounded
-                                className={`size-8 hidden md:flex`}
-                                icon={<i className={`pi ${collapsed ? "pi-arrow-right" : "pi-arrow-left"} text-xl`}/>}/>
-                        <Button severity="secondary" onClick={() => setToggled(!toggled)} text rounded
-                                className={`size-8 flex md:hidden`}
-                                icon={<i className={`pi pi-arrow-right text-md`}/>}/>
+                        <div className={`flex items-center`}>
+                            <Button severity="secondary" onClick={() => setCollapsed(!collapsed)} text rounded
+                                    className={`size-8 hidden md:flex`}
+                                    icon={<i
+                                        className={`pi ${collapsed ? "pi-arrow-right" : "pi-arrow-left"} text-xl`}/>}/>
+                            <Button severity="secondary" onClick={() => setToggled(!toggled)} text rounded
+                                    className={`size-8 flex md:hidden`}
+                                    icon={<i className={`pi pi-arrow-right text-md`}/>}/>
+                            <p className={`ml-4 text-xl text-[#4b5563]`}>{lastPath}</p>
+                        </div>
+
+
                         <Button ref={buttonRef} severity="secondary" onClick={toggleMenuVisibility} text rounded
                                 className={`size-8`} icon={<i className={`pi pi-bars text-xl`}/>}/>
                         <div ref={menuContainerRef} className={`absolute top-0 right-0`}>
                             <PrimeMenu
                                 key={key}
-                                className={`${isMenuVisible ? "visible" : "hidden"} text-md shadow-md absolute top-[70px] right-1`}
+                                className={`${isMenuVisible ? "visible" : "hidden"} text-md shadow-md absolute top-[70px] right-1 menu-news`}
                                 model={[
                                     {
                                         label: "Profile",
@@ -221,7 +227,7 @@ const SidebarResponsive = ({children}) => {
                 imageRef={imageRef}
             />
 
-            {/* Modal Update Password */}
+            {/*modal update password */}
             <PasswordModal
                 visible={visiblePasswordModal}
                 onClose={handleClosePasswordModal}

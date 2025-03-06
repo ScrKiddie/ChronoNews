@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useState} from "react";
 import {DataTable} from "primereact/datatable";
 import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
@@ -13,7 +13,6 @@ const ReusableLazyTable = ({
                                onPageChange,
                                searchParams,
                                setSearchParams,
-                               onSearch,
                                children
 
                            }) => {
@@ -34,13 +33,12 @@ const ReusableLazyTable = ({
                     role: value
                 };
             });
-        }, 300), // 300ms delay
+        }, 300),
         [setSearchParams]
     );
 
     const handleSearchChange = (e) => {
         setSearchValue(e.target.value);
-        console.log(e.target.value)
         debouncedSearch(e.target.value);
     };
 
@@ -57,11 +55,6 @@ const ReusableLazyTable = ({
                         />
 
                     </div>
-                    {/*<Button*/}
-                    {/*    icon={<i className="pi pi-sync" style={{fontSize: '1.25rem'}}></i>}*/}
-                    {/*    className="w-11 h-11 min-w-[44px] min-h-[44px]"*/}
-                    {/*    onClick={onSearch}*/}
-                    {/*/>*/}
                     <Button
                         icon={<i className="pi pi-plus-circle" style={{fontSize: '1.45rem'}}></i>}
                         className="w-11 h-11 min-w-[44px] min-h-[44px]"
@@ -71,8 +64,6 @@ const ReusableLazyTable = ({
                 </div>
             </div>
 
-            {/* Data Table */
-            }
             <DataTable
                 value={data}
                 paginator

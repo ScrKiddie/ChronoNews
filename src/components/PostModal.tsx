@@ -1,12 +1,14 @@
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
-import { Editor } from "primereact/editor";
+import {Dialog} from "primereact/dialog";
+import {Button} from "primereact/button";
+import {InputText} from "primereact/inputtext";
+import {Editor} from "primereact/editor";
 import {Dropdown} from "primereact/dropdown";
 import useQuillConfig from "../hooks/useQuillConfig.tsx";
 import thumbnail from "../../public/thumbnail.svg";
 import React, {useCallback, useEffect, useRef} from "react";
 import {InputTextarea} from "primereact/inputtextarea";
+
+const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
 const PostModal = ({
                        visible,
                        onClose,
@@ -22,24 +24,24 @@ const PostModal = ({
                        categoryOptions = [],
                        userOptions = [],
                        isEditMode,
-                       role="admin"
+                       role = "admin",
+                       editorContent
                    }) => {
 
     useQuillConfig();
 
-    const editorContent = useRef("");
     useEffect(() => {
         if (data?.content) {
             editorContent.current = data.content;
         }
     }, [data?.content]);
 
+
     const handleTextChange = useCallback((htmlValue) => {
         editorContent.current = htmlValue;
     }, []);
 
     const handleFormSubmit = (e) => {
-        console.log(editorContent.current)
         handleSubmit(e, editorContent.current)
     }
 
@@ -93,8 +95,6 @@ const PostModal = ({
                                     options={userOptions}
                                     onChange={(e) => {
                                         setData((prev) => ({...prev, userID: e.value}));
-                                        console.log(data)
-                                        console.log(e.value)
                                         errors.userID = false;
                                     }}
                                 />
@@ -113,7 +113,7 @@ const PostModal = ({
                             <img src={
                                 croppedImage ||
                                 (data?.thumbnail
-                                    ? `http://localhost:3000/post_picture/${data?.thumbnail}`
+                                    ? `${apiUri}/post_picture/${data?.thumbnail}`
                                     : `${thumbnail}`)
                             } className="h-full  w-full rounded-md  border-none z-10"
                                  style={{border: "1px solid #d1d5db"}}/>
@@ -195,7 +195,7 @@ const PostModal = ({
                                     },
                                 },
                             }}
-                            value={data?.content || ""}
+                            value={editorContent?.current || data?.content || ""}
                             onTextChange={(e) => handleTextChange(e.htmlValue || "")}
                             placeholder="Masukkan Konten"
                             headerTemplate={
@@ -210,7 +210,7 @@ const PostModal = ({
                                     <option value="">Normal</option>
                                 </select>
                                 <select className="ql-size" aria-label="Font Size">
-                                    <option value="small">Small</option>
+                                    <option value="small" selected>Small</option>
                                     <option value="">Normal</option>
                                     <option value="large">Large</option>
                                     <option value="huge">Huge</option>

@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { z } from "zod";
-import { useAuth } from "./useAuth.tsx";
-import { UserService } from "../services/UserService";
-import { UserCreateSchema } from "../schemas/UserSchema.tsx";
-import { useCropper } from "./useCropper";
+import {useState} from "react";
+import {z} from "zod";
+import {useAuth} from "./useAuth.tsx";
+import {UserService} from "../services/UserService";
+import {UserCreateSchema} from "../schemas/UserSchema.tsx";
+import {useCropper} from "./useCropper";
 
 export const useCreateUser = (toastRef = null, fetchData = null) => {
-    const { token } = useAuth();
+    const {token} = useAuth();
 
     const [visibleModal, setVisibleModal] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
@@ -17,7 +17,7 @@ export const useCreateUser = (toastRef = null, fetchData = null) => {
         password: "",
         role: ""
     });
-    const [profilePicture,setProfilePicture] = useState(null)
+    const [profilePicture, setProfilePicture] = useState(null)
     const [errors, setErrors] = useState({});
 
     const {
@@ -32,21 +32,18 @@ export const useCreateUser = (toastRef = null, fetchData = null) => {
         handleClickUploadButton,
         handleCrop,
         resetCropper,
-    } = useCropper({ setVisibleModal, setProfilePicture, toastRef });
+    } = useCropper({setVisibleModal, setProfilePicture, toastRef});
 
-    // Buka Modal Create User
     const handleVisibleModal = () => {
         resetCropper();
         setErrors({});
-        setData({ name: "", phoneNumber: "", email: "", password: "", role: ""});
+        setData({name: "", phoneNumber: "", email: "", password: "", role: ""});
         setProfilePicture(null)
         setVisibleModal(true);
     };
 
-    // Tutup Modal Create User
     const handleCloseModal = () => setVisibleModal(false);
 
-    // Handle Submit Create User
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitLoading(true);
@@ -56,7 +53,7 @@ export const useCreateUser = (toastRef = null, fetchData = null) => {
             const validatedData = UserCreateSchema.parse(data);
             const request = {
                 ...validatedData,
-                ...(profilePicture instanceof File ? { profilePicture: profilePicture } : {}),
+                ...(profilePicture instanceof File ? {profilePicture: profilePicture} : {}),
             };
 
             await UserService.createUser(request, token);
@@ -66,13 +63,13 @@ export const useCreateUser = (toastRef = null, fetchData = null) => {
                 life: 2000,
             });
 
-            if (fetchData){
+            if (fetchData) {
                 fetchData();
             }
             setVisibleModal(false);
         } catch (error) {
             if (error instanceof z.ZodError) {
-                setErrors(error.errors.reduce((acc, err) => ({ ...acc, [err.path[0]]: err.message }), {}));
+                setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
                 toastRef.current?.show({
                     severity: "error",
@@ -96,7 +93,7 @@ export const useCreateUser = (toastRef = null, fetchData = null) => {
         setData,
         setVisibleModal,
 
-        // Props dari useCropper
+        // props dari useCropper
         fileInputRef,
         selectedImage,
         visibleCropImageModal,

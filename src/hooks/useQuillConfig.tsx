@@ -1,13 +1,13 @@
-import { useEffect } from "react";
+import {useEffect} from "react";
 import Quill from "quill";
-import { Scope } from "parchment";
+import {Scope} from "parchment";
 import ResizeModule from "@botom/quill-resize-module";
 
 const useQuillConfig = () => {
     useEffect(() => {
         const ImageFormatAttributesList = ["height", "width", "style"];
         const allowedStyles = {
-            display: ["inline","block"],
+            display: ["inline", "block"],
             float: ["left", "right"],
             margin: [],
         };
@@ -64,7 +64,6 @@ const useQuillConfig = () => {
         Quill.register(ImageFormat, true);
         Quill.register("modules/resize", ResizeModule);
 
-        // Video Blot
         const BlockEmbed = Quill.import("blots/block/embed");
 
         class VideoBlot extends BlockEmbed {

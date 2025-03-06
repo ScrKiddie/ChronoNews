@@ -1,20 +1,20 @@
-import {useEffect, useState} from "react";
-import { z } from "zod";
-import { useAuth } from "./useAuth.tsx";
-import { PostService } from "../services/PostService";
-import { CategoryService } from "../services/CategoryService";
-import { PostCreateSchema } from "../schemas/PostSchema.tsx";
-import { useCropper } from "./useCropper";
+import {useEffect, useRef, useState} from "react";
+import {z} from "zod";
+import {useAuth} from "./useAuth.tsx";
+import {PostService} from "../services/PostService";
+import {CategoryService} from "../services/CategoryService";
+import {PostCreateSchema} from "../schemas/PostSchema.tsx";
+import {useCropper} from "./useCropper";
 import {UserService} from "../services/UserService.tsx";
 
 export const useCreatePost = (toastRef = null, fetchData = null) => {
-    const { token, role } = useAuth();
-
+    const {token, role} = useAuth();
+    const editorContent = useRef("");
     const [visibleModal, setVisibleModal] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
-    const [modalLoading, setModalLoading] = useState(false); // Loading state for modal
-    const [categoryOptions, setCategoryOptions] = useState([]); // Store categories
-    const [userOptions, setUserOptions] = useState([]); // Store categories
+    const [modalLoading, setModalLoading] = useState(false);
+    const [categoryOptions, setCategoryOptions] = useState([]);
+    const [userOptions, setUserOptions] = useState([]);
     const [data, setData] = useState({
         title: "",
         summary: "",
@@ -37,16 +37,19 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
         handleClickUploadButton,
         handleCrop,
         resetCropper,
-    } = useCropper({ setVisibleModal: setVisibleModal, setProfilePicture: setThumbnail, toastRef, width:1200, height:675});
+    } = useCropper({
+        setVisibleModal: setVisibleModal,
+        setProfilePicture: setThumbnail,
+        toastRef,
+        width: 1200,
+        height: 675
+    });
 
-    useEffect(() => {
-        console.log("Thumbnail telah diperbarui:", thumbnail);
-    }, [thumbnail]);
-    // Open Create Post Modal and fetch categories
     const handleVisibleModal = async () => {
         resetCropper();
         setErrors({});
-        setData({ title: "", summary: "", content: "", userID: 0, categoryID: 0 });
+        editorContent.current = "";
+        setData({title: "", summary: "", content: "", userID: 0, categoryID: 0});
         setThumbnail(null);
         setModalLoading(true);
         try {
@@ -57,11 +60,11 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
                     value: category.id,
                 })));
             }
-            if (role == "admin"){
+            if (role == "admin") {
                 const responseUsers = await UserService.searchUser(token);
                 if (responseUsers && Array.isArray(responseUsers.data)) {
                     setUserOptions([
-                        { label: "Posting Sebagai Diri Sendiri", value: 0 },
+                        {label: "Posting Sebagai Diri Sendiri", value: 0},
                         ...responseUsers.data.map(user => ({
                             label: `${user.name} - ${user.phoneNumber} - ${user.email} - ${user.role}`,
                             value: user.id,
@@ -82,10 +85,8 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
         setModalLoading(false);
     };
 
-    // Close Modal
     const handleCloseModal = () => setVisibleModal(false);
 
-    // Handle Submit Create Post
     const handleSubmit = async (e, editorValue) => {
         e.preventDefault();
         setSubmitLoading(true);
@@ -95,9 +96,8 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
             const validatedData = PostCreateSchema.parse(data);
             const request = {
                 ...validatedData,
-                ...(thumbnail instanceof File ? { thumbnail: thumbnail } : {}),
+                ...(thumbnail instanceof File ? {thumbnail: thumbnail} : {}),
             };
-            console.log(validatedData)
             await PostService.createPost(request, token);
             toastRef.current?.show({
                 severity: "success",
@@ -111,7 +111,7 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
             setVisibleModal(false);
         } catch (error) {
             if (error instanceof z.ZodError) {
-                setErrors(error.errors.reduce((acc, err) => ({ ...acc, [err.path[0]]: err.message }), {}));
+                setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
                 toastRef.current?.show({
                     severity: "error",
@@ -130,15 +130,16 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
         modalLoading,
         data,
         errors,
-        categoryOptions, // Include category options
+        categoryOptions,
         userOptions,
         handleVisibleModal,
         handleCloseModal,
         handleSubmit,
         setData,
         setVisibleModal,
+        editorContent,
 
-        // Props dari useCropper
+        // props dari useCropper
         fileInputRef,
         selectedImage,
         visibleCropImageModal,

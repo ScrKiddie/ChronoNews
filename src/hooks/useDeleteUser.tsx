@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { UserService } from "../services/UserService";
-import {useAuth} from "./useAuth.tsx"; // Sesuaikan path
+import {useState} from "react";
+import {UserService} from "../services/UserService";
+import {useAuth} from "./useAuth.tsx";
+
 export const useDeleteUser = (toast, fetchData, page, setPage, totalItem, size) => {
-    const { token } = useAuth();
+    const {token} = useAuth();
     const [submitLoading, setSubmitLoading] = useState(false);
     const [visibleModal, setVisibleModal] = useState(false);
     const [id, setId] = useState(0);
@@ -16,23 +17,23 @@ export const useDeleteUser = (toast, fetchData, page, setPage, totalItem, size) 
         setSubmitLoading(true);
         try {
             await UserService.deleteUser(id, token);
-            toast?.current?.show({ severity: "success", detail: "User berhasil dihapus" });
+            toast?.current?.show({severity: "success", detail: "User berhasil dihapus"});
 
-            const remainingItems = totalItem - 1; // Total item setelah penghapusan
-            const remainingPages = Math.ceil(remainingItems / size); // Hitung ulang total halaman
+            const remainingItems = totalItem - 1;
+            const remainingPages = Math.ceil(remainingItems / size);
 
             if (remainingItems > 0 && remainingPages < page) {
-                setPage((prev) => Math.max(1, prev - 1)); // Mundur halaman jika kosong dan tidak di halaman pertama
+                setPage((prev) => Math.max(1, prev - 1));
             }
 
-            fetchData(); // Ambil data baru setelah penghapusan
+            fetchData();
             setVisibleModal(false);
         } catch (error) {
-            toast?.current?.show({ severity: "error", detail: error.message });
+            toast?.current?.show({severity: "error", detail: error.message});
         } finally {
             setSubmitLoading(false);
         }
     };
 
-    return { handleSubmit, submitLoading, visibleModal, handleVisibleModal, setVisibleModal };
+    return {handleSubmit, submitLoading, visibleModal, handleVisibleModal, setVisibleModal};
 };

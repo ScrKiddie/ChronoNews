@@ -13,10 +13,9 @@ import {useCreatePost} from "../../hooks/useCreatePost.tsx";
 import {useUpdatePost} from "../../hooks/useUpdatePost.tsx";
 import {useDeletePost} from "../../hooks/useDeletePost.tsx";
 
-const Journalist = () => {
+const Post = () => {
     const toastRef = useToast();
 
-    // Hook untuk pencarian dan manajemen post list
     const {
         data,
         searchParams,
@@ -31,7 +30,6 @@ const Journalist = () => {
         visibleLoadingConnection,
     } = useSearchPost();
 
-    // Hook untuk CREATE post baru
     const {
         visibleModal: visiblePostCreateModal,
         submitLoading: submitPostCreateLoading,
@@ -52,12 +50,12 @@ const Journalist = () => {
         cropperRef: cropperRefCreate,
         imageRef: imageRefCreate,
         modalLoading: modalCreateLoading,
-        categoryOptions:categoryOptionsCreate,
-        userOptions:userOptionsCreate,
-        role:roleCreate
+        categoryOptions: categoryOptionsCreate,
+        userOptions: userOptionsCreate,
+        role: roleCreate,
+        editorContent: editorContentCreate
     } = useCreatePost(toastRef, fetchData);
 
-    // Hook untuk UPDATE post
     const {
         visibleModal: visiblePostUpdateModal,
         submitLoading: submitPostUpdateLoading,
@@ -79,8 +77,9 @@ const Journalist = () => {
         imageRef: imageRefUpdate,
         modalLoading: modalUpdateLoading,
         categoryOptions: categoryOptionsUpdate,
-        userOptions:userOptionsUpdate,
+        userOptions: userOptionsUpdate,
         role: roleUpdate,
+        editorContent: editorContentUpdate
     } = useUpdatePost(toastRef, fetchData);
 
     const {
@@ -91,17 +90,14 @@ const Journalist = () => {
         setVisibleModal: setVisiblePostDeleteModal
     } = useDeletePost(toastRef, fetchData, page, setPage, totalItem, size);
 
-    // Template Aksi dalam Tabel
     const actionTemplate = (rowData) => {
         return (
             <div className="flex items-center justify-center gap-2">
-                {/* Tombol Edit */}
                 <Button
-                    icon={<i className="pi pi-pen-to-square" style={{ fontSize: '1.4rem' }}></i>}
+                    icon={<i className="pi pi-pen-to-square" style={{fontSize: '1.4rem'}}></i>}
                     className="size-11"
                     onClick={() => handleVisiblePostUpdateModal(rowData.id)}
                 />
-                {/* Tombol Hapus */}
                 <Button
                     icon={<i className="pi pi-trash" style={{fontSize: '1.25rem'}}></i>}
                     severity="secondary"
@@ -116,7 +112,6 @@ const Journalist = () => {
 
     return (
         <div className="m-4 min-h-full max-h-fit bg-white rounded-xl shadow-md p-4 flex flex-col">
-            {/* Jika koneksi aman, tampilkan tabel */}
             <div className={`${(visibleLoadingConnection || visibleConnectionError) ? "hidden" : "block"}`}>
                 <ReusableLazyTable
                     data={data}
@@ -139,7 +134,7 @@ const Journalist = () => {
                                 {rowData.title}
                             </div>
                         )}
-                         />
+                    />
 
                     <Column className="text-center" field="user"
                             header={<p className="text-center font-medium">Penulis</p>}/>
@@ -163,14 +158,14 @@ const Journalist = () => {
                 </ReusableLazyTable>
             </div>
 
-            {/* Error koneksi */}
+            {/* error koneksi */}
             <LoadingRetry
                 visibleConnectionError={visibleConnectionError}
                 onRetry={fetchData}
                 visibleLoadingConnection={visibleLoadingConnection}
             />
 
-            {/* Modal Create Post */}
+            {/* modal create post */}
             <PostModal
                 role={roleCreate}
                 userOptions={userOptionsCreate}
@@ -187,6 +182,7 @@ const Journalist = () => {
                 handleClickUploadButton={handleClickUploadButtonCreate}
                 handleImageChange={handleImageChangeCreate}
                 setData={setDataPostCreate}
+                editorContent={editorContentCreate}
             />
 
             {/*modal loading create*/}
@@ -194,7 +190,7 @@ const Journalist = () => {
                 modalLoading={modalCreateLoading}
             />
 
-            {/* Modal Cropper untuk Create */}
+            {/* modal cropper untuk create */}
             <CropImageModal
                 visible={visibleCropImageModalCreate}
                 onClose={handleCloseCropImageModalCreate}
@@ -202,11 +198,11 @@ const Journalist = () => {
                 onCrop={handleCropCreate}
                 cropperRef={cropperRefCreate}
                 imageRef={imageRefCreate}
-                aspectRatio={16/9}
+                aspectRatio={16 / 9}
             />
 
 
-            {/*/!* Modal Update Post *!/*/}
+            {/* modal update post /*/}
             <PostModal
                 role={roleUpdate}
                 userOptions={userOptionsUpdate}
@@ -223,6 +219,7 @@ const Journalist = () => {
                 handleImageChange={handleImageChangeUpdate}
                 setData={setDataPostUpdate}
                 categoryOptions={categoryOptionsUpdate}
+                editorContent={editorContentUpdate}
             />
 
             {/*modal loading create*/}
@@ -231,7 +228,7 @@ const Journalist = () => {
             />
 
 
-            {/* Modal Cropper untuk Update */}
+            {/* modal cropper untuk update */}
             <CropImageModal
                 visible={visibleCropImageModalUpdate}
                 onClose={handleCloseCropImageModalUpdate}
@@ -239,10 +236,10 @@ const Journalist = () => {
                 onCrop={handleCropUpdate}
                 cropperRef={cropperRefUpdate}
                 imageRef={imageRefUpdate}
-                aspectRatio={16/9}
+                aspectRatio={16 / 9}
             />
 
-            {/* Modal Delete Post */}
+            {/* modal delete post */}
             <DeleteModal
                 submitLoading={submitPostDeleteLoading}
                 visibleModal={visiblePostDeleteModal}
@@ -253,4 +250,4 @@ const Journalist = () => {
     );
 };
 
-export default Journalist;
+export default Post;

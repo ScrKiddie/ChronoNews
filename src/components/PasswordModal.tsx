@@ -1,6 +1,6 @@
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
-import { Password } from "primereact/password";
+import {Dialog} from "primereact/dialog";
+import {Button} from "primereact/button";
+import {Password} from "primereact/password";
 
 const PasswordModal = ({
                            visible,
@@ -21,7 +21,6 @@ const PasswordModal = ({
         >
             <form onSubmit={handleSubmit} className="w-full">
                 <div className="flex flex-col p-4 gap-4">
-                    {/* Password Lama */}
                     <div className="w-full">
                         <label htmlFor="oldPassword" className="block mb-1 font-medium">Password Lama</label>
                         <Password
@@ -39,8 +38,6 @@ const PasswordModal = ({
                         />
                         {errors.oldPassword && <small className="p-error">{errors.oldPassword}</small>}
                     </div>
-
-                    {/* Password Baru */}
                     <div className="w-full">
                         <label htmlFor="password" className="block mb-1 font-medium">Password Baru</label>
                         <Password
@@ -58,8 +55,6 @@ const PasswordModal = ({
                         />
                         {errors.password && <small className="p-error">{errors.password}</small>}
                     </div>
-
-                    {/* Konfirmasi Password */}
                     <div className="w-full">
                         <label htmlFor="confirmPassword" className="block mb-1 font-medium">Konfirmasi Password</label>
                         <Password
@@ -77,15 +72,13 @@ const PasswordModal = ({
                         />
                         {errors.confirmPassword && <small className="p-error">{errors.confirmPassword}</small>}
                     </div>
-
-                    {/* Tombol Submit */}
                     <Button
                         disabled={submitLoading}
                         className="w-full flex items-center justify-center font-normal"
                         type="submit"
                     >
                         {submitLoading ? (
-                            <i className="pi pi-spin pi-spinner text-[24px]" style={{ color: "#475569" }}></i>
+                            <i className="pi pi-spin pi-spinner text-[24px]" style={{color: "#475569"}}></i>
                         ) : (
                             "Submit"
                         )}

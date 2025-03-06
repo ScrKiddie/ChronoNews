@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
-import { PostService } from "../services/PostService";
-import { useToast } from "./useToast.tsx";
-import { useAuth } from "./useAuth.tsx";
+import {useState, useEffect} from "react";
+import {PostService} from "../services/PostService";
+import {useToast} from "./useToast.tsx";
+import {useAuth} from "./useAuth.tsx";
 
 const useSearchPost = () => {
     const toastRef = useToast();
-    const { token, sub , role } = useAuth();
+    const {token, sub, role} = useAuth();
     const [data, setData] = useState([]);
     const [searchParams, setSearchParams] = useState({
         title: "",
@@ -22,11 +22,11 @@ const useSearchPost = () => {
 
     useEffect(() => {
         setPage(1);
-    }, [searchParams,size]);
+    }, [searchParams, size]);
 
     useEffect(() => {
         fetchData();
-    }, [page,searchParams,size]);
+    }, [page, searchParams, size]);
     const fetchData = async () => {
         setVisibleConnectionError(false);
         setVisibleLoadingConnection(true);
@@ -39,7 +39,7 @@ const useSearchPost = () => {
                 page: page.toString(),
                 size: size.toString(),
             };
-            if (role == "journalist"){
+            if (role == "journalist") {
                 filters.userID = sub
             }
             const response = await PostService.searchPost(token, filters);
@@ -66,7 +66,7 @@ const useSearchPost = () => {
             if (!error.response) {
                 setVisibleConnectionError(true);
             } else {
-                toastRef.current.show({ severity: "error", detail: error.message });
+                toastRef.current.show({severity: "error", detail: error.message});
             }
         }
         setVisibleLoadingConnection(false);

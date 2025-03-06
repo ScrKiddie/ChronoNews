@@ -1,4 +1,4 @@
-import { z } from "zod";
+import {z} from "zod";
 
 export const ProfileSchema = z.object({
     name: z.string().superRefine((value, ctx) => {

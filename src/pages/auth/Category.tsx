@@ -39,7 +39,7 @@ const Category = () => {
         return (
             <div className="flex items-center justify-center gap-2">
                 <Button
-                    icon={<i className="pi pi-pen-to-square" style={{ fontSize: '1.4rem' }}></i>}
+                    icon={<i className="pi pi-pen-to-square" style={{fontSize: '1.4rem'}}></i>}
                     className="size-11"
                     onClick={() => handleOpenEditModal(rowData.id)}
                 />

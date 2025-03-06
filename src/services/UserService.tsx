@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api";
+const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
 
 export const UserService = {
     createUser: async (data, token) => {
@@ -15,7 +15,7 @@ export const UserService = {
                 formData.append("profilePicture", data.profilePicture);
             }
 
-            const response = await axios.post(`${API_URL}/user`, formData, {
+            const response = await axios.post(`${apiUri}/api/user`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data"
@@ -31,7 +31,7 @@ export const UserService = {
         try {
             const { name = "", phoneNumber = "", email = "", page = "", size = "",role="" } = filters;
             const queryParams = new URLSearchParams({ name, phoneNumber, email, page, size,role }).toString();
-            const url = `${API_URL}/user?${queryParams}`;
+            const url = `${apiUri}/api/user?${queryParams}`;
 
             const response = await axios.get(url, {
                 headers: {
@@ -46,7 +46,7 @@ export const UserService = {
     },
     getUser: async (id, token) => {
         try {
-            const response = await axios.get(`${API_URL}/user/${id}`, {
+            const response = await axios.get(`${apiUri}/api/user/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -71,7 +71,7 @@ export const UserService = {
                 formData.append("profilePicture", data.profilePicture);
             }
 
-            const response = await axios.put(`${API_URL}/user/${id}`, formData, {
+            const response = await axios.put(`${apiUri}/api/user/${id}`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data"
@@ -85,7 +85,7 @@ export const UserService = {
     },
     deleteUser: async (id, token) => {
         try {
-            const response = await axios.delete(`${API_URL}/user/${id}`, {
+            const response = await axios.delete(`${apiUri}/api/user/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

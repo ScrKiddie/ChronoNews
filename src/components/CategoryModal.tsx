@@ -1,16 +1,17 @@
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
+import {Dialog} from "primereact/dialog";
+import {Button} from "primereact/button";
+import {InputText} from "primereact/inputtext";
+
 const CategoryModal = ({
-                       visible,
-                       onClose,
-                       data,
-                       setData,
-                       errors,
-                       submitLoading,
-                       handleSubmit,
-                       isEditMode,
-                   }) => {
+                           visible,
+                           onClose,
+                           data,
+                           setData,
+                           errors,
+                           submitLoading,
+                           handleSubmit,
+                           isEditMode,
+                       }) => {
     return (
         <Dialog
             header={
@@ -27,8 +28,6 @@ const CategoryModal = ({
         >
             <form onSubmit={handleSubmit} className="w-full">
                 <div className="flex flex-col p-4 gap-4">
-                    {/* Avatar hanya untuk mode profile */}
-
                     <div className="w-full">
                         <label htmlFor="name" className="block mb-1 font-medium">
                             Nama Kategori

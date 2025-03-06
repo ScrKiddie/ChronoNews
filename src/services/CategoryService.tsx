@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api";
+const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
 
 export const CategoryService = {
     createCategory: async (data, token) => {
         try {
-            const response = await axios.post(`${API_URL}/category`, { name: data.name }, {
+            const response = await axios.post(`${apiUri}/api/category`, { name: data.name }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json"
@@ -19,7 +19,7 @@ export const CategoryService = {
     },
     listCategories: async (token) => {
         try {
-            const response = await axios.get(`${API_URL}/category`, {
+            const response = await axios.get(`${apiUri}/api/category`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -32,7 +32,7 @@ export const CategoryService = {
     },
     getCategory: async (id, token) => {
         try {
-            const response = await axios.get(`${API_URL}/category/${id}`, {
+            const response = await axios.get(`${apiUri}/api/category/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -45,7 +45,7 @@ export const CategoryService = {
     },
     updateCategory: async (id, data, token) => {
         try {
-            const response = await axios.put(`${API_URL}/category/${id}`, { name: data.name }, {
+            const response = await axios.put(`${apiUri}/api/category/${id}`, { name: data.name }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json"
@@ -59,7 +59,7 @@ export const CategoryService = {
     },
     deleteCategory: async (id, token) => {
         try {
-            const response = await axios.delete(`${API_URL}/category/${id}`, {
+            const response = await axios.delete(`${apiUri}/api/category/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

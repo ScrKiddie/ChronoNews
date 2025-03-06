@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
-import { z } from "zod";
-import { useAuth } from "./useAuth.tsx";
-import { PostService } from "../services/PostService";
-import { CategoryService } from "../services/CategoryService";
-import { PostUpdateSchema } from "../schemas/PostSchema.tsx";
-import { useCropper } from "./useCropper";
+import {useEffect, useRef, useState} from "react";
+import {z} from "zod";
+import {useAuth} from "./useAuth.tsx";
+import {PostService} from "../services/PostService";
+import {CategoryService} from "../services/CategoryService";
+import {PostUpdateSchema} from "../schemas/PostSchema.tsx";
+import {useCropper} from "./useCropper";
 import {UserService} from "../services/UserService.tsx";
 
+const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
 export const useUpdatePost = (toastRef = null, fetchData = null) => {
-    const { token,role } = useAuth();
-
+    const {token, role} = useAuth();
+    const editorContent = useRef("");
     const [modalLoading, setModalLoading] = useState(false);
     const [visibleModal, setVisibleModal] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
@@ -20,8 +21,8 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         userID: 0,
         categoryID: 0,
     });
-    const [categoryOptions, setCategoryOptions] = useState([]); // Menyimpan daftar kategori
-    const [userOptions, setUserOptions] = useState([]); // Store categories
+    const [categoryOptions, setCategoryOptions] = useState([]);
+    const [userOptions, setUserOptions] = useState([]);
     const [errors, setErrors] = useState({});
     const [thumbnail, setThumbnail] = useState(null);
     const [id, setId] = useState(0);
@@ -35,7 +36,7 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         doc.querySelectorAll("img").forEach((img) => {
             const src = img.getAttribute("src");
             if (src && !src.startsWith("http")) {
-                img.setAttribute("src", `http://localhost:3000/post_picture/${src}`);
+                img.setAttribute("src", `${apiUri}/post_picture/${src}`);
             }
         });
 
@@ -50,8 +51,8 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
 
         doc.querySelectorAll("img").forEach((img) => {
             const src = img.getAttribute("src");
-            if (src && src.startsWith("http://localhost:3000/post_picture/")) {
-                img.setAttribute("src", src.replace("http://localhost:3000/post_picture/", ""));
+            if (src && src.startsWith(`${apiUri}/post_picture/`)) {
+                img.setAttribute("src", src.replace(`${apiUri}/post_picture/`, ""));
             }
         });
 
@@ -71,23 +72,24 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         handleClickUploadButton,
         handleCrop,
         resetCropper,
-    } = useCropper({ setVisibleModal: setVisibleModal, setProfilePicture: setThumbnail, toastRef, width: 1200, height: 675 });
+    } = useCropper({
+        setVisibleModal: setVisibleModal,
+        setProfilePicture: setThumbnail,
+        toastRef,
+        width: 1200,
+        height: 675
+    });
 
-    useEffect(() => {
-        console.log("Thumbnail telah diperbarui:", thumbnail);
-    }, [thumbnail]);
-
-    // Fungsi untuk membuka modal update post dan fetch data
     const handleVisibleModal = async (postId) => {
         setId(postId);
         resetCropper();
         setErrors({});
         setModalLoading(true);
-        setData({ title: "", summary: "", content: "", userID: 0, categoryID: 0 });
+        editorContent.current = "";
+        setData({title: "", summary: "", content: "", userID: 0, categoryID: 0});
         setThumbnail(null);
 
         try {
-            // Ambil daftar kategori
             const categoryResponse = await CategoryService.listCategories(token);
             if (categoryResponse && Array.isArray(categoryResponse.data)) {
                 setCategoryOptions(categoryResponse.data.map(category => ({
@@ -95,20 +97,19 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
                     value: category.id,
                 })));
             }
-            if (role == "admin"){
-            const responseUsers = await UserService.searchUser(token);
-            if (responseUsers && Array.isArray(responseUsers.data)) {
-                setUserOptions([
-                    { label: "Posting Sebagai Diri Sendiri", value: 0 },
-                    ...responseUsers.data.map(user => ({
-                        label: `${user.name} - ${user.phoneNumber} - ${user.email} - ${user.role}`,
-                        value: user.id,
-                    })),
-                ]);
-            }
+            if (role == "admin") {
+                const responseUsers = await UserService.searchUser(token);
+                if (responseUsers && Array.isArray(responseUsers.data)) {
+                    setUserOptions([
+                        {label: "Posting Sebagai Diri Sendiri", value: 0},
+                        ...responseUsers.data.map(user => ({
+                            label: `${user.name} - ${user.phoneNumber} - ${user.email} - ${user.role}`,
+                            value: user.id,
+                        })),
+                    ]);
+                }
             }
 
-            // Ambil data post berdasarkan ID
             const response = await PostService.getPost(postId, token);
             if (response) {
                 setData({
@@ -134,17 +135,14 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         setModalLoading(false);
     };
 
-    // Fungsi untuk menutup modal
     const handleCloseModal = () => setVisibleModal(false);
 
-    // Fungsi untuk menangani submit update post
     const handleSubmit = async (e, editorValue) => {
         e.preventDefault();
         setSubmitLoading(true);
         setErrors({});
 
         try {
-            // Validasi data sebelum mengirim ke server
             const validatedData = PostUpdateSchema.parse({
                 title: data?.title,
                 summary: data?.summary,
@@ -157,8 +155,8 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
 
             const request = {
                 ...validatedData,
-                content: cleanedContent, // Gunakan versi yang sudah dihapus prefix-nya
-                ...(thumbnail instanceof File ? { thumbnail } : {}),
+                content: cleanedContent,
+                ...(thumbnail instanceof File ? {thumbnail} : {}),
             };
 
 
@@ -176,7 +174,7 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         } catch (error) {
             console.log(error)
             if (error instanceof z.ZodError) {
-                setErrors(error.errors.reduce((acc, err) => ({ ...acc, [err.path[0]]: err.message }), {}));
+                setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
                 toastRef?.current?.show({
                     severity: "error",
@@ -196,15 +194,15 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         submitLoading,
         data,
         errors,
-        categoryOptions, // Include category options
+        categoryOptions,
         userOptions,
         handleVisibleModal,
         handleCloseModal,
         handleSubmit,
         setData,
         setVisibleModal,
-
-        // Props dari useCropper
+        editorContent,
+        // props dari useCropper
         fileInputRef,
         selectedImage,
         visibleCropImageModal,

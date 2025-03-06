@@ -1,10 +1,12 @@
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
-import { Password } from "primereact/password";
+import {Dialog} from "primereact/dialog";
+import {Button} from "primereact/button";
+import {InputText} from "primereact/inputtext";
+import {Password} from "primereact/password";
 import defaultProfilePicture from "../../public/profilepicture.svg";
 import React from "react";
 import {Dropdown} from "primereact/dropdown";
+
+const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
 const UserModal = ({
                        visible,
                        onClose,
@@ -21,8 +23,8 @@ const UserModal = ({
                        isUserEditMode,
                    }) => {
     const roleOptions = [
-        { label: "Admin", value: "admin" },
-        { label: "Journalist", value: "journalist" },
+        {label: "Admin", value: "admin"},
+        {label: "Journalist", value: "journalist"},
     ];
     return (
         <Dialog
@@ -42,21 +44,17 @@ const UserModal = ({
         >
             <form onSubmit={handleSubmit} className="w-full">
                 <div className="flex flex-col p-4 gap-4">
-                    {/* Avatar hanya untuk mode profile */}
                     <div className="relative w-fit mx-auto flex justify-center items-center">
-                        {/* Gambar Profil Bulat */}
                         <img
                             src={
                                 croppedImage ||
                                 (data?.profilePicture
-                                    ? `http://localhost:3000/profile_picture/${data?.profilePicture}`
+                                    ? `${apiUri}/profile_picture/${data?.profilePicture}`
                                     : `${defaultProfilePicture}`)
                             }
                             className="size-[14rem] rounded-full "
                             style={{border: "1px solid #d1d5db"}}
                         />
-
-                        {/* Tombol Upload Gambar */}
                         <Button
                             onClick={handleClickUploadButton}
                             type="button"
@@ -102,7 +100,7 @@ const UserModal = ({
                                 options={roleOptions}
                                 value={data?.role || null}
                                 onChange={(e) => {
-                                    setData((prev) => ({ ...prev, role: e.value }));
+                                    setData((prev) => ({...prev, role: e.value}));
                                     errors.role = false;
                                 }}
                                 invalid={errors.role}
@@ -147,7 +145,6 @@ const UserModal = ({
                         {errors.phoneNumber && <small className="p-error">{errors.phoneNumber}</small>}
                     </div>
 
-                    {/* Input Password untuk Create & Edit */}
                     {(isUserCreateMode || isUserEditMode) && (
                         <div className="w-full">
                             <label htmlFor="password" className="block mb-1 font-medium">

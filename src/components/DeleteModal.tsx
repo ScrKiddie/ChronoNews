@@ -1,8 +1,8 @@
 import React from "react";
-import { Button } from "primereact/button";
-import { ConfirmDialog } from "primereact/confirmdialog";
+import {Button} from "primereact/button";
+import {ConfirmDialog} from "primereact/confirmdialog";
 
-const DeleteModal = ({ visibleModal, setVisibleModal, onSubmit, submitLoading }) => {
+const DeleteModal = ({visibleModal, setVisibleModal, onSubmit, submitLoading}) => {
     const footer = (
         <div className="flex justify-end gap-2">
             <Button
@@ -19,7 +19,8 @@ const DeleteModal = ({ visibleModal, setVisibleModal, onSubmit, submitLoading })
                     onSubmit();
                 }}
                 disabled={submitLoading}
-            >{submitLoading ? <i className="pi pi-spin pi-spinner text-[24px] w-[51px]" style={{color: "#475569"}}></i> : "Delete"}</Button>
+            >{submitLoading ? <i className="pi pi-spin pi-spinner text-[24px] w-[51px]"
+                                 style={{color: "#475569"}}></i> : "Delete"}</Button>
         </div>
     );
     return (

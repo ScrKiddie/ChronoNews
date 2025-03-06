@@ -1,6 +1,6 @@
-import React, { createContext, useState, useEffect, ReactNode } from "react";
+import React, {createContext, useState, useEffect, ReactNode} from "react";
 import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 
 interface DecodedToken {
     role: string;
@@ -18,7 +18,7 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({children}) => {
     const [token, setToken] = useState<string | null>(null);
     const [sub, setSub] = useState<number | null>(null);
     const [role, setRole] = useState<string | null>(null);
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
 
     return (
-        <AuthContext.Provider value={{ sub, token, role, isAuthChecked, login, logout }}>
+        <AuthContext.Provider value={{sub, token, role, isAuthChecked, login, logout}}>
             {children}
         </AuthContext.Provider>
     );

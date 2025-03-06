@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api/user/current";
+const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
 
 export const ProfileService = {
-    getCurrentUser: async (token) => { // Terima token sebagai parameter
+    getCurrentUser: async (token) => {
         try {
-            const response = await axios.get(API_URL, {
+            const response = await axios.get(apiUri+"/api/user/current", {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -25,7 +25,7 @@ export const ProfileService = {
                 formData.append("profilePicture", data.profilePicture);
             }
 
-            const response = await axios.patch(`${API_URL}/profile`, formData, {
+            const response = await axios.patch(`${apiUri}/api/user/current/profile`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data"

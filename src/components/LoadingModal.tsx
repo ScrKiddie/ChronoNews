@@ -1,4 +1,4 @@
-const LoadingModal = ({ modalLoading }) => {
+const LoadingModal = ({modalLoading}) => {
     return (
         <div
             className={`flex items-center justify-center p-dialog-mask p-dialog-center p-component-overlay p-component-overlay-enter ${modalLoading ? "block" : "hidden"}`}
@@ -15,7 +15,7 @@ const LoadingModal = ({ modalLoading }) => {
         >
             <i
                 className="pi pi-spin pi-spinner text-[10vh]"
-                style={{ color: "#f59e0b", animationDuration: "1s" }}
+                style={{color: "#f59e0b", animationDuration: "1s"}}
             ></i>
         </div>
     );

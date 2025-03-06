@@ -1,8 +1,8 @@
-import React, { useRef, useState } from "react";
-import { Button } from "primereact/button";
-import { Menu as PrimeMenu } from "primereact/menu";
+import React, {useRef, useState} from "react";
+import {Button} from "primereact/button";
+import {Menu as PrimeMenu} from "primereact/menu";
 
-const MenuButton = ({ toastRef, openProfileModal }) => {
+const MenuButton = ({openProfileModal}) => {
     const [isMenuVisible, setIsMenuVisible] = useState(false);
     const [key, setKey] = useState(0);
     const buttonRef = useRef(null);
@@ -51,9 +51,10 @@ const MenuButton = ({ toastRef, openProfileModal }) => {
                         {
                             label: "Password",
                             icon: <i className="pi pi-key pr-3"/>,
-                            command: () => {} // Add your logic here
+                            command: () => {
+                            } // Add your logic here
                         },
-                        { label: "Keluar", icon: <i className="pi pi-sign-out pr-3"/> },
+                        {label: "Keluar", icon: <i className="pi pi-sign-out pr-3"/>},
                     ]}
                 />
             </div>
