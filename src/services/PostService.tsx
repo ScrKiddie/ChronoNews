@@ -62,6 +62,7 @@ export const PostService = {
 
             return response.data.data;
         } catch (error) {
+            console.error("Error details:", error.response || error.message);
             throw new Error(error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },

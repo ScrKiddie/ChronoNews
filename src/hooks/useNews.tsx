@@ -332,14 +332,13 @@ const useNews = () => {
                     setSelectedCategory("")
                     setNotFound(false);
                 } catch (error) {
-                    if (!error.response) {
-                        console.log(error)
+                    if (error.message === "Terjadi kesalahan jaringan") {
                         setError(true)
+                    } else if (error.message === "Not found" || error.message === "Bad request") {
+                        setNotFound(true);
                     } else {
                         console.log(error)
-                        setNotFound(true);
                     }
-
                 } finally {
                     setLoading(false)
                 }

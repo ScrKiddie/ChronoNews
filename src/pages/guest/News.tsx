@@ -78,12 +78,11 @@ const News: React.FC = () => {
             navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
         }
     };
-
-    if (notFound) {
-        return <NotFound/>
-    }
-
+    useEffect(() => {
+        console.log(notFound)
+    }, [notFound]);
     return (
+        !notFound ?
         <div className="min-h-screen bg-white">
             <ScrollTop className="bg-[#f59e0b] color-[#465569]"/>
             <div className={`flex flex-col fixed top-0 w-full z-[999999]`}>
@@ -207,7 +206,8 @@ const News: React.FC = () => {
 
 
             <GuestFooter/>
-        </div>
+        </div> :
+            <NotFound/>
     );
 };
 

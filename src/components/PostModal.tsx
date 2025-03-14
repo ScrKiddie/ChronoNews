@@ -209,12 +209,6 @@ const PostModal = ({
                                     <option value="6">Heading 6</option>
                                     <option value="">Normal</option>
                                 </select>
-                                <select className="ql-size" aria-label="Font Size">
-                                    <option value="small" selected>Small</option>
-                                    <option value="">Normal</option>
-                                    <option value="large">Large</option>
-                                    <option value="huge">Huge</option>
-                                </select>
                                 <button className="ql-bold" aria-label="Bold"></button>
                                 <button className="ql-italic" aria-label="Italic"></button>
                                 <button className="ql-underline" aria-label="Underline"></button>
