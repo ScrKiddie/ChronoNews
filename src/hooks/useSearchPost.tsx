@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import {PostService} from "../services/PostService";
 import {useToast} from "./useToast.tsx";
 import {useAuth} from "./useAuth.tsx";
@@ -20,12 +20,19 @@ const useSearchPost = () => {
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
     const [visibleLoadingConnection, setVisibleLoadingConnection] = useState(false);
 
-    useEffect(() => {
-        setPage(1);
-    }, [searchParams, size]);
+    const prevSearchParams = useRef(searchParams);
 
     useEffect(() => {
-        fetchData();
+        if (JSON.stringify(prevSearchParams.current) !== JSON.stringify(searchParams)) {
+            prevSearchParams.current = searchParams;
+            if (page != 1){
+                setPage(1)
+            }else {
+                fetchData()
+            }
+        } else {
+            fetchData();
+        }
     }, [page, searchParams, size]);
     const fetchData = async () => {
         setVisibleConnectionError(false);

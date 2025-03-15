@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useRef} from "react";
 import {UserService} from "../services/UserService";
 import {useToast} from "./useToast.tsx";
 import {useAuth} from "./useAuth.tsx";
@@ -14,15 +14,22 @@ const useSearchUser = () => {
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
     const [visibleLoadingConnection, setVisibleLoadingConnection] = useState(false);
 
-    useEffect(() => {
-        setPage(1);
-    }, [searchParams, size]);
+    const prevSearchParams = useRef(searchParams);
 
     useEffect(() => {
-        fetchData();
+        if (JSON.stringify(prevSearchParams.current) !== JSON.stringify(searchParams)) {
+            prevSearchParams.current = searchParams;
+            if (page != 1){
+                setPage(1)
+            }else {
+                fetchData()
+            }
+        } else {
+            fetchData();
+        }
     }, [page, searchParams, size]);
 
-    const fetchData = async () => {
+    const fetchData = async (reset = false) => {
         setVisibleConnectionError(false);
         setVisibleLoadingConnection(true);
         try {
@@ -31,7 +38,7 @@ const useSearchUser = () => {
                 phoneNumber: searchParams.phoneNumber,
                 email: searchParams.email,
                 role: searchParams.role,
-                page: page.toString(),
+                page: reset ? 1 : page.toString(),
                 size: size.toString(),
             };
 
