@@ -25,16 +25,16 @@ const TopPost = ({
                 className="grid-custom"
                 itemTemplate={(post) => (
                     <div key={post.id} className="sm:w-1/3">
-                        <div className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg min-h-[320px] flex flex-col">
+                        <div className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg lg:min-h-[350px] min-h-[320px] flex flex-col">
                             <img
                                 src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail}
                                 alt={post.title}
                                 className="bg-[#f59e0b] w-full h-40 object-cover rounded-t-lg cursor-pointer"
-                                onClick={() => navigate(`/${post.id}`)}
+                                onClick={() => navigate(`/post?id=${post.id}`)}
                             />
                             <div className="p-3">
                                 <h3 className="text-md font-semibold cursor-pointer w-fit"
-                                    onClick={() => navigate(`/${post.id}`)}>
+                                    onClick={() => navigate(`/post?id=${post.id}`)}>
                                     {truncateText(post.title, 30)}
                                 </h3>
                                 <p className="text-gray-600 text-xs sm:text-sm mb-1"><span

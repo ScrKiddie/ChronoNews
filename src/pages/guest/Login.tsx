@@ -115,7 +115,7 @@ const Login: React.FC = () => {
                                 language: 'id',
                             }}
                             siteKey={turnstileSiteKey}
-                            className="md:mx-0  mx-auto w-fit border-red-1 rounded-md "
+                            className="md:mx-0  mx-auto w-fit border-red-1 rounded-md min-w-[304px] min-h-[69px]"
                             style={errors.tokenCaptcha ? {
                                 border: "1px solid #e24c69",
                                 padding: "1.5px 1.5px 2.2px 1.5px"

@@ -32,7 +32,7 @@ const RegularPost = ({
                                 src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail}
                                 alt={post.title}
                                 className="h-full w-full object-cover bg-[#f59e0b] rounded-tl-lg rounded-bl-lg cursor-pointer"
-                                onClick={() => navigate(`/${post.id}`)}
+                                onClick={() => navigate(`/post?id=${post.id}`)}
                             />
                         </div>
 
@@ -40,7 +40,7 @@ const RegularPost = ({
                         <div className="w-full flex flex-col lg:p-4 p-3">
                             <h3
                                 className="text-sm sm:text-sm lg:text-lg font-semibold cursor-pointer w-fit"
-                                onClick={() => navigate(`/${post.id}`)}
+                                onClick={() => navigate(`/post?id=${post.id}`)}
                             >
                                 {truncateText(post.title, 45)}
                             </h3>

@@ -34,13 +34,13 @@ const HeadlinePost = ({
                             src={news.thumbnail ? `${apiUri}/post_picture/${news.thumbnail}` : thumbnail}
                             alt={news.title}
                             className="w-full md:h-[480px] h-[240px] object-cover rounded-t-lg bg-[#f59e0b] cursor-pointer"
-                            onClick={() => navigate(`/${news.id}`)}
+                            onClick={() => navigate(`/post?id=${news.id}`)}
                         />
 
                         <div className="p-4 min-h-[240px] md:min-h-[160px]">
                             <h3
                                 className="text-2xl font-semibold w-fit cursor-pointer"
-                                onClick={() => navigate(`/${news.id}`)}
+                                onClick={() => navigate(`/post?id=${news.id}`)}
                             >
                                 {truncateText(news.title, 50)}
                             </h3>

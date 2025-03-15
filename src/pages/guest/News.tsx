@@ -62,13 +62,14 @@ const News: React.FC = () => {
         post,
         notFound,
         searchMode,
-        getSearchQueryFromUrl,
+        getQueryFromUrl,
         searchNews,
         searchNewsSize,
         searchNewsPagination,
         searchNewsPage,
         setSearchNewsPage,
-        handleRetry
+        handleRetry,
+        categories
     } = useNews();
 
     const navigate = useNavigate();
@@ -78,9 +79,7 @@ const News: React.FC = () => {
             navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
         }
     };
-    useEffect(() => {
-        console.log(notFound)
-    }, [notFound]);
+
     return (
         !notFound ?
         <div className="min-h-screen bg-white">
@@ -152,7 +151,7 @@ const News: React.FC = () => {
                         {searchMode ? (
                             <>
                                 <h3 className={`text-[#4b5563] lg:mb-2 font-medium`}>Hasil Pencarian Untuk
-                                    : {getSearchQueryFromUrl()}</h3>
+                                    : {getQueryFromUrl()}</h3>
                                 <RegularPost
                                     classKu="mt-2"
                                     posts={searchNews}
@@ -205,7 +204,7 @@ const News: React.FC = () => {
             </div>
 
 
-            <GuestFooter/>
+            <GuestFooter quickLinks={categories} />
         </div> :
             <NotFound/>
     );

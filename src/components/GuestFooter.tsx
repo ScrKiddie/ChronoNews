@@ -1,7 +1,8 @@
 import React from "react";
 import chronoverseLogo from "../../public/chronoverse.svg";
+import {Link} from "react-router-dom";
 
-const GuestFooter: React.FC = () => {
+const GuestFooter: React.FC = ({quickLinks = null} ) => {
     return (
         <footer className="bg-[#242b35] dark:bg-blackHover dark:text-white pt-10 lg:pb-1">
             <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
@@ -20,11 +21,20 @@ const GuestFooter: React.FC = () => {
                 </div>
                 <div className="flex flex-col mx-auto items-center lg:items-start pt-2">
                     <h2 className="text-xl font-semibold mb-4 text-center text-white">Tautan Cepat</h2>
-                    <p>Beranda</p>
-                    <p>Politik</p>
-                    <p>Teknologi</p>
-                    <p>Olahraga</p>
-                    <p>Business</p>
+                    <p key={"home"} className="text-white text-sm ">
+                        <Link to={`/home`} className="no-underline text-inherit">
+                            Home
+                        </Link>
+                    </p>
+                    {quickLinks.slice(0, -1).map((category, index) => (
+                        <p key={category.id} className="text-white text-sm">
+                            <Link to={`/${category.name.toLowerCase()}`} className="no-underline text-inherit">
+                                {category.name}
+                            </Link>
+                        </p>
+                    ))}
+
+
                 </div>
                 <div className="mx-auto pt-2">
                     <h2 className="text-xl font-semibold mb-4 text-center">Kontak Kami</h2>

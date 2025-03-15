@@ -85,7 +85,7 @@ const useNews = () => {
 
     const token = localStorage.getItem("token");
 
-    const [headlineMode, setHeadlineMode] = useState(true);
+    const [headlineMode, setHeadlineMode] = useState(false);
 
     const [post, setPost] = useState({
         id: null,
@@ -112,10 +112,6 @@ const useNews = () => {
         setRetry(prevRetry => prevRetry + 1);
     };
 
-    const getSearchQueryFromUrl = () => {
-        const params = new URLSearchParams(location.search);
-        return params.get("q") || "";
-    };
 
     useEffect(() => {
         const handleScroll = (event: Event) => {
@@ -127,6 +123,7 @@ const useNews = () => {
             window.removeEventListener("scroll", handleScroll);
         };
     }, []);
+
 
     const fetchCategories = async () => {
         setError(false)
@@ -152,7 +149,7 @@ const useNews = () => {
         setError(false)
         try {
             const filters = {
-                categoryName: category !== "Home" ? category : "",
+                categoryName: category !== "Home" && category !== "home" ? category : "",
                 page: headlinePage,
                 size: headlineSize,
             };
@@ -219,7 +216,7 @@ const useNews = () => {
         setLoading(true);
         try {
             const filters = {
-                categoryName: category !== "Home" ? category : "",
+                categoryName: category !== "Home" && category !== "home" ? category : "",
                 page: topNewsPage,
                 size: topNewsSize,
             };
@@ -249,7 +246,7 @@ const useNews = () => {
 
         try {
             const filters = {
-                categoryName: category !== "Home" ? category : "",
+                categoryName: category !== "Home" && category !== "home" ? category : "",
                 page: newsPage,
                 size: newsSize,
             };
@@ -273,21 +270,7 @@ const useNews = () => {
         }
     };
 
-    useEffect(() => {
-        if (headlineMode) {
-            fetchHeadlineNews(selectedCategory);
-        }
-    }, [selectedCategory, headlinePage, headlineMode, retry]);
 
-    useEffect(() => {
-        if (!searchMode) {
-            fetchTopNews(selectedCategory);
-        }
-    }, [selectedCategory, topNewsPage, retry]);
-
-    useEffect(() => {
-        fetchNews(selectedCategory);
-    }, [selectedCategory, newsPage]);
 
     useEffect(() => {
         fetchCategories();
@@ -295,85 +278,130 @@ const useNews = () => {
 
     const {id} = useParams();
     const {processContent} = useUpdatePost();
-    const [searchMode, setSearchMode] = useState(false)
+    const [searchMode, setSearchMode] = useState(true)
+
     useEffect(() => {
-        const query = getSearchQueryFromUrl();
-        if (query != "") {
-            setSearchQuery(query);
+        if (headlineMode && !searchMode && selectedCategory != "") {
+            fetchHeadlineNews(selectedCategory);
         }
-        if (searchQuery !== "" && query !== "") {
-            setActiveIndex(-1);
-            setSearchMode(true)
-            fetchSearchNews(searchQuery);
-            return;
-        } else {
-            setSearchMode(false)
+}, [selectedCategory, headlinePage, headlineMode, retry, searchMode]);
+
+    useEffect(() => {
+        if (!searchMode && selectedCategory != "") {
+            fetchTopNews(selectedCategory);
         }
-        if (!isNaN(Number(id)) && Number(id) > 0) {
-            setHeadlineMode(false);
-            setActiveIndex(-1);
-            const fetchPost = async () => {
-                setLoading(true);
-                setError(false)
-                try {
-                    const post = await PostService.getPost(id);
-                    setPost(prevPost => ({
-                        ...prevPost,
-                        category: post.category,
-                        summary: post.summary,
-                        id: post.id ?? null,
-                        title: post.title,
-                        thumbnail: post.thumbnail,
-                        user: post.user,
-                        content: processContent(post.content),
-                        publishedDate: formatDate(post.publishedDate),
-                        lastUpdated: post.lastUpdated ? formatDate(post.lastUpdated) : "",
-                    }));
-                    setSelectedCategory("")
-                    setNotFound(false);
-                } catch (error) {
-                    if (error.message === "Terjadi kesalahan jaringan") {
-                        setError(true)
-                    } else if (error.message === "Not found" || error.message === "Bad request") {
-                        setNotFound(true);
-                    } else {
-                        console.log(error)
+    }, [selectedCategory, topNewsPage, retry, searchMode]);
+
+    useEffect(() => {
+        if (!searchMode && selectedCategory != "") {
+            fetchNews(selectedCategory);
+        }
+    }, [selectedCategory, newsPage,retry, searchMode]);
+
+    const getQueryFromUrl = () => {
+        if (window.location.pathname === '/post') {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id') || '';
+        }else if (window.location.pathname === '/search') {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('q') || '';
+        }
+        return '';
+    };
+    useEffect(() => {
+        const query = getQueryFromUrl()
+        if (window.location.pathname === '/post') {
+            if(!isNaN(Number(query)) && Number(query) > 0){
+                setSearchMode(false);
+                setHeadlineMode(false);
+                setActiveIndex(-1);
+                const fetchPost = async () => {
+                    setLoading(true);
+                    setError(false)
+                    try {
+                        const post = await PostService.getPost(query);
+                        setPost(prevPost => ({
+                            ...prevPost,
+                            category: post.category,
+                            summary: post.summary,
+                            id: post.id ?? null,
+                            title: post.title,
+                            thumbnail: post.thumbnail,
+                            user: post.user,
+                            content: processContent(post.content),
+                            publishedDate: formatDate(post.publishedDate),
+                            lastUpdated: post.lastUpdated ? formatDate(post.lastUpdated) : "",
+                        }));
+                        setSelectedCategory("")
+                        setNotFound(false);
+                        fetchTopNews()
+                        fetchNews()
+                    } catch (error) {
+                        if (error.message === "Terjadi kesalahan jaringan") {
+                            setError(true)
+                        } else if (error.message === "Not found" || error.message === "Bad request") {
+                            setNotFound(true);
+                        } else {
+                            console.log(error)
+                        }
+                    } finally {
+                        setLoading(false)
                     }
-                } finally {
-                    setLoading(false)
-                }
-            };
-            fetchPost();
-            return;
-        } else {
+                };
+                fetchPost();
+
+                return;
+            }else {
+                setNotFound(true)
+            }
+        } else if (window.location.pathname === '/search') {
+            setSearchQuery(query);
+            setActiveIndex(-1);
+            setSearchMode(true);
+            fetchSearchNews(query);
+        }else {
+            setSearchMode(false);
             setHeadlineMode(true);
         }
 
-        if (!id) {
-            setActiveIndex(0);
+    }, [location.search, newsPage, retry]);
+
+
+
+    useEffect(() => {
+        if (categories.length === 0) {
+            console.log("nukll nug")
             return;
         }
+        if (window.location.pathname !== '/search' && window.location.pathname !== '/post') {
+            const primaryCategories = categories.slice(0, 3);
+            const remainingCategories = categories.slice(3);
 
-        const primaryCategories = categories.slice(0, 3);
-        const remainingCategories = categories.slice(3);
+            let foundIndex = primaryCategories.findIndex(cat => cat.name.toLowerCase() === id.toLowerCase());
+            console.log(foundIndex);
 
-        let foundIndex = primaryCategories.findIndex(cat => cat.name.toLowerCase() === id.toLowerCase());
+            if (window.location.pathname === "/home") {
+                handleCategoryChange(id);
+                setActiveIndex(0);
+                return;
+            }
 
-        if (foundIndex !== -1) {
-            setActiveIndex(foundIndex + 1);
-            return;
+            if (foundIndex !== -1) {
+                handleCategoryChange(id);
+                setActiveIndex(foundIndex + 1);
+                return;
+            }
+
+            const isInMoreCategories = remainingCategories.some(cat => cat.name.toLowerCase() === id.toLowerCase());
+            if (isInMoreCategories) {
+                handleCategoryChange(id);
+                setActiveIndex(4);
+                return;
+            }
+
+            setNotFound(true)
         }
-
-        const isInMoreCategories = remainingCategories.some(cat => cat.name.toLowerCase() === id.toLowerCase());
-
-        if (isInMoreCategories) {
-            setActiveIndex(4);
-            return;
-        }
-
-        setActiveIndex(0);
-
-    }, [id, categories, location.search, newsPage, retry]);
+    }, [id,categories]);
 
 
     const handleCategoryChange = (category: string) => {
@@ -389,10 +417,10 @@ const useNews = () => {
     const remainingCategories = categories.slice(3);
 
     const allCategories = [
-        {label: "Home", command: () => handleCategoryChange("Home")},
+        {label: "Home", command: () => handleCategoryChange("home")},
         ...primaryCategories.map((cat, index) => ({
             label: cat.name,
-            command: () => handleCategoryChange(cat.name),
+            command: () => handleCategoryChange(cat.name.toLowerCase()),
         })),
         ...(remainingCategories.length > 0
             ? [{label: "Lainnya", command: (e) => menuRef.current?.toggle(e.originalEvent)}]
@@ -409,7 +437,7 @@ const useNews = () => {
 
     useEffect(() => {
         window.scrollTo({top: 0, left: 0, behavior: 'auto'});
-    }, [id]);
+    }, [location.search,id]);
 
 
     return {
@@ -446,13 +474,14 @@ const useNews = () => {
         post,
         notFound,
         searchMode,
-        getSearchQueryFromUrl,
+        getQueryFromUrl,
         searchNews,
         searchNewsPage,
         searchNewsPagination,
         searchNewsSize,
         setSearchNewsPage,
-        handleRetry
+        handleRetry,
+        categories
     };
 };
 
