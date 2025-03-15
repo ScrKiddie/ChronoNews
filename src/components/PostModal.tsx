@@ -38,7 +38,18 @@ const PostModal = ({
 
 
     const handleTextChange = useCallback((htmlValue) => {
+        const isEditorFocused = document.activeElement.closest(".ql-editor") !== null;
+
         editorContent.current = htmlValue;
+        setData((prev) => ({ ...prev, content: htmlValue }));
+
+        if (!isEditorFocused) {
+            setTimeout(() => {
+                if (document.activeElement) {
+                    document.activeElement.blur();
+                }
+            }, 0);
+        }
     }, []);
 
     const handleFormSubmit = (e) => {
@@ -200,6 +211,12 @@ const PostModal = ({
                             placeholder="Masukkan Konten"
                             headerTemplate={
                                 <span className="ql-formats">
+                                <select className="ql-size" aria-label="Font Size">
+                                     <option value="small" selected>Small</option>
+                                     <option value="">Normal</option>
+                                     <option value="large">Large</option>
+                                     <option value="huge">Huge</option>
+                                 </select>
                                 <select className="ql-header" aria-label="Heading">
                                     <option value="1">Heading 1</option>
                                     <option value="2">Heading 2</option>
