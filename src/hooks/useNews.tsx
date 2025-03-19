@@ -274,7 +274,8 @@ const useNews = () => {
 
     useEffect(() => {
         fetchCategories();
-    }, []);
+    }, [retry]);
+
 
     const {id} = useParams();
     const {processContent} = useUpdatePost();
@@ -370,7 +371,11 @@ const useNews = () => {
 
     useEffect(() => {
         if (categories.length === 0) {
-            console.log("nukll nug")
+            if (window.location.pathname === "/home") {
+                handleCategoryChange("home");
+                setActiveIndex(0);
+                return;
+            }
             return;
         }
         if (window.location.pathname !== '/search' && window.location.pathname !== '/post') {
@@ -430,14 +435,18 @@ const useNews = () => {
     const moreCategories = remainingCategories.map((cat) => ({
         label: cat.name,
         command: () => {
-            handleCategoryChange(cat.name);
+            handleCategoryChange(cat.name.toLowerCase());
             setActiveIndex(4);
         },
     }));
 
     useEffect(() => {
-        window.scrollTo({top: 0, left: 0, behavior: 'auto'});
-    }, [location.search,id]);
+        const timeout = setTimeout(() => {
+            window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        }, 1);  // Delay yang sangat singkat
+        return () => clearTimeout(timeout);
+    }, [location.search, id]);
+
 
 
     return {

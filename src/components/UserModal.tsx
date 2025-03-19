@@ -5,6 +5,7 @@ import {Password} from "primereact/password";
 import defaultProfilePicture from "../../public/profilepicture.svg";
 import React from "react";
 import {Dropdown} from "primereact/dropdown";
+// import {TriStateCheckbox} from "primereact/tristatecheckbox";
 
 const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
 const UserModal = ({
@@ -124,7 +125,12 @@ const UserModal = ({
                                 errors.email = false;
                             }}
                         />
+
                         {errors.email && <small className="p-error">{errors.email}</small>}
+                        {/*<div className={`flex items-center gap-2 mt-2`}>*/}
+                        {/*    <TriStateCheckbox />*/}
+                        {/*    <p className={`text-sm h-fit pt-[1px] text-[#4b586d]`}>Notifikasi Pendaftaran</p>*/}
+                        {/*</div>*/}
                     </div>
 
                     <div className="w-full">

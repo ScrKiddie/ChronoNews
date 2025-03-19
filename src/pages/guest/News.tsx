@@ -84,7 +84,7 @@ const News: React.FC = () => {
         !notFound ?
         <div className="min-h-screen bg-white">
             <ScrollTop className="bg-[#f59e0b] color-[#465569]"/>
-            <div className={`flex flex-col fixed top-0 w-full z-[999999]`}>
+            <div className={`flex flex-col fixed top-0 w-full z-[600]`}>
                 <nav
                     className="flex justify-between items-center lg:flex-row flex-col bg-white  w-full lg:fixed h-[56px]   bg-none">
                     <div className={`flex lg:block justify-between items-center w-full lg:w-fit mt-2 lg:mt-0`}>
@@ -150,8 +150,8 @@ const News: React.FC = () => {
                     <>
                         {searchMode ? (
                             <>
-                                <h3 className={`text-[#4b5563] lg:mb-2 font-medium`}>Hasil Pencarian Untuk
-                                    : {getQueryFromUrl()}</h3>
+                                <h3 className={`text-[#4b5563] lg:mb-3  text-center font-[450]`}>Menampilkan Hasil Pencarian Untuk
+                                     "{getQueryFromUrl()}"</h3>
                                 <RegularPost
                                     classKu="mt-2"
                                     posts={searchNews}
