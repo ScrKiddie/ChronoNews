@@ -36,20 +36,15 @@ const PostModal = ({
         }
     }, [data?.content]);
 
+    useEffect(() => {
+        if (data?.content) {
+            editorContent.current = data.content;
+        }
+    }, [data?.content]);
+
 
     const handleTextChange = useCallback((htmlValue) => {
-        const isEditorFocused = document.activeElement.closest(".ql-editor") !== null;
-
         editorContent.current = htmlValue;
-        setData((prev) => ({ ...prev, content: htmlValue }));
-
-        if (!isEditorFocused) {
-            setTimeout(() => {
-                if (document.activeElement) {
-                    document.activeElement.blur();
-                }
-            }, 0);
-        }
     }, []);
 
     const handleFormSubmit = (e) => {

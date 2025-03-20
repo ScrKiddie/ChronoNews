@@ -373,4 +373,9 @@ body .navbar-top {
     margin: auto;
     margin-bottom: 1rem;
 }
-
+.p-galleria-thumbnail-next, .p-galleria-thumbnail-prev{
+    display: none;
+}
+.p-galleria-thumbnail-item-content{
+    height: fit-content !important;
+}

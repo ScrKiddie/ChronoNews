@@ -1,10 +1,11 @@
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Editor} from "primereact/editor";
 import {Button} from "primereact/button";
 import {BreadCrumb} from "primereact/breadcrumb";
 import defaultProfilePicture from "../../public/profilepicture.svg";
 import thumbnail from "../../public/thumbnail.svg";
 import {Dialog} from "primereact/dialog";
+import {Galleria} from "primereact/galleria";
 
 const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
 
@@ -17,6 +18,55 @@ const MainPost = ({post, handleCategoryChange}) => {
     const toggleModal = () => {
         setIsModalVisible(!isModalVisible);
     };
+
+    const containerRef = useRef(null);
+    const [containerWidth, setContainerWidth] = useState(0);
+
+    useEffect(() => {
+        const updateSize = () => {
+            if (containerRef.current) {
+                setContainerWidth(containerRef.current.clientWidth);
+            }
+        };
+
+        updateSize();
+        window.addEventListener("resize", updateSize);
+        return () => window.removeEventListener("resize", updateSize);
+    }, []);
+
+    const images = [
+        { itemImageSrc: post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail },
+        ...Array.from(new DOMParser().parseFromString(post.content, "text/html").querySelectorAll("img")).map(img => ({
+            itemImageSrc: img.src
+        }))
+    ];
+
+    const responsiveOptions = [
+        { breakpoint: '768px', numVisible: 2 }
+    ];
+
+    const itemTemplate = (item) => {
+        const height = containerWidth * 0.5625;
+
+        return (
+            <div
+                ref={containerRef}
+                className="w-full flex items-center justify-center bg-black"
+                style={{ height: `${height}px`, overflow: "hidden" }}
+            >
+                <img
+                    src={item.itemImageSrc}
+                    alt="Gallery"
+                    className="max-w-full max-h-full object-contain"
+                />
+            </div>
+        );
+    };
+
+    const thumbnailTemplate = (item) => (
+        <img src={item.itemImageSrc} alt="Thumbnail" className=" w-32 h-30 pt-[6px] lg:w-40 lg:h-20 object-cover" />
+    );
+
 
     return (
         <>
@@ -42,13 +92,23 @@ const MainPost = ({post, handleCategoryChange}) => {
                 <h1 className="text-[#475569] font-semibold text-3xl">{post.title}</h1>
                 <small className="text-[#475569] mb-2 mt-2">{post.summary}</small>
 
-                <img
-                    src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail}
-                    alt={post.title}
-                    className="w-full object-cover bg-[#f59e0b]"
-                />
-
-                <div className="flex justify-between mb-4 mt-2 flex-row lg:gap-0 ">
+                {/*<img*/}
+                {/*    src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail}*/}
+                {/*    alt={post.title}*/}
+                {/*    className="w-full object-cover bg-[#f59e0b]"*/}
+                {/*/>*/}
+                <div>
+                    <Galleria
+                        value={images}
+                        responsiveOptions={responsiveOptions}
+                        circular
+                        showItemNavigators
+                        item={itemTemplate}
+                        thumbnail={thumbnailTemplate}
+                        numVisible={4}
+                    />
+                </div>
+                <div className="flex justify-between my-4 flex-row lg:gap-0 ">
                     <div className="flex gap-2 items-center">
                         <img
                             src={post.user?.profilePicture
