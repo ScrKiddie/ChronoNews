@@ -12,10 +12,10 @@ ChronoVerse is a minimalist Single Page Application (SPA) designed to display ne
 - **Tailwind CSS**: Utility-first CSS framework for rapid responsive design.
 
 ## Environment Variables
-| **Key**                | **Type**     | **Description**                                                                           | **Example**                |
-|--------------------|----------|-------------------------------------------------------------------------------------------|----------------------------|
-| **VITE_TURNSTILE_SITE_KEY**     | `string` | Turnstile (reCAPTCHA) site key                                                            | `0x4AAABABA_vmrAXsPDzuG1l` |
-| **VITE_CHRONOVERSE_API_URI**     | `string` | URL of the backend API from [ChronoVerseAPI](https://github.com/ScrKiddie/ChronoVerseAPI) | `http://localhost:6969`    |
-
+| **Key**                | **Type**     | **Description**                                                                          | **Example**               |
+|--------------------|----------|------------------------------------------------------------------------------------------|---------------------------|
+| **VITE_TURNSTILE_SITE_KEY**     | `string` | Turnstile (reCAPTCHA) site key                                                           | `0x4AAABABA_vmrAXsPDzuG1l` |
+| **VITE_CHRONOVERSE_API_URI**     | `string` | URL of the backend API from [ChronoVerseAPI](https://github.com/ScrKiddie/ChronoVerseAPI) | `http://localhost:6969`   |
+| **VITE_DISQUS_SHORTNAME**      | `string`     | Disqus shortname for your site                      | `your-shortname`          |
 ## Preview
 ![Image](https://github.com/user-attachments/assets/c52744de-de66-4572-a51b-e067980a47ab)

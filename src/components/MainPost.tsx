@@ -12,6 +12,23 @@ const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
 const MainPost = ({post, handleCategoryChange}) => {
     const [showLastUpdated, setShowLastUpdated] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
+
+    useEffect(() => {
+        if (window.DISQUS) {
+            window.DISQUS.reset({ reload: true,
+                config: function () {
+                    this.page.identifier = post.id;
+                    this.page.url = window.location.href;
+                }});
+        } else {
+            const script = document.createElement("script");
+            script.src = `https://${import.meta.env.VITE_DISQUS_SHORTNAME}.disqus.com/embed.js`;
+            script.setAttribute("data-timestamp", +new Date());
+            script.async = true;
+            document.body.appendChild(script);
+        }
+    }, [post.id]);
+
     const toggleLastUpdated = () => {
         setShowLastUpdated(!showLastUpdated);
     };
@@ -173,7 +190,7 @@ const MainPost = ({post, handleCategoryChange}) => {
                 <Editor key={post.id} className="content-view" headerTemplate={<></>} value={post.content} readOnly/>
 
                 <div className="w-full my-4 opacity-30" style={{borderTop: "1px solid #8496af"}}></div>
-
+                <div id="disqus_thread" className={`my-4`}></div>
             </main>
             <Dialog
                 header={

@@ -379,3 +379,9 @@ body .navbar-top {
 .p-galleria-thumbnail-item-content{
     height: fit-content !important;
 }
+#disqus_thread a {
+    color: #f49f14;
+}
+#disqus_thread button span{
+    color: white;
+}
