@@ -26,7 +26,7 @@ const GuestFooter: React.FC = ({quickLinks = null} ) => {
                             Home
                         </Link>
                     </p>
-                    {quickLinks.slice(0, -1).map((category, index) => (
+                    {quickLinks.slice(0, -1).map((category) => (
                         <p key={category.id} className="text-white text-sm">
                             <Link to={`/${category.name.toLowerCase()}`} className="no-underline text-inherit">
                                 {category.name}

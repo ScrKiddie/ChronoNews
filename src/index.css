@@ -7,9 +7,7 @@ html, body {
     padding: 0;
 
     width: 100%;
-
     background-color: #f2f2f2;
-
 }
 
 small {
@@ -76,10 +74,6 @@ p {
 
 .css-wx7wi4 {
     min-width: fit-content !important;
-}
-
-#cf-turnstile > div {
-    height: 64px;
 }
 
 .ql-editor[contenteditable="false"] {
@@ -179,6 +173,8 @@ body .ql-editing a {
 
 .ql-editor[contenteditable="false"] {
     overflow: hidden;
+    min-height: fit-content;
+    max-height: fit-content;
 }
 
 .p-inputnumber-input {
@@ -293,6 +289,11 @@ body .navbar-top {
     border-radius: 0px;
 }
 
+.normal .p-menuitem-link {
+    font-weight: 400;
+    border-radius: 0px;
+}
+
 .menu-news span {
     color: #6b7280 !important;
 }
@@ -301,7 +302,6 @@ body .navbar-top {
     display: flex;
     gap: 14px;
     justify-content: center;
-
 }
 
 @media screen and (max-width: 768px) {
@@ -329,7 +329,7 @@ body .navbar-top {
 .p-breadcrumb {
     padding: 0px;
     font-size: 1.2rem;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     border: none;
 }
 
@@ -354,11 +354,11 @@ body .navbar-top {
 }
 
 .p-dataview-emptymessage::after {
-    content: "Data Tidak Tersedia";
+    content: "Data tidak tersedia";
     visibility: visible;
     display: block;
     font-size: 18px;
-    font-weight: 450;
+    font-weight: 400;
 }
 
 .p-dataview-emptymessage::before {
@@ -371,7 +371,7 @@ body .navbar-top {
     background-size: contain;
     background-repeat: no-repeat;
     margin: auto;
-    margin-bottom: 1rem;
+
 }
 .p-galleria-thumbnail-next, .p-galleria-thumbnail-prev{
     display: none;

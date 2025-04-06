@@ -85,4 +85,3 @@ export const PasswordSchema = z
         }
     });
 
-export type PasswordType = z.infer<typeof PasswordSchema>;

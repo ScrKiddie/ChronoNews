@@ -66,36 +66,6 @@ export const UserCreateSchema = z.object({
             });
         }
     }),
-    password: z.string().superRefine((value, ctx) => {
-        if (value.trim().length === 0) {
-            ctx.addIssue({
-                code: "custom",
-                message: "Password tidak boleh kosong",
-            });
-            return;
-        }
-
-        if (value.length < 8) {
-            ctx.addIssue({
-                code: "custom",
-                message: "Password minimal 8 karakter",
-            });
-        }
-
-        if (value.length > 255) {
-            ctx.addIssue({
-                code: "custom",
-                message: "Password maksimal 255 karakter",
-            });
-        }
-
-        if (!/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/.test(value)) {
-            ctx.addIssue({
-                code: "custom",
-                message: "Password harus mengandung huruf besar, angka, dan simbol",
-            });
-        }
-    }),
     role: z.string().superRefine((value, ctx) => {
         if (value.trim().length === 0) {
             ctx.addIssue({
@@ -224,5 +194,3 @@ export const UserUpdateSchema = z.object({
     }),
 });
 
-
-export type UserCreateType = z.infer<typeof UserCreateSchema>;

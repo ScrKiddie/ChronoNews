@@ -24,8 +24,8 @@ const TopPost = ({
                 layout="grid"
                 className="grid-custom"
                 itemTemplate={(post) => (
-                    <div key={post.id} className="sm:w-1/3">
-                        <div className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg lg:min-h-[350px] min-h-[320px] flex flex-col">
+                    <div key={post.id} className="sm:w-full">
+                        <div className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg min-h-[320px] flex flex-col">
                             <img
                                 src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail}
                                 alt={post.title}
@@ -40,7 +40,7 @@ const TopPost = ({
                                 <p className="text-gray-600 text-xs sm:text-sm mb-1"><span
                                     className="no-underline text-gray-600 hover:text-gray-600 cursor-pointer"
                                     onClick={() => {
-                                        handleCategoryChange(post.category?.name)
+                                        handleCategoryChange(post.category?.name.toLowerCase())
                                     }}
                                 >
                             {post.category?.name}

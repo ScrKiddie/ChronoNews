@@ -25,11 +25,11 @@ const HeadlinePost = ({
         <div>
             {/* Headline News */}
             <DataView
-                value={headlineNews ? [headlineNews] : []} // Mengubah headline menjadi array agar sesuai dengan DataView
+                value={headlineNews ? [headlineNews] : []}
                 layout="grid"
                 className="grid-custom"
                 itemTemplate={(news) => (
-                    <div key={news.id} className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg">
+                    <div key={news.id} className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg w-full">
                         <img
                             src={news.thumbnail ? `${apiUri}/post_picture/${news.thumbnail}` : thumbnail}
                             alt={news.title}
@@ -47,7 +47,7 @@ const HeadlinePost = ({
                             <p className=""><span
                                 className="no-underline text-gray-600 hover:text-gray-600 cursor-pointer"
                                 onClick={() => {
-                                    handleCategoryChange(headlineNews.category?.name)
+                                    handleCategoryChange(headlineNews.category?.name.toLowerCase())
                                 }}
                             >
                             {news.category?.name}

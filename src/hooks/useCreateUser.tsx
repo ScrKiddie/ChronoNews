@@ -92,7 +92,6 @@ export const useCreateUser = (toastRef = null, fetchData = null) => {
         handleSubmit,
         setData,
         setVisibleModal,
-
         // props dari useCropper
         fileInputRef,
         selectedImage,

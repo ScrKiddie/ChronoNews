@@ -5,7 +5,6 @@ import {BreadCrumb} from "primereact/breadcrumb";
 import defaultProfilePicture from "../../public/profilepicture.svg";
 import thumbnail from "../../public/thumbnail.svg";
 import {Dialog} from "primereact/dialog";
-import {Galleria} from "primereact/galleria";
 
 const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
 
@@ -32,7 +31,19 @@ const MainPost = ({post, handleCategoryChange}) => {
     const toggleLastUpdated = () => {
         setShowLastUpdated(!showLastUpdated);
     };
+    useEffect(() => {
+        if (isModalVisible) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "auto";
+        }
+
+        return () => {
+            document.body.style.overflow = "auto";
+        };
+    }, [isModalVisible]);
     const toggleModal = () => {
+
         setIsModalVisible(!isModalVisible);
     };
 
@@ -88,19 +99,18 @@ const MainPost = ({post, handleCategoryChange}) => {
     return (
         <>
             <main>
-                {/* Breadcrumb */}
                 <BreadCrumb model={[
                     {
                         label: "Home", template: () => <span
-                            className="text-[#475569] cursor-pointer font-medium" onClick={() => {
+                            className="text-[#475569]  cursor-pointer font-[600]" onClick={() => {
                             handleCategoryChange("")
                         }}
                         > Home</span>
                     },
                     {
                         label: post.category?.name || "Kategori", template: () => <span
-                            className="text-[#f59e0b] cursor-pointer font-medium" onClick={() => {
-                            handleCategoryChange(post.category?.name)
+                            className="text-[#f59e0b] cursor-pointer font-[600]" onClick={() => {
+                            handleCategoryChange(post.category?.name.toLowerCase())
                         }}
                         > {post.category?.name}</span>
                     }
@@ -109,21 +119,14 @@ const MainPost = ({post, handleCategoryChange}) => {
                 <h1 className="text-[#475569] font-semibold text-3xl">{post.title}</h1>
                 <small className="text-[#475569] mb-2 mt-2">{post.summary}</small>
 
-                {/*<img*/}
-                {/*    src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail}*/}
-                {/*    alt={post.title}*/}
-                {/*    className="w-full object-cover bg-[#f59e0b]"*/}
-                {/*/>*/}
                 <div>
-                    <Galleria
-                        value={images}
-                        responsiveOptions={responsiveOptions}
-                        circular
-                        showItemNavigators
-                        item={itemTemplate}
-                        thumbnail={thumbnailTemplate}
-                        numVisible={4}
-                    />
+                    <div className={`mb-[-0.5rem]`}>
+                        <img
+                            src={images[0].itemImageSrc}
+                            alt={post.title}
+                            className="w-full object-cover bg-[#f59e0b]"
+                        />
+                    </div>
                 </div>
                 <div className="flex justify-between my-4 flex-row lg:gap-0 ">
                     <div className="flex gap-2 items-center">
@@ -187,10 +190,9 @@ const MainPost = ({post, handleCategoryChange}) => {
 
                 <div className="w-full my-4 opacity-30" style={{borderTop: "1px solid #8496af"}}></div>
 
-                <Editor key={post.id} className="content-view" headerTemplate={<></>} value={post.content} readOnly/>
-
+                <Editor key={post.id} className="content-view" headerTemplate={<></>} value={post?.content} readOnly/>
                 <div className="w-full my-4 opacity-30" style={{borderTop: "1px solid #8496af"}}></div>
-                <div id="disqus_thread" className={`my-4`}></div>
+                <div id="disqus_thread" className={`mt-8 mb-4`}></div>
             </main>
             <Dialog
                 header={

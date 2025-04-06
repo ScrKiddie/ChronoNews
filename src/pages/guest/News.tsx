@@ -1,31 +1,21 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import {TabMenu} from "primereact/tabmenu";
 import {InputText} from "primereact/inputtext";
 import {Menu} from "primereact/menu";
-import {DataView} from "primereact/dataview";
-import {Paginator} from "primereact/paginator";
-import {IconField} from "primereact/iconfield";
-import {InputIcon} from "primereact/inputicon";
 import chronoverseLogo from "../../../public/chronoverse.svg";
 import GuestFooter from "../../components/GuestFooter.tsx";
 import useNews from "../../hooks/useNews.tsx";
-import thumbnail from "../../../public/thumbnail.svg";
-import {useNavigate, useParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {ScrollTop} from "primereact/scrolltop";
 import HeadlinePost from "../../components/HeadlinePost.tsx";
-import {Editor} from "primereact/editor";
-import {PostService} from "../../services/PostService.tsx";
-import {useUpdatePost} from "../../hooks/useUpdatePost.tsx";
 import useQuillConfig from "../../hooks/useQuillConfig.tsx";
-import defaultProfilePicture from "../../../public/profilepicture.svg";
 import {Button} from "primereact/button";
-import {BreadCrumb} from "primereact/breadcrumb";
 import NotFound from "./NotFound.tsx";
 import MainPost from "../../components/MainPost.tsx";
 import TopPost from "../../components/TopPost.tsx";
 import RegularPost from "../../components/RegularPost.tsx";
-import Loading from "./Loading.tsx";
 import LoadingRetry from "../../components/LoadingRetry.tsx";
+import EmptyData from "../../components/EmptyData.tsx";
 
 const News: React.FC = () => {
     const {
@@ -50,19 +40,15 @@ const News: React.FC = () => {
         moreCategories,
         loading,
         error,
-        selectedCategory,
         handleCategoryChange,
         topNewsSize,
         headlineSize,
         newsSize,
         headlineMode,
-        setHeadlineMode,
-        formatDate,
         truncateText,
         post,
         notFound,
         searchMode,
-        getQueryFromUrl,
         searchNews,
         searchNewsSize,
         searchNewsPagination,
@@ -80,11 +66,22 @@ const News: React.FC = () => {
         }
     };
 
+    useEffect(() => {
+        if (loading || error) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "auto";
+        }
+        return () => {
+            document.body.style.overflow = "auto";
+        };
+    }, [loading, error]);
+
     return (
         !notFound ?
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-white ">
             <ScrollTop className="bg-[#f59e0b] color-[#465569]"/>
-            <div className={`flex flex-col fixed top-0 w-full z-[600]`}>
+            <div className={`flex flex-col fixed top-0 w-full z-[600] `}>
                 <nav
                     className="flex justify-between items-center lg:flex-row flex-col bg-white  w-full lg:fixed h-[56px]   bg-none">
                     <div className={`flex lg:block justify-between items-center w-full lg:w-fit mt-2 lg:mt-0`}>
@@ -138,73 +135,96 @@ const News: React.FC = () => {
                             }
                         }
                     }}
-                    className="lg:h-full overflow-y-hidden h-[58px]  w-full "
+                    className="lg:h-full overflow-y-hidden h-[58px] w-full "
                 />
             </div>
 
-            <div className="p-4 mx-auto max-w-4xl bg-white lg:pt-20 pt-32 rounded-md min-h-screen">
+            <div className="min-h-screen p-4 mx-auto max-w-4xl bg-white lg:pt-[4.6rem] pt-32 rounded-md">
                 {(error || loading) ?
-                    <LoadingRetry visibleConnectionError={error} visibleLoadingConnection={loading}
-                                  onRetry={handleRetry}/>
+                    <div className="fixed inset-0 flex items-center justify-center bg-white z-[9999] overflow-hidden overflow-y-hidden">
+                        <LoadingRetry visibleConnectionError={error} visibleLoadingConnection={loading}
+                                      onRetry={handleRetry}/>
+                    </div>
+
                     :
-                    <>
+                    <div >
                         {searchMode ? (
                             <>
-                                <h3 className={`text-[#4b5563] lg:mb-3  text-center font-[450]`}>Menampilkan Hasil Pencarian Untuk
-                                     "{getQueryFromUrl()}"</h3>
-                                <RegularPost
-                                    classKu="mt-2"
-                                    posts={searchNews}
-                                    postPage={searchNewsPage}
-                                    setPostPage={setSearchNewsPage}
-                                    postSize={searchNewsSize}
-                                    postPagination={searchNewsPagination}
-                                    truncateText={truncateText}
-                                /></>
+                                {searchNews.length > 0 ? (
+                                    <>
+                                        <h3 className="text-[#4b5563] mb-3" >Hasil Pencarian</h3>
+                                        <RegularPost
+                                            posts={searchNews}
+                                            postPage={searchNewsPage}
+                                            setPostPage={setSearchNewsPage}
+                                            postSize={searchNewsSize}
+                                            postPagination={searchNewsPagination}
+                                            truncateText={truncateText}
+                                            handleCategoryChange={handleCategoryChange}
+                                        />
+                                    </>
+
+                                ) : (
+                                    <EmptyData/>
+                                )}</>
                         ) : (
                             <>
-                                {headlineMode ? (
-                                    <HeadlinePost
-                                        headlineNews={headlineNews}
-                                        headlinePage={headlinePage}
-                                        setHeadlinePage={setHeadlinePage}
-                                        headlinePagination={headlinePagination}
-                                        headlineSize={headlineSize}
-                                        handleCategoryChange={handleCategoryChange}
-                                    />
-                                ) : (
+                                {topNews.length <= 0 ?
+                                    <EmptyData/>
+                                    :
                                     <>
-                                        <MainPost post={post} handleCategoryChange={handleCategoryChange}/>
-                                        <h3 className="text-[#4b5563]">Berita Lainnya</h3>
+                                        {headlineMode ? (
+                                            <>
+                                                <h3 className="text-[#4b5563] mb-3">Berita Terkini</h3>
+                                                <HeadlinePost
+                                                    headlineNews={headlineNews}
+                                                    headlinePage={headlinePage}
+                                                    setHeadlinePage={setHeadlinePage}
+                                                    headlinePagination={headlinePagination}
+                                                    headlineSize={headlineSize}
+                                                    handleCategoryChange={handleCategoryChange}
+                                                />
+                                                <h3 className="text-[#4b5563]">Berita Populer</h3>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <MainPost post={post} handleCategoryChange={handleCategoryChange}/>
+                                                <h3 className="text-[#4b5563]">Berita Terkait</h3>
+                                            </>
+                                        )}
+                                        <TopPost
+                                            topPosts={topNews}
+                                            topPostPage={topNewsPage}
+                                            setTopPostPage={setTopNewsPage}
+                                            topPostSize={topNewsSize}
+                                            topPostPagination={topNewsPagination}
+                                            truncateText={truncateText}
+                                            handleCategoryChange={handleCategoryChange}
+                                        />
+                                        {headlineMode && <h3 className="text-[#4b5563]">Berita Lainnya</h3>}
+                                        {!headlineMode && !searchMode && <h3 className="text-[#4b5563]">Berita Lainnya</h3>}
+                                        <RegularPost
+                                            posts={news}
+                                            postPage={newsPage}
+                                            setPostPage={setNewsPage}
+                                            postSize={newsSize}
+                                            postPagination={newsPagination}
+                                            truncateText={truncateText}
+                                            classKu={"mt-4"}
+                                            handleCategoryChange={handleCategoryChange}
+                                        />
                                     </>
-                                )}
-                                <TopPost
-                                    topPosts={topNews}
-                                    topPostPage={topNewsPage}
-                                    setTopPostPage={setTopNewsPage}
-                                    topPostSize={topNewsSize}
-                                    topPostPagination={topNewsPagination}
-                                    truncateText={truncateText}
-                                    handleCategoryChange={handleCategoryChange}
-                                />
-                                <RegularPost
-                                    posts={news}
-                                    postPage={newsPage}
-                                    setPostPage={setNewsPage}
-                                    postSize={newsSize}
-                                    postPagination={newsPagination}
-                                    truncateText={truncateText}
-                                    classKu={"mt-4"}
-                                    handleCategoryChange={handleCategoryChange}
-                                />
+                                }
+
+
                             </>
                         )}
-                    </>
+                    </div>
                 }
             </div>
 
 
-            <GuestFooter quickLinks={categories} />
+            <GuestFooter quickLinks={categories}/>
         </div> :
             <NotFound/>
     );

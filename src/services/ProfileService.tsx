@@ -12,7 +12,7 @@ export const ProfileService = {
             });
             return response.data.data;
         } catch (error) {
-            throw new Error(error.response?.data?.error || "Terjadi kesalahan jaringan");
+            throw new Error(error.response?.status === 500 ? "Terjadi kesalahan jaringan" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },
     updateCurrentUser: async (data, token) => {
@@ -34,7 +34,7 @@ export const ProfileService = {
 
             return response.data.data;
         } catch (error) {
-            throw new Error(error.response?.data?.error || "Terjadi kesalahan jaringan");
+            throw new Error(error.response?.status === 500 ? "Terjadi kesalahan jaringan" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     }
 };

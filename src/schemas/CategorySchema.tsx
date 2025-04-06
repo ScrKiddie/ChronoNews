@@ -26,4 +26,3 @@ export const CategorySchema = z.object({
     }),
 });
 
-export type CategoryType = z.infer<typeof CategorySchema>;

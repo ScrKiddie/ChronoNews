@@ -86,6 +86,8 @@ const useNews = () => {
     const token = localStorage.getItem("token");
 
     const [headlineMode, setHeadlineMode] = useState(false);
+    const [mainMode, setMainMode] = useState(false);
+    const [searchMode, setSearchMode] = useState(false)
 
     const [post, setPost] = useState({
         id: null,
@@ -113,16 +115,7 @@ const useNews = () => {
     };
 
 
-    useEffect(() => {
-        const handleScroll = (event: Event) => {
-            menuRef.current?.hide(event);
-        };
 
-        window.addEventListener("scroll", handleScroll);
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-        };
-    }, []);
 
 
     const fetchCategories = async () => {
@@ -279,26 +272,44 @@ const useNews = () => {
 
     const {id} = useParams();
     const {processContent} = useUpdatePost();
-    const [searchMode, setSearchMode] = useState(true)
+
 
     useEffect(() => {
-        if (headlineMode && !searchMode && selectedCategory != "") {
+        if (headlineMode && !mainMode && !searchMode) {
             fetchHeadlineNews(selectedCategory);
         }
-}, [selectedCategory, headlinePage, headlineMode, retry, searchMode]);
-
+}, [selectedCategory, headlinePage ,retry, searchMode, mainMode]);
+    const [prevTopNewsPage, setPrevTopNewsPage] = useState(1)
+    const [prevNewsPage, setPrevNewsPage] = useState(1)
     useEffect(() => {
-        if (!searchMode && selectedCategory != "") {
+        if (!headlineMode && mainMode && !searchMode){
+            if (topNewsPage != prevTopNewsPage){
+                fetchTopNews("")
+                setPrevTopNewsPage(topNewsPage)
+            }
+            setSelectedCategory("")
+        }else if (!mainMode && headlineMode && !searchMode) {
             fetchTopNews(selectedCategory);
         }
-    }, [selectedCategory, topNewsPage, retry, searchMode]);
+    }, [selectedCategory, topNewsPage, retry, searchMode, mainMode]);
 
     useEffect(() => {
-        if (!searchMode && selectedCategory != "") {
+        console.log("halo"+newsPage)
+        console.log("mainMode"+mainMode)
+        console.log("headlineMode"+headlineMode)
+        console.log("searchMode"+searchMode)
+
+
+        if (!headlineMode && mainMode && !searchMode){
+            if (newsPage != prevNewsPage){
+                fetchNews("")
+                setPrevNewsPage(newsPage)
+            }
+            setSelectedCategory("")
+        }else if (!mainMode && headlineMode && !searchMode){
             fetchNews(selectedCategory);
         }
-    }, [selectedCategory, newsPage,retry, searchMode]);
-
+    }, [selectedCategory, newsPage,retry, searchMode, mainMode]);
     const getQueryFromUrl = () => {
         if (window.location.pathname === '/post') {
             const params = new URLSearchParams(window.location.search);
@@ -315,6 +326,7 @@ const useNews = () => {
             if(!isNaN(Number(query)) && Number(query) > 0){
                 setSearchMode(false);
                 setHeadlineMode(false);
+                setMainMode(true);
                 setActiveIndex(-1);
                 const fetchPost = async () => {
                     setLoading(true);
@@ -333,10 +345,9 @@ const useNews = () => {
                             publishedDate: formatDate(post.publishedDate),
                             lastUpdated: post.lastUpdated ? formatDate(post.lastUpdated) : "",
                         }));
-                        setSelectedCategory("")
                         setNotFound(false);
-                        fetchTopNews()
-                        fetchNews()
+                        fetchNews("")
+                        fetchTopNews("")
                     } catch (error) {
                         if (error.message === "Terjadi kesalahan jaringan") {
                             setError(true)
@@ -358,15 +369,18 @@ const useNews = () => {
         } else if (window.location.pathname === '/search') {
             setSearchQuery(query);
             setActiveIndex(-1);
+            setMainMode(false);
+            setHeadlineMode(false)
             setSearchMode(true);
             fetchSearchNews(query);
         }else {
             setSearchMode(false);
+            setMainMode(false)
             setHeadlineMode(true);
+            setSearchNewsPage(1);
         }
 
-    }, [location.search, newsPage, retry]);
-
+    }, [location.search,retry,searchNewsPage]);
 
 
     useEffect(() => {
@@ -443,10 +457,20 @@ const useNews = () => {
     useEffect(() => {
         const timeout = setTimeout(() => {
             window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-        }, 1);  // Delay yang sangat singkat
+        }, 1);
         return () => clearTimeout(timeout);
-    }, [location.search, id]);
+    }, [location.search,searchNewsPage ,id]);
 
+    useEffect(() => {
+        const handleScroll = (event: Event) => {
+            menuRef.current?.hide(event);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+        };
+    }, []);
 
 
     return {

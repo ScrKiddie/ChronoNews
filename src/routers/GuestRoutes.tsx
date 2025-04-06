@@ -3,6 +3,8 @@ import {Routes, Route, Navigate} from "react-router-dom";
 import Login from "../pages/guest/Login.tsx";
 import NotFound from "../pages/guest/NotFound.tsx";
 import News from "../pages/guest/News.tsx";
+import Reset from "../pages/guest/Reset.tsx";
+import Forgot from "../pages/guest/ResetRequest.tsx";
 
 const GuestRoutes = () => {
     return (
@@ -12,6 +14,8 @@ const GuestRoutes = () => {
             <Route path="/" element={<News/>}/>
             <Route path="/:id" element={<News/>}/>
             <Route path="/*" element={<NotFound/>}/>
+            <Route path="/reset" element={<Reset/>}/>
+            <Route path="/reset/request" element={<Forgot/>}/>
         </Routes>
     );
 };

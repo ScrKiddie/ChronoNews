@@ -1,6 +1,7 @@
 import {Dialog} from "primereact/dialog";
-import {Button} from "primereact/button";
-import {InputText} from "primereact/inputtext";
+import InputGroup from "./InputGroup.tsx";
+import React from "react";
+import SubmitButton from "./SubmitButton.tsx";
 
 const CategoryModal = ({
                            visible,
@@ -29,34 +30,16 @@ const CategoryModal = ({
             <form onSubmit={handleSubmit} className="w-full">
                 <div className="flex flex-col p-4 gap-4">
                     <div className="w-full">
-                        <label htmlFor="name" className="block mb-1 font-medium">
-                            Nama Kategori
-                        </label>
-                        <InputText
-                            id="name"
-                            className="w-full"
-                            invalid={errors.name}
-                            placeholder="Masukkan Nama Kategori"
-                            value={data?.name}
-                            onChange={(e) => {
-                                setData((prev) => ({...prev, name: e.target.value}));
-                                errors.name = false;
-                            }}
+                        <InputGroup
+                            label="Nama Kategori"
+                            data={data?.name}
+                            error={errors.name}
+                            setData={(e)=>{ setData(prev => ({ ...prev, name: e }));}}
+                            setError={(e)=>{ errors.name = e }}
                         />
-                        {errors.name && <small className="p-error">{errors.name}</small>}
                     </div>
 
-                    <Button
-                        disabled={submitLoading}
-                        className="w-full flex items-center justify-center font-normal"
-                        type="submit"
-                    >
-                        {submitLoading ? (
-                            <i className="pi pi-spin pi-spinner text-[24px]" style={{color: "#475569"}}></i>
-                        ) : (
-                            "Submit"
-                        )}
-                    </Button>
+                    <SubmitButton loading={submitLoading}/>
                 </div>
             </form>
         </Dialog>

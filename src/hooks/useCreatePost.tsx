@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useRef, useState} from "react";
 import {z} from "zod";
 import {useAuth} from "./useAuth.tsx";
 import {PostService} from "../services/PostService";
@@ -72,8 +72,6 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
                     ]);
                 }
             }
-
-
             setVisibleModal(true);
         } catch (error) {
             toastRef?.current?.show({
@@ -92,10 +90,10 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
         setSubmitLoading(true);
         setErrors({});
         try {
-            data.content = editorValue
             const validatedData = PostCreateSchema.parse(data);
             const request = {
                 ...validatedData,
+                content: editorValue,
                 ...(thumbnail instanceof File ? {thumbnail: thumbnail} : {}),
             };
             await PostService.createPost(request, token);
@@ -138,7 +136,6 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
         setData,
         setVisibleModal,
         editorContent,
-
         // props dari useCropper
         fileInputRef,
         selectedImage,

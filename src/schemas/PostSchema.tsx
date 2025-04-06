@@ -24,11 +24,7 @@ export const PostCreateSchema = z.object({
         }
     }),
 
-    content: z.string().superRefine((value, ctx) => {
-        if (value.trim().length === 0) {
-            ctx.addIssue({code: "custom", message: "Konten tidak boleh kosong"});
-        }
-    }),
+
 
     categoryID: z.number().superRefine((value, ctx) => {
         if (value === undefined || value === null || value === 0) {
@@ -72,11 +68,7 @@ export const PostUpdateSchema = z.object({
         }
     }),
 
-    content: z.string().superRefine((value, ctx) => {
-        if (value.trim().length === 0) {
-            ctx.addIssue({code: "custom", message: "Konten tidak boleh kosong"});
-        }
-    }),
+
 
     categoryID: z.number().superRefine((value, ctx) => {
         if (value === undefined || value === null || value === 0) {
@@ -153,8 +145,3 @@ export const PostDeleteSchema = z.object({
         }
     }),
 });
-
-export type PostCreateType = z.infer<typeof PostCreateSchema>;
-export type PostUpdateType = z.infer<typeof PostUpdateSchema>;
-export type PostSearchType = z.infer<typeof PostSearchSchema>;
-export type PostDeleteType = z.infer<typeof PostDeleteSchema>;

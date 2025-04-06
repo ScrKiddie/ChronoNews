@@ -153,7 +153,7 @@ const SidebarResponsive = ({children}) => {
                         <div ref={menuContainerRef} className={`absolute top-0 right-0`}>
                             <PrimeMenu
                                 key={key}
-                                className={`${isMenuVisible ? "visible" : "hidden"} text-md shadow-md absolute top-[70px] right-1 menu-news`}
+                                className={`${isMenuVisible ? "visible" : "hidden"} normal text-md shadow-md absolute top-[70px] right-1 menu-news`}
                                 model={[
                                     {
                                         label: "Profile",

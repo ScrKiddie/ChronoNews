@@ -15,19 +15,19 @@ const LoadingRetry: React.FC<ConnectionErrorProps> = ({visibleConnectionError, o
             <div className="flex flex-col items-center justify-center text-center h-screen text-[#4b5563]">
                 {visibleConnectionError ? (
                     <div className="font-medium text-2xl md:text-3xl">
-                        <p>Connection Lost</p>
+                        <p>Koneksi Terputus</p>
                         <p className="font-normal text-[18px]/[22px] line md:text-xl mt-1 mb-3 px-2">
-                            It seems there is an error with your internet connection.
+                            Sepertinya ada masalah dengan koneksi internet Anda.
                         </p>
                         <Button severity="secondary" onClick={onRetry}>
-                            Retry
+                            Coba Lagi
                         </Button>
                     </div>
                 ) : visibleLoadingConnection ? (
                     <div className="flex flex-col font-medium text-2xl md:text-3xl">
-                        <p>Loading Data</p>
+                        <p>Memuat Data</p>
                         <p className="font-normal text-[18px]/[22px] line md:text-xl mt-1 mb-3 px-2">
-                            Please wait while we load the data.
+                            Mohon tunggu sementara kami memuat data.
                         </p>
                         <i className="pi pi-spin pi-spinner text-[3rem]"
                            style={{color: "#64748b", animationDuration: "1s"}}></i>

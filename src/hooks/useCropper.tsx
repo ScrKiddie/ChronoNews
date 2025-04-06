@@ -2,7 +2,7 @@ import {useState, useRef} from "react";
 
 export const useCropper = ({
                                setVisibleModal = () => {
-                               }, setProfilePicture = null, toastRef = null, width = 320, height = 320
+                               }, setProfilePicture = null, toastRef = null, width = 800 , height = 800
                            } = {}) => {
     const fileInputRef = useRef(null);
     const [selectedImage, setSelectedImage] = useState(null);
@@ -22,19 +22,6 @@ export const useCropper = ({
                 toastRef.current?.show({
                     severity: "error",
                     detail: "Format gambar tidak valid",
-                    life: 2000,
-                });
-            }
-            setSelectedImage(null);
-            e.target.value = "";
-            return;
-        }
-
-        if (file.size > 500 * 1024) {
-            if (toastRef) {
-                toastRef.current?.show({
-                    severity: "error",
-                    detail: "Ukuran gambar melebihi 500KB",
                     life: 2000,
                 });
             }
@@ -73,10 +60,27 @@ export const useCropper = ({
 
     const handleCrop = () => {
         if (cropperRef.current) {
-            const canvas = cropperRef.current.getCroppedCanvas({width: width, height: height});
+            const canvas = cropperRef.current.getCroppedCanvas({width: width, height: height,imageSmoothingEnabled: true,
+                imageSmoothingQuality: "high"});
 
             canvas.toBlob((blob) => {
                 if (blob) {
+                    const fileSize = blob.size;
+                    if (fileSize > 2 * 1024 * 1024) {
+                        if (toastRef) {
+                            toastRef.current?.show({
+                                severity: "error",
+                                detail: "Hasil crop gambar melebihi 2MB",
+                                life: 2000,
+                            });
+                        }
+                        setVisibleCropImageModal(false);
+                        if (setVisibleModal) {
+                            setVisibleModal(true);
+                        }
+                        return;
+                    }
+
                     setCroppedImage(URL.createObjectURL(blob));
                     if (setProfilePicture) {
                         const fileExtension = imageFormat.split("/")[1];

@@ -1,11 +1,9 @@
 import {Dialog} from "primereact/dialog";
 import {Button} from "primereact/button";
-import {InputText} from "primereact/inputtext";
-import {Password} from "primereact/password";
 import defaultProfilePicture from "../../public/profilepicture.svg";
 import React from "react";
-import {Dropdown} from "primereact/dropdown";
-// import {TriStateCheckbox} from "primereact/tristatecheckbox";
+import InputGroup from "./InputGroup.tsx";
+import SubmitButton from "./SubmitButton.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
 const UserModal = ({
@@ -73,119 +71,64 @@ const UserModal = ({
                     />
 
                     <div className="w-full">
-                        <label htmlFor="name" className="block mb-1 font-medium">
-                            Nama Lengkap
-                        </label>
-                        <InputText
-                            id="name"
-                            className="w-full"
-                            invalid={errors.name}
-                            placeholder="Masukkan Nama Lengkap"
-                            value={data?.name}
-                            onChange={(e) => {
-                                setData((prev) => ({...prev, name: e.target.value}));
-                                errors.name = false;
-                            }}
-                        />
-                        {errors.name && <small className="p-error">{errors.name}</small>}
+                        <div className="w-full">
+                            <InputGroup
+                                label="Nama"
+                                data={data?.name}
+                                error={errors.name}
+                                setData={(e) => {setData(prev => ({...prev, name: e}))}}
+                                setError={(e) => {errors.name = e}}
+                            />
+                        </div>
                     </div>
 
                     {(isUserCreateMode || isUserEditMode) && (
                         <div className="w-full">
-                            <label htmlFor="role" className="block mb-1 font-medium">
-                                Role
-                            </label>
-                            <Dropdown
-                                id="role"
-                                className="w-full"
+                            <InputGroup
+                                type={"dropdown"}
                                 options={roleOptions}
-                                value={data?.role || null}
-                                onChange={(e) => {
-                                    setData((prev) => ({...prev, role: e.value}));
-                                    errors.role = false;
-                                }}
-                                invalid={errors.role}
-                                placeholder="Pilih Role"
+                                label="Role"
+                                data={data?.role}
+                                error={errors.role}
+                                setData={(e)=>{ setData(prev => ({ ...prev, role: e }));}}
+                                setError={(e)=>{ errors.role=e;}}
                             />
-                            {errors.role && <small className="p-error">{errors.role}</small>}
                         </div>
                     )}
                     <div className="w-full">
-                        <label htmlFor="email" className="block mb-1 font-medium">
-                            Email
-                        </label>
-                        <InputText
-                            id="email"
-                            className="w-full"
-                            invalid={errors.email}
-                            placeholder="Masukkan Email"
-                            value={data?.email}
-                            onChange={(e) => {
-                                setData((prev) => ({...prev, email: e.target.value}));
-                                errors.email = false;
-                            }}
+                        <InputGroup
+                            label="Email"
+                            data={data?.email}
+                            error={errors.email}
+                            setData={(e)=>{ setData(prev => ({ ...prev, email: e }));}}
+                            setError={(e)=>{ errors.email = e}}
                         />
-
-                        {errors.email && <small className="p-error">{errors.email}</small>}
-                        {/*<div className={`flex items-center gap-2 mt-2`}>*/}
-                        {/*    <TriStateCheckbox />*/}
-                        {/*    <p className={`text-sm h-fit pt-[1px] text-[#4b586d]`}>Notifikasi Pendaftaran</p>*/}
-                        {/*</div>*/}
                     </div>
 
                     <div className="w-full">
-                        <label htmlFor="phoneNumber" className="block mb-1 font-medium">
-                            Telepon
-                        </label>
-                        <InputText
-                            id="phoneNumber"
-                            className="w-full"
-                            invalid={errors.phoneNumber}
-                            placeholder="Masukkan Nomor Telepon"
-                            value={data?.phoneNumber}
-                            onChange={(e) => {
-                                setData((prev) => ({...prev, phoneNumber: e.target.value}));
-                                errors.phoneNumber = false;
-                            }}
+                        <InputGroup
+                            label="Telepon"
+                            data={data?.phoneNumber}
+                            error={errors.phoneNumber}
+                            setData={(e)=>{ setData(prev => ({ ...prev, phoneNumber: e }));}}
+                            setError={(e)=>{ errors.phoneNumber = e }}
                         />
-                        {errors.phoneNumber && <small className="p-error">{errors.phoneNumber}</small>}
                     </div>
 
-                    {(isUserCreateMode || isUserEditMode) && (
+                    {(isUserEditMode) && (
                         <div className="w-full">
-                            <label htmlFor="password" className="block mb-1 font-medium">
-                                Password
-                            </label>
-                            <Password
-                                id="password"
-                                className="w-full"
-                                invalid={errors.password}
-                                placeholder={"Masukkan Password"}
-                                value={data?.password || ""}
-                                onChange={(e) => {
-                                    setData((prev) => ({...prev, password: e.target.value}));
-                                    errors.password = false;
-                                }}
-                                toggleMask
-                                feedback={false}
+                            <InputGroup
+                                type="password"
+                                label="Password"
+                                data={data?.password}
+                                error={errors.password}
+                                setData={(e)=>{ setData(prev => ({ ...prev, password: e }));}}
+                                setError={(e)=>{ errors.password = e }}
+                                tip={(isUserEditMode) && !errors.password && "Kosongkan jika tidak ingin mengubah password"}
                             />
-                            {errors.password && <small className="p-error">{errors.password}</small>}
-                            {isUserEditMode && !errors.password &&
-                                <small className="text-gray-500">Kosongkan jika tidak ingin mengubah password</small>}
                         </div>
                     )}
-
-                    <Button
-                        disabled={submitLoading}
-                        className="w-full flex items-center justify-center font-normal"
-                        type="submit"
-                    >
-                        {submitLoading ? (
-                            <i className="pi pi-spin pi-spinner text-[24px]" style={{color: "#475569"}}></i>
-                        ) : (
-                            "Submit"
-                        )}
-                    </Button>
+                   <SubmitButton loading={submitLoading}/>
                 </div>
             </form>
         </Dialog>

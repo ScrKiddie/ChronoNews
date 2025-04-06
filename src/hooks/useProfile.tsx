@@ -103,7 +103,6 @@ export const useProfile = (toastRef = null) => {
         handleSubmit,
         setData,
         setVisibleModal,
-
         // props dari useCropper
         fileInputRef,
         selectedImage,

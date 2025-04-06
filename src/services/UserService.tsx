@@ -9,7 +9,6 @@ export const UserService = {
             formData.append("name", data.name);
             formData.append("phoneNumber", data.phoneNumber);
             formData.append("email", data.email);
-            formData.append("password", data.password);
             formData.append("role", data.role);
             if (data.profilePicture) {
                 formData.append("profilePicture", data.profilePicture);
@@ -24,7 +23,7 @@ export const UserService = {
 
             return response.data.data;
         } catch (error) {
-            throw new Error(error.response?.data?.error || "Terjadi kesalahan jaringan");
+            throw new Error(error.response?.status === 500 ? "Terjadi kesalahan jaringan" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },
     searchUser: async (token, filters = {}) => {
@@ -41,7 +40,7 @@ export const UserService = {
 
             return response.data;
         } catch (error) {
-            throw new Error(error.response?.data?.error || "Terjadi kesalahan jaringan");
+            throw new Error(error.response?.status === 500 ? "Terjadi kesalahan jaringan" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },
     getUser: async (id, token) => {
@@ -54,7 +53,7 @@ export const UserService = {
 
             return response.data.data;
         } catch (error) {
-            throw new Error(error.response?.data?.error || "Terjadi kesalahan jaringan");
+            throw new Error(error.response?.status === 500 ? "Terjadi kesalahan jaringan" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },
     updateUser: async (id, data, token) => {
@@ -80,7 +79,7 @@ export const UserService = {
 
             return response.data.data;
         } catch (error) {
-            throw new Error(error.response?.data?.error || "Terjadi kesalahan jaringan");
+            throw new Error(error.response?.status === 500 ? "Terjadi kesalahan jaringan" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },
     deleteUser: async (id, token) => {
@@ -93,7 +92,7 @@ export const UserService = {
 
             return response.data.message || "User berhasil dihapus";
         } catch (error) {
-            throw new Error(error.response?.data?.error || "Terjadi kesalahan jaringan");
+            throw new Error(error.response?.status === 500 ? "Terjadi kesalahan jaringan" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     }
 };

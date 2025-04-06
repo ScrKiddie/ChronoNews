@@ -26,8 +26,8 @@ const RegularPost = ({
                 layout="list"
                 itemTemplate={(post) => (
                     <div key={post.id}
-                         className="flex my-2 justify-between min-h-36 md:min-h-40 shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg">
-                        <div className="lg:w-[50%] w-[80%] h-full sm:h-40">
+                         className={`flex ${post.id === posts[posts.length - 1]?.id ? '' : 'mb-3'} w-full justify-between min-h-36 md:min-h-40 shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg`}>
+                        <div className="lg:w-[50%] w-[80%] min-h-36 md:min-h-40">
                             <img
                                 src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail}
                                 alt={post.title}
@@ -35,8 +35,6 @@ const RegularPost = ({
                                 onClick={() => navigate(`/post?id=${post.id}`)}
                             />
                         </div>
-
-                        {/* Konten */}
                         <div className="w-full flex flex-col lg:p-4 p-3">
                             <h3
                                 className="text-sm sm:text-sm lg:text-lg font-semibold cursor-pointer w-fit"
@@ -47,7 +45,7 @@ const RegularPost = ({
                             <p className="text-gray-600 text-xs sm:text-sm mb-1"><span
                                 className="no-underline text-gray-600 hover:text-gray-600 cursor-pointer"
                                 onClick={() => {
-                                    handleCategoryChange(post.category?.name)
+                                    handleCategoryChange(post.category?.name.toLowerCase())
                                 }}
                             >
                             {post.category?.name}

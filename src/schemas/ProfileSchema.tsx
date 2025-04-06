@@ -67,5 +67,3 @@ export const ProfileSchema = z.object({
         }
     }),
 });
-
-export type ProfileType = z.infer<typeof ProfileSchema>;

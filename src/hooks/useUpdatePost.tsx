@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useRef, useState} from "react";
 import {z} from "zod";
 import {useAuth} from "./useAuth.tsx";
 import {PostService} from "../services/PostService";
@@ -45,7 +45,6 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
 
     const reverseProcessContent = (htmlContent) => {
         if (!htmlContent) return "";
-
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlContent, "text/html");
 
@@ -138,6 +137,7 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
     const handleCloseModal = () => setVisibleModal(false);
 
     const handleSubmit = async (e, editorValue) => {
+        console.log(editorValue)
         e.preventDefault();
         setSubmitLoading(true);
         setErrors({});
@@ -146,13 +146,11 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
             const validatedData = PostUpdateSchema.parse({
                 title: data?.title,
                 summary: data?.summary,
-                content: editorValue,
                 userID: data?.userID,
                 categoryID: data?.categoryID,
             });
 
-            const cleanedContent = reverseProcessContent(validatedData.content);
-
+            const cleanedContent = reverseProcessContent(editorValue);
             const request = {
                 ...validatedData,
                 content: cleanedContent,

@@ -1,156 +1,132 @@
-import React, {useEffect, useRef, useState} from "react";
-import {InputText} from "primereact/inputtext";
-import {Password} from "primereact/password";
-import {Button} from "primereact/button";
-import {useAuth} from "../../hooks/useAuth.tsx";
-import {loginSchema} from "../../schemas/authSchema";
-import {loginUser} from "../../services/authService";
-import chronoverseLogo from "../../../public/chronoverse.svg";
-import {useNavigate} from "react-router-dom";
-import {useToast} from "../../hooks/useToast.tsx";
-import {Turnstile} from "@marsidev/react-turnstile";
+import React, { useEffect, useRef, useState } from "react";
+import { useAuth } from "../../hooks/useAuth.tsx";
+import { loginSchema } from "../../schemas/authSchema";
+import { loginUser } from "../../services/authService";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "../../hooks/useToast.tsx";
+import { Turnstile } from "@marsidev/react-turnstile";
+import GuestFormContainer from "../../components/GuestFormContainer.tsx";
+import SubmitButton from "../../components/SubmitButton.tsx";
+import InputGroup from "../../components/InputGroup.tsx";
 
 const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
+
 const Login: React.FC = () => {
     const toastRef = useToast();
-    const {login, token} = useAuth();
+    const { login, token } = useAuth();
     const navigate = useNavigate();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [errors, setErrors] = useState<{ email?: string; password?: string; tokenCaptcha: string }>({});
+    const [data, setData] = useState({
+        email: "",
+        password: "",
+        tokenCaptcha: "",
+    });
+    const [errors, setError] = useState({
+        email: "",
+        password: "",
+        tokenCaptcha: "",
+    });
     const [loading, setLoading] = useState(false);
-    const ref = useRef();
-    const [tokenCaptcha, setTokenCaptcha] = useState("");
+    const ref = useRef(null);
 
     useEffect(() => {
         if (token) {
-            navigate("/admin/beranda", {replace: true});
+            navigate("/admin/beranda", { replace: true });
         }
     }, [token, navigate]);
-
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
-        const result = loginSchema.safeParse({email, password, tokenCaptcha});
+        const result = loginSchema.safeParse(data);
 
         if (!result.success) {
-            const errorMessages: { email?: string; password?: string; tokenCaptcha: string; } = {};
+            const errorMessages = {
+                email: "",
+                password: "",
+                tokenCaptcha: "",
+            };
             result.error.errors.forEach((err) => {
-                if (err.path.includes("email")) errorMessages.email = err.message;
-                if (err.path.includes("password")) errorMessages.password = err.message;
-                if (err.path.includes("tokenCaptcha")) errorMessages.tokenCaptcha = err.message;
+                errorMessages[err.path[0]] = err.message;
             });
-            setErrors(errorMessages);
+            setError(errorMessages);
             setLoading(false);
             return;
         }
 
-        setErrors({});
+        setError({
+            email: "",
+            password: "",
+            tokenCaptcha: "",
+        });
 
         try {
-            const response = await loginUser({email, password, tokenCaptcha});
+            const response = await loginUser(data);
             login(response.data);
-            toastRef.current?.show({severity: "success", detail: "Berhasil masuk ke sistem", life: 2000});
+            toastRef.current?.show({ severity: "success", detail: "Berhasil masuk ke sistem", life: 2000 });
             navigate("/admin/beranda");
         } catch (error) {
-            toastRef.current?.show({severity: "error", detail: error.message, life: 2000});
+            toastRef.current?.show({ severity: "error", detail: error.message, life: 2000 });
         } finally {
-            setTokenCaptcha("");
+            setData(prev => ({ ...prev, tokenCaptcha: "" }));
             ref.current?.reset();
             setLoading(false);
         }
     };
 
     return (
-        <div className="flex justify-center flex-col items-center h-screen bg-cover bg-center bg-white md:bg-[#f2f2f2]">
-            <div
-                className="w-fit  flex items-center justify-center bg-white flex-col rounded-xl md:shadow-md">
-                <div className="w-fit m-10">
-                    <div className="flex items-center justify-center flex-col">
-                        <img src={chronoverseLogo} className="w-1/2" alt="Chronoverse Logo"/>
-                        <h1 className="m-0 font-extrabold" style={{color: 'var(--surface-600)'}}>
-                            CHRONO<span style={{color: 'var(--primary-500)'}}>VERSE</span>
-                        </h1>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="w-full">
-                        <div className="mb-2 mt-2">
-                            <label htmlFor="email" className="block mb-1 font-medium text-[#48525f]">Email</label>
-                            <InputText
-                                id="email"
-                                className={`w-full`}
-                                invalid={errors.email}
-                                placeholder="Masukkan Email"
-                                value={email}
-                                onChange={(e) => {
-                                    setEmail(e.target.value);
-                                    errors.email = false;
-                                }}
-                            />
-                            {errors.email && <small className="p-error">{errors.email}</small>}
-                        </div>
-
-                        <div className="mb-2">
-                            <label htmlFor="password" className="block mb-1 font-medium text-[#48525f]">Password</label>
-                            <Password
-                                id="password"
-                                className={`w-full`}
-                                invalid={errors.password}
-                                feedback={false}
-                                placeholder="Masukkan Password"
-                                toggleMask
-                                value={password}
-                                onChange={(e) => {
-                                    setPassword(e.target.value);
-                                    errors.password = false;
-                                }}
-                            />
-                            {errors.password && <small className="p-error">{errors.password}</small>}
-                        </div>
-                        <Turnstile
-                            ref={ref}
-                            options={{
-                                language: 'id',
-                            }}
-                            siteKey={turnstileSiteKey}
-                            className="md:mx-0  mx-auto w-fit border-red-1 rounded-md min-w-[304px] min-h-[69px]"
-                            style={errors.tokenCaptcha ? {
-                                border: "1px solid #e24c69",
-                                padding: "1.5px 1.5px 2.2px 1.5px"
-                            } : {}}
-                            onSuccess={(token) => {
-                                setErrors((prevErrors) => ({
-                                    ...prevErrors,
-                                    tokenCaptcha: false,
-                                }));
-                                setTokenCaptcha(token)
-                            }}
-                            onError={() => {
-                                setTokenCaptcha("");
-                                ref.current?.reset();
-                            }}
-                            onExpire={() => {
-                                setTokenCaptcha("");
-                                ref.current?.reset();
-                            }}
-                        />
-                        {errors.tokenCaptcha && <small className="p-error">{errors.tokenCaptcha}</small>}
-                        <div className={"mb-2"}></div>
-
-                        <Button
-                            className="w-full flex items-center justify-center font-normal"
-                            type="submit"
-                            disabled={loading}
-                        >
-                            {loading ? <i className="pi pi-spin pi-spinner text-[24px]"
-                                          style={{color: "#475569"}}></i> : "Sign In"}
-                        </Button>
-                    </form>
+        <GuestFormContainer title="Masuk Ke ChronoVerse">
+            <form onSubmit={handleSubmit} className="w-full">
+                <div className="mb-2 mt-2 w-full">
+                    <InputGroup
+                        label="Email"
+                        data={data.email}
+                        error={errors.email}
+                        setData={(e) => {
+                            setData(prev => ({...prev, email: e}));
+                        }}
+                        setError={(e) => {
+                            setError(prev => ({...prev, email: e}));
+                        }}
+                    />
                 </div>
-            </div>
-        </div>
+                <div className="mb-2">
+                    <InputGroup
+                        type="password"
+                        label="Password"
+                        data={data.password}
+                        error={errors.password}
+                        setData={(e) => {
+                            setData(prev => ({...prev, password: e}));
+                        }}
+                        setError={(e) => {
+                            setError(prev => ({...prev, password: e}));
+                        }}
+                    />
+                </div>
+                <div className="flex flex-col mb-2">
+                    <Turnstile
+                        ref={ref}
+                        options={{language: "id", size: "flexible"}}
+                        siteKey={turnstileSiteKey}
+                        onSuccess={(token) => setData(prev => ({...prev, tokenCaptcha: token}))}
+                        onError={() => setData(prev => ({...prev, tokenCaptcha: ""}))}
+                        onExpire={() => setData(prev => ({...prev, tokenCaptcha: ""}))}
+                    />
+                </div>
+                <SubmitButton loading={loading} captchaMode={true} tokenCaptcha={data.tokenCaptcha}/>
+            </form>
+            <h1 className="m-0 mt-2  text-sm font-normal text-center" style={{color: 'var(--surface-600)'}}>
+                Lupa Password? <span
+                onClick={() => navigate('/reset/request')}
+                style={{color: 'var(--primary-500)', fontWeight: '500'}}
+                className="cursor-pointer"
+            >
+        Permintaan Reset
+      </span>
+            </h1>
+
+        </GuestFormContainer>
     );
 };
 

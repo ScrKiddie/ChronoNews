@@ -44,7 +44,6 @@ const ReusableLazyTable = ({
 
     return (
         <div>
-            {/* Search Input */}
             <div className="flex justify-between mb-4 md:flex-row flex-col gap-2">
                 <div className="flex justify-end  gap-2">
                     <div className="p-inputgroup w-full size-11">

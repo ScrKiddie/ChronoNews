@@ -52,7 +52,7 @@ const MenuButton = ({openProfileModal}) => {
                             label: "Password",
                             icon: <i className="pi pi-key pr-3"/>,
                             command: () => {
-                            } // Add your logic here
+                            }
                         },
                         {label: "Keluar", icon: <i className="pi pi-sign-out pr-3"/>},
                     ]}

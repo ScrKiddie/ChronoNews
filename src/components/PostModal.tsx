@@ -1,12 +1,12 @@
 import {Dialog} from "primereact/dialog";
 import {Button} from "primereact/button";
-import {InputText} from "primereact/inputtext";
 import {Editor} from "primereact/editor";
 import {Dropdown} from "primereact/dropdown";
 import useQuillConfig from "../hooks/useQuillConfig.tsx";
 import thumbnail from "../../public/thumbnail.svg";
-import React, {useCallback, useEffect, useRef} from "react";
+import React, {useCallback, useEffect} from "react";
 import {InputTextarea} from "primereact/inputtextarea";
+import InputGroup from "./InputGroup.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
 const PostModal = ({
@@ -68,21 +68,13 @@ const PostModal = ({
             <form onSubmit={handleFormSubmit} className="w-full">
                 <div className="flex flex-col p-4 gap-4">
                     <div className="w-full">
-                        <label htmlFor="name" className="block mb-1 font-medium">
-                            Judul
-                        </label>
-                        <InputText
-                            id="title"
-                            className="w-full"
-                            invalid={errors.title}
-                            placeholder="Masukkan Judul"
-                            value={data?.title || ""}
-                            onChange={(e) => {
-                                setData((prev) => ({...prev, title: e.target.value}));
-                                errors.title = false;
-                            }}
+                        <InputGroup
+                            label="Judul"
+                            data={data?.title}
+                            error={errors.title}
+                            setData={(e) => {setData(prev => ({...prev, title: e}))}}
+                            setError={(e) => {errors.title = e}}
                         />
-                        {errors.title && <small className="p-error">{errors.title}</small>}
                     </div>
                     {
                         role == "admin" ? (
@@ -143,43 +135,32 @@ const PostModal = ({
                     </div>
 
                     <div className="w-full">
-                        <label htmlFor="email" className="block mb-1 font-medium">
-                            Kategori
-                        </label>
-
-                        <Dropdown
-                            id="categoryID"
-                            className="w-full"
-                            filter
-                            invalid={!!errors.categoryID}
-                            placeholder="Pilih Kategori"
-                            value={data?.categoryID || null}
+                        <InputGroup
+                            type={"dropdown"}
                             options={categoryOptions}
-                            onChange={(e) => {
-                                setData((prev) => ({...prev, categoryID: e.value}));
-                                errors.categoryID = false;
-                            }}
+                            label="Kategori"
+                            data={data?.categoryID}
+                            error={errors.categoryID}
+                            setData={(e)=>{ setData(prev => ({ ...prev, categoryID: e }));}}
+                            setError={(e)=>{ errors.categoryID=e;}}
                         />
-                        {errors.categoryID && <small className="p-error">{errors.categoryID}</small>}
                     </div>
 
                     <div className="w-full">
-                        <label htmlFor="email" className="block mb-1 font-medium">
-                            Ringkasan
-                        </label>
+                        <label htmlFor="summary"
+                               className={`block mb-1 font-medium  ${errors.summary ? "p-error" : "text-[#48525f]"}`}>Ringkasan</label>
                         <InputTextarea
                             autoResize={true}
                             id="summary"
-                            className="w-full"
+                            className="w-full h-fit"
                             invalid={!!errors.summary}
-                            placeholder="Masukkan Ringkasan"
                             value={data?.summary || ""}
                             onChange={(e) => {
                                 setData((prev) => ({...prev, summary: e.target.value}));
                                 errors.summary = false;
                             }}
                         />
-                        {errors.summary && <small className="p-error">{errors.summary}</small>}
+                        {errors.summary && <small className="p-error mt-[-5px]">{errors.summary}</small>}
                     </div>
 
 
@@ -203,7 +184,6 @@ const PostModal = ({
                             }}
                             value={editorContent?.current || data?.content || ""}
                             onTextChange={(e) => handleTextChange(e.htmlValue || "")}
-                            placeholder="Masukkan Konten"
                             headerTemplate={
                                 <span className="ql-formats">
                                 <select className="ql-size" aria-label="Font Size">
@@ -243,6 +223,7 @@ const PostModal = ({
                                 <button className="ql-clean" aria-label="Clear Formatting"></button>
                             </span>
                             }
+
                         />
                         {errors.content && <small className="p-error">{errors.content}</small>}
                     </div>

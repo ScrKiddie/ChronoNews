@@ -110,7 +110,6 @@ export const useUpdateUser = (toastRef = null, fetchData = null) => {
         handleSubmit,
         setData,
         setVisibleModal,
-
         // props dari useCropper
         fileInputRef,
         selectedImage,

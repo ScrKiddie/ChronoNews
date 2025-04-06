@@ -1,6 +1,7 @@
 import {Dialog} from "primereact/dialog";
-import {Button} from "primereact/button";
-import {Password} from "primereact/password";
+import InputGroup from "./InputGroup.tsx";
+import React from "react";
+import SubmitButton from "./SubmitButton.tsx";
 
 const PasswordModal = ({
                            visible,
@@ -22,67 +23,36 @@ const PasswordModal = ({
             <form onSubmit={handleSubmit} className="w-full">
                 <div className="flex flex-col p-4 gap-4">
                     <div className="w-full">
-                        <label htmlFor="oldPassword" className="block mb-1 font-medium">Password Lama</label>
-                        <Password
-                            id="oldPassword"
-                            className="w-full"
-                            invalid={errors.oldPassword}
-                            placeholder="Masukkan Password Lama"
-                            value={data.oldPassword}
-                            toggleMask
-                            feedback={false}
-                            onChange={(e) => {
-                                setData(prev => ({...prev, oldPassword: e.target.value}))
-                                errors.oldPassword = false
-                            }}
+                        <InputGroup
+                            type="password"
+                            label="Password Lama"
+                            data={data?.oldPassword}
+                            error={errors.oldPassword}
+                            setData={(e)=>{ setData(prev => ({ ...prev, oldPassword: e }));}}
+                            setError={(e)=>{ errors.oldPassword = e }}
                         />
-                        {errors.oldPassword && <small className="p-error">{errors.oldPassword}</small>}
                     </div>
                     <div className="w-full">
-                        <label htmlFor="password" className="block mb-1 font-medium">Password Baru</label>
-                        <Password
-                            id="password"
-                            className="w-full"
-                            invalid={errors.password}
-                            placeholder="Masukkan Password Baru"
-                            value={data.password}
-                            toggleMask
-                            feedback={false}
-                            onChange={(e) => {
-                                setData(prev => ({...prev, password: e.target.value}))
-                                errors.password = false
-                            }}
+                        <InputGroup
+                            type="password"
+                            label="Password Baru"
+                            data={data?.password}
+                            error={errors.password}
+                            setData={(e)=>{ setData(prev => ({ ...prev, password: e }));}}
+                            setError={(e)=>{ errors.password = e }}
                         />
-                        {errors.password && <small className="p-error">{errors.password}</small>}
                     </div>
                     <div className="w-full">
-                        <label htmlFor="confirmPassword" className="block mb-1 font-medium">Konfirmasi Password</label>
-                        <Password
-                            id="confirmPassword"
-                            className="w-full"
-                            invalid={errors.confirmPassword}
-                            placeholder="Konfirmasi Password Baru"
-                            value={data.confirmPassword}
-                            toggleMask
-                            feedback={false}
-                            onChange={(e) => {
-                                setData(prev => ({...prev, confirmPassword: e.target.value}))
-                                errors.confirmPassword = false
-                            }}
+                        <InputGroup
+                            type="password"
+                            label="Konfirmasi Password Baru"
+                            data={data?.confirmPassword}
+                            error={errors.confirmPassword}
+                            setData={(e)=>{ setData(prev => ({ ...prev, confirmPassword: e }));}}
+                            setError={(e)=>{ errors.confirmPassword = e }}
                         />
-                        {errors.confirmPassword && <small className="p-error">{errors.confirmPassword}</small>}
                     </div>
-                    <Button
-                        disabled={submitLoading}
-                        className="w-full flex items-center justify-center font-normal"
-                        type="submit"
-                    >
-                        {submitLoading ? (
-                            <i className="pi pi-spin pi-spinner text-[24px]" style={{color: "#475569"}}></i>
-                        ) : (
-                            "Submit"
-                        )}
-                    </Button>
+                    <SubmitButton loading={submitLoading}/>
                 </div>
             </form>
         </Dialog>
