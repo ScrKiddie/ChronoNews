@@ -4,13 +4,13 @@ import {Paginator} from "primereact/paginator";
 import {useNavigate} from "react-router-dom";
 import thumbnail from "../../public/thumbnail.svg";
 
-const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
+const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
 const HeadlinePost = ({
-                          headlineNews,
-                          headlinePage,
-                          setHeadlinePage,
-                          headlinePagination,
+                          headlinePost,
+                          headlinePostPage,
+                          setHeadlinePostPage,
+                          headlinePostPagination,
                           headlineSize,
                           handleCategoryChange
                       }) => {
@@ -23,47 +23,47 @@ const HeadlinePost = ({
 
     return (
         <div>
-            {/* Headline News */}
+            {/* Headline RegularPost */}
             <DataView
-                value={headlineNews ? [headlineNews] : []}
+                value={headlinePost ? [headlinePost] : []}
                 layout="grid"
                 className="grid-custom"
-                itemTemplate={(news) => (
-                    <div key={news.id} className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg w-full">
+                itemTemplate={(post) => (
+                    <div key={post.id} className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg w-full">
                         <img
-                            src={news.thumbnail ? `${apiUri}/post_picture/${news.thumbnail}` : thumbnail}
-                            alt={news.title}
+                            src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail}
+                            alt={post.title}
                             className="w-full md:h-[480px] h-[240px] object-cover rounded-t-lg bg-[#f59e0b] cursor-pointer"
-                            onClick={() => navigate(`/post?id=${news.id}`)}
+                            onClick={() => navigate(`/post?id=${post.id}`)}
                         />
 
                         <div className="p-4 min-h-[240px] md:min-h-[160px]">
                             <h3
                                 className="text-2xl font-semibold w-fit cursor-pointer"
-                                onClick={() => navigate(`/post?id=${news.id}`)}
+                                onClick={() => navigate(`/post?id=${post.id}`)}
                             >
-                                {truncateText(news.title, 50)}
+                                {truncateText(post.title, 50)}
                             </h3>
                             <p className=""><span
                                 className="no-underline text-gray-600 hover:text-gray-600 cursor-pointer"
                                 onClick={() => {
-                                    handleCategoryChange(headlineNews.category?.name.toLowerCase())
+                                    handleCategoryChange(headlinePost.category?.name.toLowerCase())
                                 }}
                             >
-                            {news.category?.name}
-                          </span> - {news.publishedDate}</p>
+                            {post.category?.name}
+                          </span> - {post.publishedDate}</p>
                             <p className="mt-1">
-                                {truncateText(news.summary, 150)}
+                                {truncateText(post.summary, 150)}
                             </p>
                         </div>
                     </div>
                 )}
             />
             <Paginator
-                first={(headlinePage - 1) * headlineSize}
+                first={(headlinePostPage - 1) * headlineSize}
                 rows={headlineSize}
-                totalRecords={headlinePagination.totalItem}
-                onPageChange={(e) => setHeadlinePage(e.page + 1)}
+                totalRecords={headlinePostPagination.totalItem}
+                onPageChange={(e) => setHeadlinePostPage(e.page + 1)}
                 template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                 className="mt-4"
             />

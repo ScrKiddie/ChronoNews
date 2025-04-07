@@ -2,9 +2,9 @@ import React, {useEffect} from "react";
 import {TabMenu} from "primereact/tabmenu";
 import {InputText} from "primereact/inputtext";
 import {Menu} from "primereact/menu";
-import chronoverseLogo from "../../../public/chronoverse.svg";
+import ChronoNewsLogo from "../../../public/chrononews.svg";
 import GuestFooter from "../../components/GuestFooter.tsx";
-import useNews from "../../hooks/useNews.tsx";
+import usePost from "../../hooks/usePost.tsx";
 import {useNavigate} from "react-router-dom";
 import {ScrollTop} from "primereact/scrolltop";
 import HeadlinePost from "../../components/HeadlinePost.tsx";
@@ -17,46 +17,46 @@ import RegularPost from "../../components/RegularPost.tsx";
 import LoadingRetry from "../../components/LoadingRetry.tsx";
 import EmptyData from "../../components/EmptyData.tsx";
 
-const News: React.FC = () => {
+const Post: React.FC = () => {
     const {
         activeIndex,
         setActiveIndex,
         searchQuery,
         setSearchQuery,
-        headlineNews,
-        topNews,
-        news,
-        headlinePage,
-        setHeadlinePage,
-        topNewsPage,
-        setTopNewsPage,
-        newsPage,
-        setNewsPage,
-        headlinePagination,
-        topNewsPagination,
-        newsPagination,
+        headlinePost,
+        topPost,
+        post,
+        headlinePostPage,
+        setHeadlinePostPage,
+        topPostPage,
+        setTopPostPage,
+        postPage,
+        setPostPage,
+        headlinePostPagination,
+        topPostPagination,
+        postPagination,
         menuRef,
         allCategories,
         moreCategories,
         loading,
         error,
         handleCategoryChange,
-        topNewsSize,
+        topPostSize,
         headlineSize,
-        newsSize,
+        postSize,
         headlineMode,
         truncateText,
-        post,
+        mainPost,
         notFound,
         searchMode,
-        searchNews,
-        searchNewsSize,
-        searchNewsPagination,
-        searchNewsPage,
-        setSearchNewsPage,
+        searchPost,
+        searchPostSize,
+        searchPostPagination,
+        searchPostPage,
+        setSearchPostPage,
         handleRetry,
         categories
-    } = useNews();
+    } = usePost();
 
     const navigate = useNavigate();
     useQuillConfig();
@@ -86,10 +86,10 @@ const News: React.FC = () => {
                     className="flex justify-between items-center lg:flex-row flex-col bg-white  w-full lg:fixed h-[56px]   bg-none">
                     <div className={`flex lg:block justify-between items-center w-full lg:w-fit mt-2 lg:mt-0`}>
                         <div className="flex items-center h-full ml-3 ">
-                            <img src={chronoverseLogo} className="lg:w-8 w-11" alt="Chronoverse Logo"/>
+                            <img src={ChronoNewsLogo} className="lg:w-8 w-11" alt="ChronoNewsLogo"/>
                             <h1 style={{color: 'var(--surface-600)'}}
                                 className="ml-1 text-[#475569] font-bold text-2xl lg:block hidden">
-                                CHRONO<span style={{color: 'var(--primary-500)'}}>VERSE</span>
+                                CHRONO<span style={{color: 'var(--primary-500)'}}>NEWS</span>
                             </h1>
                         </div>
 
@@ -150,15 +150,15 @@ const News: React.FC = () => {
                     <div >
                         {searchMode ? (
                             <>
-                                {searchNews.length > 0 ? (
+                                {searchPost.length > 0 ? (
                                     <>
                                         <h3 className="text-[#4b5563] mb-3" >Hasil Pencarian</h3>
                                         <RegularPost
-                                            posts={searchNews}
-                                            postPage={searchNewsPage}
-                                            setPostPage={setSearchNewsPage}
-                                            postSize={searchNewsSize}
-                                            postPagination={searchNewsPagination}
+                                            post={searchPost}
+                                            postPage={searchPostPage}
+                                            setPostPage={setSearchPostPage}
+                                            postSize={searchPostSize}
+                                            postPagination={searchPostPagination}
                                             truncateText={truncateText}
                                             handleCategoryChange={handleCategoryChange}
                                         />
@@ -169,7 +169,7 @@ const News: React.FC = () => {
                                 )}</>
                         ) : (
                             <>
-                                {topNews.length <= 0 ?
+                                {topPost.length <= 0 ?
                                     <EmptyData/>
                                     :
                                     <>
@@ -177,10 +177,10 @@ const News: React.FC = () => {
                                             <>
                                                 <h3 className="text-[#4b5563] mb-3">Berita Terkini</h3>
                                                 <HeadlinePost
-                                                    headlineNews={headlineNews}
-                                                    headlinePage={headlinePage}
-                                                    setHeadlinePage={setHeadlinePage}
-                                                    headlinePagination={headlinePagination}
+                                                    headlinePost={headlinePost}
+                                                    headlinePostPage={headlinePostPage}
+                                                    setHeadlinePostPage={setHeadlinePostPage}
+                                                    headlinePostPagination={headlinePostPagination}
                                                     headlineSize={headlineSize}
                                                     handleCategoryChange={handleCategoryChange}
                                                 />
@@ -188,27 +188,27 @@ const News: React.FC = () => {
                                             </>
                                         ) : (
                                             <>
-                                                <MainPost post={post} handleCategoryChange={handleCategoryChange}/>
+                                                <MainPost mainPost={mainPost} handleCategoryChange={handleCategoryChange}/>
                                                 <h3 className="text-[#4b5563]">Berita Terkait</h3>
                                             </>
                                         )}
                                         <TopPost
-                                            topPosts={topNews}
-                                            topPostPage={topNewsPage}
-                                            setTopPostPage={setTopNewsPage}
-                                            topPostSize={topNewsSize}
-                                            topPostPagination={topNewsPagination}
+                                            topPost={topPost}
+                                            topPostPage={topPostPage}
+                                            setTopPostPage={setTopPostPage}
+                                            topPostSize={topPostSize}
+                                            topPostPagination={topPostPagination}
                                             truncateText={truncateText}
                                             handleCategoryChange={handleCategoryChange}
                                         />
                                         {headlineMode && <h3 className="text-[#4b5563]">Berita Lainnya</h3>}
                                         {!headlineMode && !searchMode && <h3 className="text-[#4b5563]">Berita Lainnya</h3>}
                                         <RegularPost
-                                            posts={news}
-                                            postPage={newsPage}
-                                            setPostPage={setNewsPage}
-                                            postSize={newsSize}
-                                            postPagination={newsPagination}
+                                            post={post}
+                                            postPage={postPage}
+                                            setPostPage={setPostPage}
+                                            postSize={postSize}
+                                            postPagination={postPagination}
                                             truncateText={truncateText}
                                             classKu={"mt-4"}
                                             handleCategoryChange={handleCategoryChange}
@@ -230,4 +230,4 @@ const News: React.FC = () => {
     );
 };
 
-export default News;
+export default Post;

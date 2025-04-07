@@ -4,11 +4,11 @@ import {Paginator} from "primereact/paginator";
 import {useNavigate} from "react-router-dom";
 import thumbnail from "../../public/thumbnail.svg";
 
-const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
+const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
 
 const RegularPost = ({
-                         posts,
+                         post,
                          postPage,
                          setPostPage,
                          postSize,
@@ -22,11 +22,11 @@ const RegularPost = ({
     return (
         <div className={`${classKu}`}>
             <DataView
-                value={posts}
+                value={post}
                 layout="list"
                 itemTemplate={(post) => (
                     <div key={post.id}
-                         className={`flex ${post.id === posts[posts.length - 1]?.id ? '' : 'mb-3'} w-full justify-between min-h-36 md:min-h-40 shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg`}>
+                         className={`flex ${post.id === post[post.length - 1]?.id ? '' : 'mb-3'} w-full justify-between min-h-36 md:min-h-40 shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg`}>
                         <div className="lg:w-[50%] w-[80%] min-h-36 md:min-h-40">
                             <img
                                 src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail}

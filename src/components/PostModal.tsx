@@ -8,7 +8,7 @@ import React, {useCallback, useEffect} from "react";
 import {InputTextarea} from "primereact/inputtextarea";
 import InputGroup from "./InputGroup.tsx";
 
-const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
+const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 const PostModal = ({
                        visible,
                        onClose,

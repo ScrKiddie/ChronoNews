@@ -61,7 +61,7 @@ const Login: React.FC = () => {
     };
 
     return (
-        <GuestFormContainer title={"Reset Password Anda"}>
+        <GuestFormContainer title={"Reset Akun Anda"}>
             <form onSubmit={handleSubmit} className="w-full">
                 <div className="mb-2 mt-2 w-full">
                     <InputGroup

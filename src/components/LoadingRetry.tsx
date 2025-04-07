@@ -1,13 +1,8 @@
 import React from "react";
 import {Button} from "primereact/button";
 
-interface ConnectionErrorProps {
-    visibleConnectionError: boolean;
-    visibleLoadingConnection?: boolean;
-    onRetry?: () => void;
-}
 
-const LoadingRetry: React.FC<ConnectionErrorProps> = ({visibleConnectionError, onRetry, visibleLoadingConnection}) => {
+const LoadingRetry: React.FC = ({visibleConnectionError, onRetry, visibleLoadingConnection}) => {
     if (!visibleConnectionError && !visibleLoadingConnection) return null;
 
     return (

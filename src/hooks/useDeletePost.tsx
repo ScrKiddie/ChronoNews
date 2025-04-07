@@ -17,7 +17,7 @@ export const useDeletePost = (toast, fetchData, page, setPage, totalItem, size) 
         setSubmitLoading(true);
         try {
             await PostService.deletePost(id, token);
-            toast?.current?.show({severity: "success", detail: "Post berhasil dihapus"});
+            toast?.current?.show({severity: "success", detail: "RegularPost berhasil dihapus"});
 
             const remainingItems = totalItem - 1;
             const remainingPages = Math.ceil(remainingItems / size);

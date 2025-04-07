@@ -64,7 +64,7 @@ const Login: React.FC = () => {
     }, [email]);
 
     return (
-        <GuestFormContainer title={"Permintaan Reset Password"}>
+        <GuestFormContainer title={"Permintaan Reset Akun"}>
 
             <form onSubmit={handleSubmit} className="w-full">
                 <div className="mb-2 mt-2">
@@ -117,7 +117,7 @@ const Login: React.FC = () => {
                     style={{color: 'var(--primary-500)', fontWeight: '500'}}
                     className="cursor-pointer"
                 >
-        Reset Password
+        Reset Akun
       </span>
                 </h1>
                 <h1 className="m-0 text-sm font-normal text-center" style={{color: 'var(--surface-600)'}}>

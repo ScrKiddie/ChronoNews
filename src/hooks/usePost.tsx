@@ -50,32 +50,32 @@ const formatDate = (timestamp: number) => {
     return `${formattedDate}, ${formattedTime}`;
 };
 
-const useNews = () => {
+const usePost = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
     const [activeIndex, setActiveIndex] = useState(-1);
     const [searchQuery, setSearchQuery] = useState("");
 
-    const [headlineNews, setHeadlineNews] = useState(null);
-    const [topNews, setTopNews] = useState([]);
-    const [news, setNews] = useState([]);
-    const [searchNews, setSearchNews] = useState([]);
+    const [headlinePost, setHeadlinePost] = useState(null);
+    const [topPost, setTopPost] = useState([]);
+    const [post, setPost] = useState([]);
+    const [searchPost, setSearchPost] = useState([]);
 
-    const [headlinePage, setHeadlinePage] = useState(1);
-    const [topNewsPage, setTopNewsPage] = useState(1);
-    const [newsPage, setNewsPage] = useState(1);
-    const [searchNewsPage, setSearchNewsPage] = useState(1);
+    const [headlinePostPage, setHeadlinePostPage] = useState(1);
+    const [topPostPage, setTopPostPage] = useState(1);
+    const [postPage, setPostPage] = useState(1);
+    const [searchPostPage, setSearchPostPage] = useState(1);
 
-    const [headlinePagination, setHeadlinePagination] = useState({totalItem: 0, totalPage: 1});
-    const [topNewsPagination, setTopNewsPagination] = useState({totalItem: 0, totalPage: 1});
-    const [newsPagination, setNewsPagination] = useState({totalItem: 0, totalPage: 1});
-    const [searchNewsPagination, setSearchNewsPagination] = useState({totalItem: 0, totalPage: 1});
+    const [headlinePostPagination, setHeadlinePostPagination] = useState({totalItem: 0, totalPage: 1});
+    const [topPostPagination, setTopPostPagination] = useState({totalItem: 0, totalPage: 1});
+    const [postPagination, setPostPagination] = useState({totalItem: 0, totalPage: 1});
+    const [searchPostPagination, setSearchPostPagination] = useState({totalItem: 0, totalPage: 1});
 
     const headlineSize = 1;
-    const topNewsSize = 3;
-    const newsSize = 5;
-    const searchNewsSize = 5
+    const topPostSize = 3;
+    const postSize = 5;
+    const searchPostSize = 5
 
     const menuRef = useRef<Menu>(null);
     const [selectedCategory, setSelectedCategory] = useState("");
@@ -89,7 +89,7 @@ const useNews = () => {
     const [mainMode, setMainMode] = useState(false);
     const [searchMode, setSearchMode] = useState(false)
 
-    const [post, setPost] = useState({
+    const [mainPost, setMainPost] = useState({
         id: null,
         category: {
             id: null,
@@ -137,25 +137,25 @@ const useNews = () => {
         }
     };
 
-    const fetchHeadlineNews = async (category = "") => {
+    const fetchHeadlinePost = async (category = "") => {
         setLoading(true);
         setError(false)
         try {
             const filters = {
-                categoryName: category !== "Home" && category !== "home" ? category : "",
-                page: headlinePage,
+                categoryName: category !== "Beranda" && category !== "beranda" ? category : "",
+                page: headlinePostPage,
                 size: headlineSize,
             };
 
             const response = await PostService.searchPost(token, filters);
             const {data, pagination} = response;
 
-            setHeadlineNews(data.length > 0 ? {
+            setHeadlinePost(data.length > 0 ? {
                 ...data[0],
                 publishedDate: getRelativeTime(data[0].publishedDate)
             } : null);
 
-            setHeadlinePagination(pagination);
+            setHeadlinePostPagination(pagination);
         } catch (error) {
             if (!error.response) {
                 console.log(error)
@@ -168,7 +168,7 @@ const useNews = () => {
         }
     };
 
-    const fetchSearchNews = async (query = "", category = "") => {
+    const fetchSearchPost = async (query = "", category = "") => {
         setLoading(true);
         setError(false);
 
@@ -178,19 +178,19 @@ const useNews = () => {
                 categoryName: query,
                 userName: query,
                 summary: query,
-                page: searchNewsPage,
-                size: searchNewsSize,
+                page: searchPostPage,
+                size: searchPostSize,
             };
 
             const response = await PostService.searchPost(token, filters);
             const {data, pagination} = response;
 
-            setSearchNews(data.map(item => ({
+            setSearchPost(data.map(item => ({
                 ...item,
                 publishedDate: getRelativeTime(item.publishedDate),
             })));
 
-            setSearchNewsPagination(pagination);
+            setSearchPostPagination(pagination);
         } catch (error) {
             if (!error.response) {
                 console.log(error)
@@ -204,23 +204,23 @@ const useNews = () => {
     };
 
 
-    const fetchTopNews = async (category = "") => {
+    const fetchTopPost = async (category = "") => {
         setError(false)
         setLoading(true);
         try {
             const filters = {
-                categoryName: category !== "Home" && category !== "home" ? category : "",
-                page: topNewsPage,
-                size: topNewsSize,
+                categoryName: category !== "Beranda" && category !== "beranda" ? category : "",
+                page: topPostPage,
+                size: topPostSize,
             };
 
             const response = await PostService.searchPost(token, filters);
             const {data, pagination} = response;
-            setTopNews(data.map(item => ({
+            setTopPost(data.map(item => ({
                 ...item,
                 publishedDate: getRelativeTime(item.publishedDate)
             })));
-            setTopNewsPagination(pagination);
+            setTopPostPagination(pagination);
         } catch (error) {
             if (!error.response) {
                 console.log(error)
@@ -233,24 +233,24 @@ const useNews = () => {
         }
     };
 
-    const fetchNews = async (category = "") => {
+    const fetchPost = async (category = "") => {
         setLoading(true);
         setError(false);
 
         try {
             const filters = {
-                categoryName: category !== "Home" && category !== "home" ? category : "",
-                page: newsPage,
-                size: newsSize,
+                categoryName: category !== "Beranda" && category !== "beranda" ? category : "",
+                page: postPage,
+                size: postSize,
             };
 
             const response = await PostService.searchPost(token, filters);
             const {data, pagination} = response;
-            setNews(data.map(item => ({
+            setPost(data.map(item => ({
                 ...item,
                 publishedDate: getRelativeTime(item.publishedDate)
             })));
-            setNewsPagination(pagination);
+            setPostPagination(pagination);
         } catch (error) {
             if (!error.response) {
                 console.log(error)
@@ -276,40 +276,35 @@ const useNews = () => {
 
     useEffect(() => {
         if (headlineMode && !mainMode && !searchMode) {
-            fetchHeadlineNews(selectedCategory);
+            fetchHeadlinePost(selectedCategory);
         }
-}, [selectedCategory, headlinePage ,retry, searchMode, mainMode]);
-    const [prevTopNewsPage, setPrevTopNewsPage] = useState(1)
-    const [prevNewsPage, setPrevNewsPage] = useState(1)
+}, [selectedCategory, headlinePostPage ,retry, searchMode, mainMode]);
+    const [prevTopPostPage, setPrevTopPostPage] = useState(1)
+    const [prevPostPage, setPrevPostPage] = useState(1)
+
     useEffect(() => {
         if (!headlineMode && mainMode && !searchMode){
-            if (topNewsPage != prevTopNewsPage){
-                fetchTopNews("")
-                setPrevTopNewsPage(topNewsPage)
+            if (topPostPage != prevTopPostPage){
+                fetchTopPost("")
+                setPrevTopPostPage(topPostPage)
             }
             setSelectedCategory("")
         }else if (!mainMode && headlineMode && !searchMode) {
-            fetchTopNews(selectedCategory);
+            fetchTopPost(selectedCategory);
         }
-    }, [selectedCategory, topNewsPage, retry, searchMode, mainMode]);
+    }, [selectedCategory, topPostPage, retry, searchMode, mainMode]);
 
     useEffect(() => {
-        console.log("halo"+newsPage)
-        console.log("mainMode"+mainMode)
-        console.log("headlineMode"+headlineMode)
-        console.log("searchMode"+searchMode)
-
-
         if (!headlineMode && mainMode && !searchMode){
-            if (newsPage != prevNewsPage){
-                fetchNews("")
-                setPrevNewsPage(newsPage)
+            if (postPage != prevPostPage){
+                fetchPost("")
+                setPrevPostPage(postPage)
             }
             setSelectedCategory("")
         }else if (!mainMode && headlineMode && !searchMode){
-            fetchNews(selectedCategory);
+            fetchPost(selectedCategory);
         }
-    }, [selectedCategory, newsPage,retry, searchMode, mainMode]);
+    }, [selectedCategory, postPage,retry, searchMode, mainMode]);
     const getQueryFromUrl = () => {
         if (window.location.pathname === '/post') {
             const params = new URLSearchParams(window.location.search);
@@ -328,26 +323,26 @@ const useNews = () => {
                 setHeadlineMode(false);
                 setMainMode(true);
                 setActiveIndex(-1);
-                const fetchPost = async () => {
+                const fetchMainPost = async () => {
                     setLoading(true);
                     setError(false)
                     try {
-                        const post = await PostService.getPost(query);
-                        setPost(prevPost => ({
+                        const response = await PostService.getPost(query);
+                        setMainPost(prevPost => ({
                             ...prevPost,
-                            category: post.category,
-                            summary: post.summary,
-                            id: post.id ?? null,
-                            title: post.title,
-                            thumbnail: post.thumbnail,
-                            user: post.user,
-                            content: processContent(post.content),
-                            publishedDate: formatDate(post.publishedDate),
-                            lastUpdated: post.lastUpdated ? formatDate(post.lastUpdated) : "",
+                            category: response.category,
+                            summary: response.summary,
+                            id: response.id ?? null,
+                            title: response.title,
+                            thumbnail: response.thumbnail,
+                            user: response.user,
+                            content: processContent(response.content),
+                            publishedDate: formatDate(response.publishedDate),
+                            lastUpdated: response.lastUpdated ? formatDate(response.lastUpdated) : "",
                         }));
                         setNotFound(false);
-                        fetchNews("")
-                        fetchTopNews("")
+                        fetchPost("")
+                        fetchTopPost("")
                     } catch (error) {
                         if (error.message === "Terjadi kesalahan jaringan") {
                             setError(true)
@@ -360,8 +355,7 @@ const useNews = () => {
                         setLoading(false)
                     }
                 };
-                fetchPost();
-
+                fetchMainPost();
                 return;
             }else {
                 setNotFound(true)
@@ -372,21 +366,21 @@ const useNews = () => {
             setMainMode(false);
             setHeadlineMode(false)
             setSearchMode(true);
-            fetchSearchNews(query);
+            fetchSearchPost(query);
         }else {
             setSearchMode(false);
             setMainMode(false)
             setHeadlineMode(true);
-            setSearchNewsPage(1);
+            setSearchPostPage(1);
         }
 
-    }, [location.search,retry,searchNewsPage]);
+    }, [location.search,retry,searchPostPage]);
 
 
     useEffect(() => {
         if (categories.length === 0) {
-            if (window.location.pathname === "/home") {
-                handleCategoryChange("home");
+            if (window.location.pathname === "/beranda") {
+                handleCategoryChange("beranda");
                 setActiveIndex(0);
                 return;
             }
@@ -399,7 +393,7 @@ const useNews = () => {
             let foundIndex = primaryCategories.findIndex(cat => cat.name.toLowerCase() === id.toLowerCase());
             console.log(foundIndex);
 
-            if (window.location.pathname === "/home") {
+            if (window.location.pathname === "/beranda") {
                 handleCategoryChange(id);
                 setActiveIndex(0);
                 return;
@@ -425,9 +419,9 @@ const useNews = () => {
 
     const handleCategoryChange = (category: string) => {
         setSelectedCategory(category);
-        setHeadlinePage(1);
-        setTopNewsPage(1);
-        setNewsPage(1);
+        setHeadlinePostPage(1);
+        setTopPostPage(1);
+        setPostPage(1);
 
         navigate(`/${category.toLowerCase()}`);
     };
@@ -436,7 +430,7 @@ const useNews = () => {
     const remainingCategories = categories.slice(3);
 
     const allCategories = [
-        {label: "Home", command: () => handleCategoryChange("home")},
+        {label: "Beranda", command: () => handleCategoryChange("beranda")},
         ...primaryCategories.map((cat, index) => ({
             label: cat.name,
             command: () => handleCategoryChange(cat.name.toLowerCase()),
@@ -459,7 +453,7 @@ const useNews = () => {
             window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
         }, 1);
         return () => clearTimeout(timeout);
-    }, [location.search,searchNewsPage ,id]);
+    }, [location.search,searchPostPage ,id]);
 
     useEffect(() => {
         const handleScroll = (event: Event) => {
@@ -478,18 +472,18 @@ const useNews = () => {
         setActiveIndex,
         searchQuery,
         setSearchQuery,
-        headlineNews,
-        topNews,
-        news,
-        headlinePage,
-        setHeadlinePage,
-        topNewsPage,
-        setTopNewsPage,
-        newsPage,
-        setNewsPage,
-        headlinePagination,
-        topNewsPagination,
-        newsPagination,
+        headlinePost,
+        topPost,
+        post,
+        headlinePostPage,
+        setHeadlinePostPage,
+        topPostPage,
+        setTopPostPage,
+        postPage,
+        setPostPage,
+        headlinePostPagination,
+        topPostPagination,
+        postPagination,
         menuRef,
         allCategories,
         moreCategories,
@@ -497,25 +491,25 @@ const useNews = () => {
         error,
         selectedCategory,
         handleCategoryChange,
-        topNewsSize,
+        topPostSize,
         headlineSize,
-        newsSize,
+        postSize,
         headlineMode,
         setHeadlineMode,
         formatDate,
         truncateText,
-        post,
+        mainPost,
         notFound,
         searchMode,
         getQueryFromUrl,
-        searchNews,
-        searchNewsPage,
-        searchNewsPagination,
-        searchNewsSize,
-        setSearchNewsPage,
+        searchPost,
+        searchPostPage,
+        searchPostPagination,
+        searchPostSize,
+        setSearchPostPage,
         handleRetry,
         categories
     };
 };
 
-export default useNews;
+export default usePost;

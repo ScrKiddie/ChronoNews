@@ -5,7 +5,7 @@ import React from "react";
 import InputGroup from "./InputGroup.tsx";
 import SubmitButton from "./SubmitButton.tsx";
 
-const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
+const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 const UserModal = ({
                        visible,
                        onClose,

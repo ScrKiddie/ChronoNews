@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Editor} from "primereact/editor";
 import {Button} from "primereact/button";
 import {BreadCrumb} from "primereact/breadcrumb";
@@ -6,9 +6,9 @@ import defaultProfilePicture from "../../public/profilepicture.svg";
 import thumbnail from "../../public/thumbnail.svg";
 import {Dialog} from "primereact/dialog";
 
-const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
+const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
-const MainPost = ({post, handleCategoryChange}) => {
+const MainPost = ({mainPost, handleCategoryChange}) => {
     const [showLastUpdated, setShowLastUpdated] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -16,7 +16,7 @@ const MainPost = ({post, handleCategoryChange}) => {
         if (window.DISQUS) {
             window.DISQUS.reset({ reload: true,
                 config: function () {
-                    this.page.identifier = post.id;
+                    this.page.identifier = mainPost.id;
                     this.page.url = window.location.href;
                 }});
         } else {
@@ -26,7 +26,7 @@ const MainPost = ({post, handleCategoryChange}) => {
             script.async = true;
             document.body.appendChild(script);
         }
-    }, [post.id]);
+    }, [mainPost.id]);
 
     const toggleLastUpdated = () => {
         setShowLastUpdated(!showLastUpdated);
@@ -47,54 +47,6 @@ const MainPost = ({post, handleCategoryChange}) => {
         setIsModalVisible(!isModalVisible);
     };
 
-    const containerRef = useRef(null);
-    const [containerWidth, setContainerWidth] = useState(0);
-
-    useEffect(() => {
-        const updateSize = () => {
-            if (containerRef.current) {
-                setContainerWidth(containerRef.current.clientWidth);
-            }
-        };
-
-        updateSize();
-        window.addEventListener("resize", updateSize);
-        return () => window.removeEventListener("resize", updateSize);
-    }, []);
-
-    const images = [
-        { itemImageSrc: post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail },
-        ...Array.from(new DOMParser().parseFromString(post.content, "text/html").querySelectorAll("img")).map(img => ({
-            itemImageSrc: img.src
-        }))
-    ];
-
-    const responsiveOptions = [
-        { breakpoint: '768px', numVisible: 2 }
-    ];
-
-    const itemTemplate = (item) => {
-        const height = containerWidth * 0.5625;
-
-        return (
-            <div
-                ref={containerRef}
-                className="w-full flex items-center justify-center bg-black"
-                style={{ height: `${height}px`, overflow: "hidden" }}
-            >
-                <img
-                    src={item.itemImageSrc}
-                    alt="Gallery"
-                    className="max-w-full max-h-full object-contain"
-                />
-            </div>
-        );
-    };
-
-    const thumbnailTemplate = (item) => (
-        <img src={item.itemImageSrc} alt="Thumbnail" className=" w-32 h-30 pt-[6px] lg:w-40 lg:h-20 object-cover" />
-    );
-
 
     return (
         <>
@@ -108,22 +60,22 @@ const MainPost = ({post, handleCategoryChange}) => {
                         > Home</span>
                     },
                     {
-                        label: post.category?.name || "Kategori", template: () => <span
+                        label: mainPost.category?.name || "Kategori", template: () => <span
                             className="text-[#f59e0b] cursor-pointer font-[600]" onClick={() => {
-                            handleCategoryChange(post.category?.name.toLowerCase())
+                            handleCategoryChange(mainPost.category?.name.toLowerCase())
                         }}
-                        > {post.category?.name}</span>
+                        > {mainPost.category?.name}</span>
                     }
                 ]}/>
 
-                <h1 className="text-[#475569] font-semibold text-3xl">{post.title}</h1>
-                <small className="text-[#475569] mb-2 mt-2">{post.summary}</small>
+                <h1 className="text-[#475569] font-semibold text-3xl">{mainPost.title}</h1>
+                <small className="text-[#475569] mb-2 mt-2">{mainPost.summary}</small>
 
                 <div>
                     <div className={`mb-[-0.5rem]`}>
                         <img
-                            src={images[0].itemImageSrc}
-                            alt={post.title}
+                            src={mainPost?.thumbnail ? apiUri+"/post_picture/"+mainPost?.thumbnail : thumbnail}
+                            alt={mainPost.title}
                             className="w-full object-cover bg-[#f59e0b]"
                         />
                     </div>
@@ -131,8 +83,8 @@ const MainPost = ({post, handleCategoryChange}) => {
                 <div className="flex justify-between my-4 flex-row lg:gap-0 ">
                     <div className="flex gap-2 items-center">
                         <img
-                            src={post.user?.profilePicture
-                                ? `${apiUri}/profile_picture/${post.user.profilePicture}`
+                            src={mainPost.user?.profilePicture
+                                ? `${apiUri}/profile_picture/${mainPost.user.profilePicture}`
                                 : defaultProfilePicture
                             }
                             className="size-[2.6rem] lg:size-[3rem] rounded-full cursor-pointer"
@@ -141,10 +93,10 @@ const MainPost = ({post, handleCategoryChange}) => {
                         />
                         <div>
                             <p className="text-[#475569] text:sm md:text-md font-medium flex items-center gap-1 cursor-pointer w-fit"
-                               onClick={toggleModal}>{post.user?.name} {post.user?.role === "admin" && (
+                               onClick={toggleModal}>{mainPost.user?.name} {mainPost.user?.role === "admin" && (
                                 <i style={{color: 'var(--primary-color)'}} className={`pi pi-verified`}></i>)}</p>
-                            <p className="text-[#475569] text-xs md:text-sm flex items-center">Diterbitkan: {post.publishedDate}
-                                {post.lastUpdated && (
+                            <p className="text-[#475569] text-xs md:text-sm flex items-center">Diterbitkan: {mainPost.publishedDate}
+                                {mainPost.lastUpdated && (
                                     <button
                                         className="bg-transparent border-none outline-none cursor-pointer"
                                         onClick={toggleLastUpdated}
@@ -154,8 +106,8 @@ const MainPost = ({post, handleCategoryChange}) => {
                                     </button>
                                 )}
                             </p>
-                            {showLastUpdated && post.lastUpdated && (
-                                <p className="text-[#475569] text-xs md:text-sm flex items-center ">Diperbarui: {post.lastUpdated}</p>
+                            {showLastUpdated && mainPost.lastUpdated && (
+                                <p className="text-[#475569] text-xs md:text-sm flex items-center ">Diperbarui: {mainPost.lastUpdated}</p>
                             )}
 
                         </div>
@@ -190,7 +142,7 @@ const MainPost = ({post, handleCategoryChange}) => {
 
                 <div className="w-full my-4 opacity-30" style={{borderTop: "1px solid #8496af"}}></div>
 
-                <Editor key={post.id} className="content-view" headerTemplate={<></>} value={post?.content} readOnly/>
+                <Editor key={mainPost.id} className="content-view" headerTemplate={<></>} value={mainPost?.content} readOnly/>
                 <div className="w-full my-4 opacity-30" style={{borderTop: "1px solid #8496af"}}></div>
                 <div id="disqus_thread" className={`mt-8 mb-4`}></div>
             </main>
@@ -200,7 +152,7 @@ const MainPost = ({post, handleCategoryChange}) => {
                         Detail Penulis
                     </h1>
                 }
-                key={`author-modal-${post.user?.id}`}
+                key={`author-modal-${mainPost.user?.id}`}
                 visible={isModalVisible}
                 onHide={toggleModal}
                 className="w-[80%] md:w-[25%]"
@@ -210,8 +162,8 @@ const MainPost = ({post, handleCategoryChange}) => {
                 <div className="flex flex-col items-center mb-[24px]">
                     <div className="relative w-fit mx-auto flex justify-center items-center">
                         <img
-                            src={post.user?.profilePicture
-                                ? `${apiUri}/profile_picture/${post.user.profilePicture}`
+                            src={mainPost.user?.profilePicture
+                                ? `${apiUri}/profile_picture/${mainPost.user.profilePicture}`
                                 : defaultProfilePicture}
                             className="size-[9rem] rounded-full"
                             style={{border: "1px solid #d1d5db"}}
@@ -219,10 +171,10 @@ const MainPost = ({post, handleCategoryChange}) => {
                     </div>
 
                     <div className="text-center mt-4">
-                        <h3 className="text-lg font-normal">{post.user?.name} {post.user?.role === "admin" && (
+                        <h3 className="text-lg font-normal">{mainPost.user?.name} {mainPost.user?.role === "admin" && (
                             <i style={{color: 'var(--primary-color)'}} className={`pi pi-verified`}></i>)}</h3>
-                        <p className="text-sm text-gray-500">{post.user?.email}</p>
-                        <p className="text-sm text-gray-500">{post.user?.phoneNumber}</p>
+                        <p className="text-sm text-gray-500">{mainPost.user?.email}</p>
+                        <p className="text-sm text-gray-500">{mainPost.user?.phoneNumber}</p>
                     </div>
                 </div>
             </Dialog>

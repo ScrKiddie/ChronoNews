@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
+const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
 export const UserService = {
     createUser: async (data, token) => {
@@ -23,7 +23,7 @@ export const UserService = {
 
             return response.data.data;
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Terjadi kesalahan jaringan" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },
     searchUser: async (token, filters = {}) => {
@@ -40,7 +40,7 @@ export const UserService = {
 
             return response.data;
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Terjadi kesalahan jaringan" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },
     getUser: async (id, token) => {
@@ -53,7 +53,7 @@ export const UserService = {
 
             return response.data.data;
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Terjadi kesalahan jaringan" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },
     updateUser: async (id, data, token) => {
@@ -79,7 +79,7 @@ export const UserService = {
 
             return response.data.data;
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Terjadi kesalahan jaringan" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },
     deleteUser: async (id, token) => {
@@ -92,7 +92,7 @@ export const UserService = {
 
             return response.data.message || "User berhasil dihapus";
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Terjadi kesalahan jaringan" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     }
 };

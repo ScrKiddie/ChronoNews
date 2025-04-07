@@ -7,7 +7,7 @@ import {PostUpdateSchema} from "../schemas/PostSchema.tsx";
 import {useCropper} from "./useCropper";
 import {UserService} from "../services/UserService.tsx";
 
-const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
+const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 export const useUpdatePost = (toastRef = null, fetchData = null) => {
     const {token, role} = useAuth();
     const editorContent = useRef("");

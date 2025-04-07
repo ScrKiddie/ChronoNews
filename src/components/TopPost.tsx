@@ -4,10 +4,10 @@ import {Paginator} from "primereact/paginator";
 import {useNavigate} from "react-router-dom";
 import thumbnail from "../../public/thumbnail.svg";
 
-const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
+const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
 const TopPost = ({
-                     topPosts,
+                     topPost,
                      topPostPage,
                      setTopPostPage,
                      topPostSize,
@@ -20,7 +20,7 @@ const TopPost = ({
     return (
         <div className="mt-4">
             <DataView
-                value={topPosts}
+                value={topPost}
                 layout="grid"
                 className="grid-custom"
                 itemTemplate={(post) => (

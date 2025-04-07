@@ -1,5 +1,5 @@
 import {Sidebar, Menu} from "react-pro-sidebar";
-import chronoverseLogo from "../../public/chronoverse.svg";
+import ChronoNewsLogo from "../../public/chrononews.svg";
 import React, {useEffect, useRef} from "react";
 import MenuItemResponsive from "./MenuItemResponsive.tsx";
 import {Button} from "primereact/button";
@@ -105,18 +105,18 @@ const SidebarResponsive = ({children}) => {
                     <Menu>
                         <div className="flex flex-col font-semibold text-lg items-center mt-0.5 justify-center">
                             <img
-                                src={chronoverseLogo}
-                                alt="LOGO ChronoVerse"
-                                className={`${collapsed ? "hidden" : "block"} w-auto px-2 max-h-[80px] mt-3 mb-3`}
+                                src={ChronoNewsLogo}
+                                alt="ChronoNewsLogo"
+                                className={`w-auto px-2 ${collapsed ? "max-h-14 my-1" : "max-h-[80px] mt-3"}`}
                             />
-                            <img
-                                src={chronoverseLogo}
-                                alt="LOGO ChronoVerse"
-                                className={`${collapsed ? "block my-1" : "hidden"} w-auto px-1 max-h-14`}
-                            />
+                            <h1 className={`mt-1 font-extrabold ${collapsed ? "hidden" : "block"}`}
+                                style={{color: 'var(--surface-0)'}}>
+                                CHRONO<span style={{color: 'var(--primary-500)'}}>NEWS</span>
+                            </h1>
                             <div
                                 className={`border-t-2 h-[2px] ${collapsed ? "mb-2" : "mb-3"} border-[#40916c] ${collapsed ? "w-[80%]" : "w-full"}`}></div>
                         </div>
+
                     </Menu>
 
                     <MenuItemResponsive collapsed={collapsed} icon={`pi pi-qrcode`} label={"Beranda"}
@@ -144,7 +144,7 @@ const SidebarResponsive = ({children}) => {
                             <Button severity="secondary" onClick={() => setToggled(!toggled)} text rounded
                                     className={`size-8 flex md:hidden`}
                                     icon={<i className={`pi pi-arrow-right text-md`}/>}/>
-                            <p className={`ml-4 text-xl text-[#4b5563]`}>{lastPath}</p>
+                            <p className={`ml-4 text-xl text-[#4b5563] md:hidden block`}>{lastPath}</p>
                         </div>
 
 
@@ -189,7 +189,7 @@ const SidebarResponsive = ({children}) => {
                     <footer
                         className=" border-t-[1px] flex flex-col gap-4 bg-white border-[#aeb0b5] py-2 md:pr-2 md:text-end text-sm pr-0 text-center">
                         <h1 className="font-normal text-xs">
-                            &copy; {new Date().getFullYear()} ChronoVerse. All rights reserved.
+                            &copy; {new Date().getFullYear()} ChronoNews. All rights reserved.
                         </h1>
                     </footer>
                 </div>

@@ -137,11 +137,11 @@ export const PostSearchSchema = z.object({
 export const PostDeleteSchema = z.object({
     id: z.number().superRefine((value, ctx) => {
         if (value === undefined || value === null || value === 0) {
-            ctx.addIssue({code: "custom", message: "ID Post tidak boleh kosong"});
+            ctx.addIssue({code: "custom", message: "ID RegularPost tidak boleh kosong"});
             return;
         }
         if (!Number.isInteger(value) || value <= 0) {
-            ctx.addIssue({code: "custom", message: "ID Post harus berupa angka positif"});
+            ctx.addIssue({code: "custom", message: "ID RegularPost harus berupa angka positif"});
         }
     }),
 });

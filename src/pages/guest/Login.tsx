@@ -75,7 +75,7 @@ const Login: React.FC = () => {
     };
 
     return (
-        <GuestFormContainer title="Masuk Ke ChronoVerse">
+        <GuestFormContainer title={<p>Masuk Ke Sistem</p>}>
             <form onSubmit={handleSubmit} className="w-full">
                 <div className="mb-2 mt-2 w-full">
                     <InputGroup

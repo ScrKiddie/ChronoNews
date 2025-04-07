@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiUri = import.meta.env.VITE_CHRONOVERSE_API_URI;
+const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
 export const ResetService = {
     resetRequest: async (data) => {
@@ -8,7 +8,7 @@ export const ResetService = {
             const response = await axios.post(apiUri+"/api/reset/request", data);
             return response.data;
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Terjadi kesalahan jaringan" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },
     reset: async (data) => {
@@ -16,7 +16,7 @@ export const ResetService = {
             const response = await axios.patch(apiUri+"/api/reset", data);
             return response.data;
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Terjadi kesalahan jaringan" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     }
 };
