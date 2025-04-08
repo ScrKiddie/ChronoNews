@@ -107,7 +107,7 @@ const SidebarResponsive = ({children}) => {
                     <Menu>
                         <div className="flex flex-col font-semibold text-lg items-center mt-0.5 justify-center">
                             <img
-                                src={ChronoNewsLogo}
+                                src={ChronoNewsLogo as string}
                                 alt="ChronoNewsLogo"
                                 className={`w-auto px-2 ${collapsed ? "max-h-14 my-1" : "max-h-[80px] mt-3"}`}
                             />

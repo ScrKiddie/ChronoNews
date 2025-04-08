@@ -4,7 +4,6 @@ import defaultProfilePicture from "../../public/profilepicture.svg";
 import React, {useEffect, useState} from "react";
 import InputGroup from "./InputGroup.tsx";
 import SubmitButton from "./SubmitButton.tsx";
-import {ListBox} from "primereact/listbox";
 import {useSidebar} from "../hooks/useSidebar.tsx";
 import {Menu} from "primereact/menu";
 

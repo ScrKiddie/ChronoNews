@@ -2,11 +2,11 @@ import React from "react";
 import {Button} from "primereact/button";
 
 
-const LoadingRetry: React.FC = ({visibleConnectionError, onRetry, visibleLoadingConnection}) => {
+const LoadingRetry: React.FC = ({visibleConnectionError, onRetry, visibleLoadingConnection, className="p-4"}) => {
     if (!visibleConnectionError && !visibleLoadingConnection) return null;
 
     return (
-        <div className="flex flex-col items-center justify-center text-center h-screen">
+        <div className={`flex flex-col items-center justify-center text-center h-screen ${className}`} >
             <div className="flex flex-col items-center justify-center text-center h-screen text-[#4b5563]">
                 {visibleConnectionError ? (
                     <div className="font-medium text-2xl md:text-3xl">

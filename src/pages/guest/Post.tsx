@@ -83,17 +83,17 @@ const Post: React.FC = () => {
             <ScrollTop className="bg-[#f59e0b] color-[#465569]"/>
             <div className={`flex flex-col fixed top-0 w-full z-[600] `}>
                 <nav
-                    className="flex justify-between items-center lg:flex-row flex-col bg-white  w-full lg:fixed h-[56px]   bg-none">
-                    <div className={`flex lg:block justify-between items-center w-full lg:w-fit mt-2 lg:mt-0`}>
+                    className="flex justify-between items-center xl:flex-row flex-col bg-white  w-full xl:fixed h-[56px]   bg-none">
+                    <div className={`flex xl:block justify-between items-center w-full xl:w-fit mt-2 xl:mt-0`}>
                         <div className="flex items-center h-full ml-3 ">
-                            <img src={ChronoNewsLogo} className="lg:w-8 w-11" alt="ChronoNewsLogo"/>
+                            <img src={ChronoNewsLogo as string} className="xl:w-8 w-11" alt="ChronoNewsLogo"/>
                             <h1 style={{color: 'var(--surface-600)'}}
-                                className="ml-1 text-[#475569] font-bold text-2xl lg:block hidden">
+                                className="ml-1 text-[#475569] font-bold text-2xl xl:block hidden">
                                 CHRONO<span style={{color: 'var(--primary-500)'}}>NEWS</span>
                             </h1>
                         </div>
 
-                        <div className="h-full flex items-center w-full justify-center lg:hidden pl-2 pr-3">
+                        <div className="h-full flex items-center w-full justify-center xl:hidden pl-2 pr-3">
                             <div className="p-inputgroup  rounded-md h-10 w-full">
                                 <InputText placeholder="Cari Berita" onChange={(e) => setSearchQuery(e.target.value)}
                                            onKeyDown={(e) => {
@@ -110,7 +110,7 @@ const Post: React.FC = () => {
                         className="menu-news text-md shadow-[0_1px_6px_rgba(0,0,0,0.1)] flex items-center justify-center "
                         model={moreCategories} popup ref={menuRef}
                         style={{borderRadius: "5px", width: "fit-content"}}/>
-                    <div className="lg:flex hidden h-full w-fit  items-center justify-center">
+                    <div className="xl:flex hidden h-full w-fit  items-center justify-center">
                         <div className="p-inputgroup  rounded-md mr-2 h-9 w-52">
                             <InputText placeholder="Cari Berita" onChange={(e) => setSearchQuery(e.target.value)}
                                        onKeyDown={(e) => {
@@ -139,10 +139,10 @@ const Post: React.FC = () => {
                 />
             </div>
 
-            <div className="min-h-screen p-4 mx-auto max-w-4xl bg-white lg:pt-[4.6rem] pt-32 rounded-md">
+            <div className="min-h-screen p-4 mx-auto max-w-4xl bg-white xl:pt-[4.6rem] pt-32 rounded-md">
                 {(error || loading) ?
-                    <div className="fixed inset-0 flex items-center justify-center bg-white z-[9999] overflow-hidden overflow-y-hidden">
-                        <LoadingRetry visibleConnectionError={error} visibleLoadingConnection={loading}
+                    <div className="fixed inset-0 flex items-center justify-center bg-white z-[10] overflow-hidden overflow-y-hidden">
+                        <LoadingRetry  visibleConnectionError={error} className={""} visibleLoadingConnection={loading}
                                       onRetry={handleRetry}/>
                     </div>
 

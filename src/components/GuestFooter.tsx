@@ -8,7 +8,7 @@ const GuestFooter: React.FC = ({quickLinks = null} ) => {
             <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
                 <div className="flex flex-col mx-auto items-center">
                     <div className="flex items-center gap-1">
-                        <img src={ChronoNewsLogo} className="w-8" alt="ChronoNewsLogo"/>
+                        <img src={ChronoNewsLogo as string} className="w-8" alt="ChronoNewsLogo"/>
                         <h1 className="text-white font-bold text-2xl">
                             CHRONO<span className="text-[#f59e0b]">NEWS</span>
                         </h1>

@@ -30,7 +30,7 @@ export const PostService = {
         }
     },
 
-    searchPost: async (token, filters = {}) => {
+    searchPost: async (token, filters = {},signal) => {
         try {
             const {
                 userID = "",
@@ -47,11 +47,15 @@ export const PostService = {
             const response = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${token}`
-                }
+                },
+                signal
             });
 
             return response.data;
         } catch (error) {
+            if (error.name === 'CanceledError') {
+                throw new Error('Request was cancelled');
+            }
             throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },

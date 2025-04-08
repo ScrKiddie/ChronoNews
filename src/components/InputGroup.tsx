@@ -12,7 +12,7 @@ const InputGroup = ({type="text", label = "", data = "", setData = (a)=>{return 
                 id={label.replace(/\s+/g, '').toLowerCase()}
                 className={`w-full`}
                 invalid={error}
-                value={data || null}
+                value={data}
                 onChange={(e) => {
                     setData(e.target.value);
                     setError("");
@@ -25,7 +25,7 @@ const InputGroup = ({type="text", label = "", data = "", setData = (a)=>{return 
                 invalid={error}
                 feedback={false}
                 toggleMask
-                value={data || null}
+                value={data}
                 onChange={(e) => {
                     setData(e.target.value);
                     setError("");
@@ -35,7 +35,7 @@ const InputGroup = ({type="text", label = "", data = "", setData = (a)=>{return 
                 id={label.replace(/\s+/g, '').toLowerCase()}
                 className="w-full"
                 options={options}
-                value={data||null}
+                value={data}
                 onChange={(e) => {
                     setData(e.target.value);
                     setError("");

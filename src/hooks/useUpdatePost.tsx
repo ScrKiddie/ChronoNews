@@ -87,9 +87,8 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         setErrors({});
         setModalLoading(true);
         editorContent.current = "";
-        setData({title: "", summary: "", content: "", userID: 0, categoryID: 0});
+        setData({deleteThumbnail: false, title: "", summary: "", content: "", userID: 0, categoryID: 0});
         setThumbnail(null);
-
         try {
             const categoryResponse = await CategoryService.listCategories(token);
             if (categoryResponse && Array.isArray(categoryResponse.data)) {
@@ -111,17 +110,16 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
                 }
             }
 
-            const response = await PostService.getPost(postId, token);
+            const response = await PostService.getPost(postId);
             if (response) {
                 setData({
+                    deleteThumbnail: false,
                     title: response.title || "",
                     summary: response.summary || "",
                     content: processContent(response.content || ""),
-                    userID: response.user.id || "",
-                    categoryID: response.category.id || "",
-                    thumbnail: response.thumbnail || "",
+                    userID: response.user.id || 0,
+                    categoryID: response.category.id || 0
                 });
-
             }
 
             setVisibleModal(true);

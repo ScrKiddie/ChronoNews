@@ -1,9 +1,9 @@
 import {useState, useEffect, useRef} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {Menu} from "primereact/menu";
 import {PostService} from "../services/PostService";
 import {CategoryService} from "../services/CategoryService";
 import {useUpdatePost} from "./useUpdatePost.tsx";
+import {useAuth} from "./useAuth.tsx";
 
 const getRelativeTime = (timestamp: number) => {
     const now = new Date();
@@ -77,36 +77,19 @@ const usePost = () => {
     const postSize = 5;
     const searchPostSize = 5
 
-    const menuRef = useRef<Menu>(null);
+    const menuRef = useRef(null);
     const [selectedCategory, setSelectedCategory] = useState("");
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
-    const token = localStorage.getItem("token");
+    const {token} = useAuth();
 
     const [headlineMode, setHeadlineMode] = useState(false);
     const [mainMode, setMainMode] = useState(false);
     const [searchMode, setSearchMode] = useState(false)
 
-    const [mainPost, setMainPost] = useState({
-        id: null,
-        category: {
-            id: null,
-            name: ""
-        },
-        user: {
-            id: null,
-            name: "",
-            profilePicture: ""
-        },
-        title: "",
-        summary: "",
-        content: "",
-        publishedDate: null,
-        lastUpdated: null,
-        thumbnail: ""
-    });
+    const [mainPost, setMainPost] = useState({});
 
     const [notFound, setNotFound] = useState(false);
     const [retry, setRetry] = useState(0);
@@ -114,10 +97,25 @@ const usePost = () => {
         setRetry(prevRetry => prevRetry + 1);
     };
 
+    const headlineAbortController = useRef<AbortController | null>(null);
+    const topPostAbortController = useRef<AbortController | null>(null);
+    const postAbortController = useRef<AbortController | null>(null);
+    const searchPostAbortController = useRef<AbortController | null>(null);
 
+    const {id} = useParams() || "";
 
+    const {processContent} = useUpdatePost();
 
-
+    const getQueryFromUrl = () => {
+        if (window.location.pathname === '/post') {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id') || '';
+        }else if (window.location.pathname === '/search') {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('q') || '';
+        }
+        return '';
+    };
     const fetchCategories = async () => {
         setError(false)
         setLoading(true)
@@ -126,18 +124,26 @@ const usePost = () => {
             if (Array.isArray(response.data)) {
                 setCategories(response.data);
             }
+            setLoading(false)
         } catch (error) {
             if (!error.response) {
-                setError(true)
+                if (error.message !== 'Request was cancelled') {
+                    setError(true);
+                }
             } else {
                 console.log(error)
+                setError(true);
             }
-        } finally {
-            setLoading(false)
         }
     };
-
     const fetchHeadlinePost = async (category = "") => {
+        if (headlineAbortController.current) {
+            headlineAbortController.current.abort();
+        }
+
+        headlineAbortController.current = new AbortController();
+        const signal = headlineAbortController.current.signal;
+
         setLoading(true);
         setError(false)
         try {
@@ -147,7 +153,7 @@ const usePost = () => {
                 size: headlineSize,
             };
 
-            const response = await PostService.searchPost(token, filters);
+            const response = await PostService.searchPost(token, filters, signal);
             const {data, pagination} = response;
 
             setHeadlinePost(data.length > 0 ? {
@@ -156,19 +162,25 @@ const usePost = () => {
             } : null);
 
             setHeadlinePostPagination(pagination);
+            setLoading(false);
         } catch (error) {
             if (!error.response) {
                 console.log(error)
-                setError(true)
+                if (error.message !== 'Request was cancelled') { setError(true); }
             } else {
                 console.log(error)
+                setError(true)
             }
-        } finally {
-            setLoading(false);
         }
     };
+    const fetchSearchPost = async (query = "") => {
+        if (searchPostAbortController.current) {
+            searchPostAbortController.current.abort();
+        }
 
-    const fetchSearchPost = async (query = "", category = "") => {
+        searchPostAbortController.current = new AbortController();
+        const signal = searchPostAbortController.current.signal;
+
         setLoading(true);
         setError(false);
 
@@ -182,7 +194,7 @@ const usePost = () => {
                 size: searchPostSize,
             };
 
-            const response = await PostService.searchPost(token, filters);
+            const response = await PostService.searchPost(token, filters,signal);
             const {data, pagination} = response;
 
             setSearchPost(data.map(item => ({
@@ -191,20 +203,25 @@ const usePost = () => {
             })));
 
             setSearchPostPagination(pagination);
+            setLoading(false);
         } catch (error) {
             if (!error.response) {
                 console.log(error)
-                setError(true)
+                if (error.message !== 'Request was cancelled') { setError(true); }
             } else {
                 console.log(error)
+                setError(true);
             }
-        } finally {
-            setLoading(false);
         }
     };
-
-
     const fetchTopPost = async (category = "") => {
+        if (topPostAbortController.current) {
+            topPostAbortController.current.abort();
+        }
+
+        topPostAbortController.current = new AbortController();
+        const signal = topPostAbortController.current.signal;
+
         setError(false)
         setLoading(true);
         try {
@@ -214,26 +231,32 @@ const usePost = () => {
                 size: topPostSize,
             };
 
-            const response = await PostService.searchPost(token, filters);
+            const response = await PostService.searchPost(token, filters, signal);
             const {data, pagination} = response;
             setTopPost(data.map(item => ({
                 ...item,
                 publishedDate: getRelativeTime(item.publishedDate)
             })));
             setTopPostPagination(pagination);
+            setLoading(false)
         } catch (error) {
             if (!error.response) {
                 console.log(error)
-                setError(true)
+                if (error.message !== 'Request was cancelled') { setError(true); }
             } else {
                 console.log(error)
+                setError(true);
             }
-        } finally {
-            setLoading(false)
         }
     };
-
     const fetchPost = async (category = "") => {
+        if (postAbortController.current) {
+            postAbortController.current.abort();
+        }
+
+        postAbortController.current = new AbortController();
+        const signal = postAbortController.current.signal;
+
         setLoading(true);
         setError(false);
 
@@ -244,119 +267,105 @@ const usePost = () => {
                 size: postSize,
             };
 
-            const response = await PostService.searchPost(token, filters);
+            const response = await PostService.searchPost(token, filters,signal);
             const {data, pagination} = response;
             setPost(data.map(item => ({
                 ...item,
                 publishedDate: getRelativeTime(item.publishedDate)
             })));
             setPostPagination(pagination);
+            setLoading(false);
         } catch (error) {
             if (!error.response) {
                 console.log(error)
-                setError(true)
+                if (error.message !== 'Request was cancelled') { setError(true); }
             } else {
                 console.log(error)
+                setError(true);
             }
-        } finally {
-            setLoading(false);
+        }
+    };
+    const fetchMainPost = async (id) => {
+        setLoading(true);
+        setError(false)
+        try {
+            const mainPostResponse = await PostService.getPost(id)
+            setMainPost(prevPost => ({
+                ...prevPost,
+                category: mainPostResponse.category,
+                summary: mainPostResponse.summary,
+                id: mainPostResponse.id ?? null,
+                title: mainPostResponse.title,
+                thumbnail: mainPostResponse.thumbnail,
+                user: mainPostResponse.user,
+                content: processContent(mainPostResponse.content),
+                publishedDate: formatDate(mainPostResponse.publishedDate),
+                lastUpdated: mainPostResponse.lastUpdated ? formatDate(mainPostResponse.lastUpdated) : "",
+            }));
+            setNotFound(false);
+            setLoading(false)
+        } catch (error) {
+            if (error.message === "Terjadi kesalahan jaringan") {
+                setError(true);
+                throw error
+            }else if (error.message !== 'Request was cancelled') {
+                if (error.message === "Not found" || error.message === "Bad request") {
+                    setNotFound(true);
+                    throw error
+                }else {
+                    setError(true);
+                    throw error
+                }
+            }
         }
     };
 
+    const fetchAllCategoryData = (category, mainMode = false) => {
+        const promises = [];
+
+        if (!mainMode) {
+            promises.push(fetchHeadlinePost(category));
+        }
+
+        if (postPage === 1) {
+            promises.push(fetchPost(category));
+        }
+
+        if (topPostPage === 1) {
+            promises.push(fetchTopPost(category));
+        }
+
+        if (promises.length > 0) {
+            return Promise.all(promises);
+        } else {
+            return Promise.resolve();
+        }
+    };
 
 
     useEffect(() => {
         fetchCategories();
     }, [retry]);
 
-
-    const {id} = useParams();
-    const {processContent} = useUpdatePost();
-
-
-    useEffect(() => {
-        if (headlineMode && !mainMode && !searchMode) {
-            fetchHeadlinePost(selectedCategory);
-        }
-}, [selectedCategory, headlinePostPage ,retry, searchMode, mainMode]);
-    const [prevTopPostPage, setPrevTopPostPage] = useState(1)
-    const [prevPostPage, setPrevPostPage] = useState(1)
-
-    useEffect(() => {
-        if (!headlineMode && mainMode && !searchMode){
-            if (topPostPage != prevTopPostPage){
-                fetchTopPost("")
-                setPrevTopPostPage(topPostPage)
-            }
-            setSelectedCategory("")
-        }else if (!mainMode && headlineMode && !searchMode) {
-            fetchTopPost(selectedCategory);
-        }
-    }, [selectedCategory, topPostPage, retry, searchMode, mainMode]);
-
-    useEffect(() => {
-        if (!headlineMode && mainMode && !searchMode){
-            if (postPage != prevPostPage){
-                fetchPost("")
-                setPrevPostPage(postPage)
-            }
-            setSelectedCategory("")
-        }else if (!mainMode && headlineMode && !searchMode){
-            fetchPost(selectedCategory);
-        }
-    }, [selectedCategory, postPage,retry, searchMode, mainMode]);
-    const getQueryFromUrl = () => {
-        if (window.location.pathname === '/post') {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('id') || '';
-        }else if (window.location.pathname === '/search') {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('q') || '';
-        }
-        return '';
-    };
     useEffect(() => {
         const query = getQueryFromUrl()
         if (window.location.pathname === '/post') {
             if(!isNaN(Number(query)) && Number(query) > 0){
+                setSelectedCategory("main")
                 setSearchMode(false);
                 setHeadlineMode(false);
                 setMainMode(true);
                 setActiveIndex(-1);
-                const fetchMainPost = async () => {
-                    setLoading(true);
-                    setError(false)
+                const fetchData = async () => {
                     try {
-                        const response = await PostService.getPost(query);
-                        setMainPost(prevPost => ({
-                            ...prevPost,
-                            category: response.category,
-                            summary: response.summary,
-                            id: response.id ?? null,
-                            title: response.title,
-                            thumbnail: response.thumbnail,
-                            user: response.user,
-                            content: processContent(response.content),
-                            publishedDate: formatDate(response.publishedDate),
-                            lastUpdated: response.lastUpdated ? formatDate(response.lastUpdated) : "",
-                        }));
-                        setNotFound(false);
-                        fetchPost("")
-                        fetchTopPost("")
+                        await fetchMainPost(query);
+                        await fetchAllCategoryData("", true);
                     } catch (error) {
-                        if (error.message === "Terjadi kesalahan jaringan") {
-                            setError(true)
-                        } else if (error.message === "Not found" || error.message === "Bad request") {
-                            setNotFound(true);
-                        } else {
-                            console.log(error)
-                        }
-                    } finally {
-                        setLoading(false)
+                        console.error(error);
                     }
                 };
-                fetchMainPost();
-                return;
+                fetchData();
+                return
             }else {
                 setNotFound(true)
             }
@@ -369,9 +378,9 @@ const usePost = () => {
             fetchSearchPost(query);
         }else {
             setSearchMode(false);
-            setMainMode(false)
-            setHeadlineMode(true);
-            setSearchPostPage(1);
+            setMainMode(false);
+            setHeadlineMode(true)
+            setSearchPostPage(1)
         }
 
     }, [location.search,retry,searchPostPage]);
@@ -380,48 +389,76 @@ const usePost = () => {
     useEffect(() => {
         if (categories.length === 0) {
             if (window.location.pathname === "/beranda") {
-                handleCategoryChange("beranda");
+                setSelectedCategory("");
                 setActiveIndex(0);
-                return;
             }
             return;
         }
-        if (window.location.pathname !== '/search' && window.location.pathname !== '/post') {
-            const primaryCategories = categories.slice(0, 3);
-            const remainingCategories = categories.slice(3);
 
-            let foundIndex = primaryCategories.findIndex(cat => cat.name.toLowerCase() === id.toLowerCase());
+        const path = window.location.pathname;
+        const lowerId = id?.toLowerCase();
+        const primaryCategories = categories.slice(0, 3);
+        const remainingCategories = categories.slice(3);
 
-            if (window.location.pathname === "/beranda") {
-                handleCategoryChange(id);
-                setActiveIndex(0);
-                return;
-            }
+        if (path === "/search" || path === "/post") return;
 
-            if (foundIndex !== -1) {
-                handleCategoryChange(id);
-                setActiveIndex(foundIndex + 1);
-                return;
-            }
-
-            const isInMoreCategories = remainingCategories.some(cat => cat.name.toLowerCase() === id.toLowerCase());
-            if (isInMoreCategories) {
-                handleCategoryChange(id);
-                setActiveIndex(4);
-                return;
-            }
-
-            setNotFound(true)
+        if (path === "/beranda") {
+            setSelectedCategory("beranda");
+            setActiveIndex(0);
+            fetchAllCategoryData("beranda").catch(console.error);
+            return;
         }
-    }, [id,categories]);
 
+        const foundIndex = primaryCategories.findIndex(cat => cat.name.toLowerCase() === lowerId);
+        if (foundIndex !== -1) {
+            setSelectedCategory(lowerId);
+            setActiveIndex(foundIndex + 1);
+            fetchAllCategoryData(lowerId).catch(console.error);
+            return;
+        }
 
-    const handleCategoryChange = (category: string) => {
-        setSelectedCategory(category);
+        const isInMoreCategories = remainingCategories.some(cat => cat.name.toLowerCase() === lowerId);
+        if (isInMoreCategories) {
+            setSelectedCategory(lowerId);
+            setActiveIndex(4);
+            fetchAllCategoryData(lowerId).catch(console.error);
+            return;
+        }
+
+        setNotFound(true);
+    }, [location.pathname, categories, retry]);
+
+    useEffect(() => {
+        if (!selectedCategory || window.location.pathname === '/search' || window.location.pathname === '/post') return;
+        fetchHeadlinePost(selectedCategory);
+    }, [headlinePostPage]);
+
+    useEffect(() => {
+        if (selectedCategory && window.location.pathname === '/post') {
+            fetchTopPost("")
+            return;
+        }
+        if (!selectedCategory || window.location.pathname === '/search' || window.location.pathname === '/post') return;
+        fetchTopPost(selectedCategory);
+    }, [topPostPage]);
+
+    useEffect(() => {
+        if (selectedCategory &&window.location.pathname === '/post') {
+            fetchPost("")
+            return;
+        }
+        if (!selectedCategory || window.location.pathname === '/search' ) return;
+        fetchPost(selectedCategory);
+    }, [postPage]);
+
+    useEffect(() => {
         setHeadlinePostPage(1);
         setTopPostPage(1);
         setPostPage(1);
+    }, [selectedCategory]);
 
+
+    const handleCategoryChange = (category: string) => {
         navigate(`/${category.toLowerCase()}`);
     };
 
@@ -430,7 +467,7 @@ const usePost = () => {
 
     const allCategories = [
         {label: "Beranda", command: () => handleCategoryChange("beranda")},
-        ...primaryCategories.map((cat, index) => ({
+        ...primaryCategories.map((cat) => ({
             label: cat.name,
             command: () => handleCategoryChange(cat.name.toLowerCase()),
         })),

@@ -26,10 +26,10 @@ const RegularPost = ({
                 layout="list"
                 itemTemplate={(post) => (
                     <div key={post.id}
-                         className={`flex ${post.id === post[post.length - 1]?.id ? '' : 'mb-3'} w-full justify-between min-h-36 md:min-h-40 shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg`}>
+                         className={`flex ${post.id === post[post.length - 1]?.id ? '' : 'mb-3'} break-all w-full justify-between min-h-36 md:min-h-40 shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg`}>
                         <div className="lg:w-[50%] w-[80%] min-h-36 md:min-h-40">
                             <img
-                                src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail}
+                                src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail as string}
                                 alt={post.title}
                                 className="h-full w-full object-cover bg-[#f59e0b] rounded-tl-lg rounded-bl-lg cursor-pointer"
                                 onClick={() => navigate(`/post?id=${post.id}`)}

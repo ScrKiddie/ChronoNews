@@ -16,7 +16,7 @@ const Login: React.FC = () => {
     const [email, setEmail] = useState("");
     const [errors, setError] = useState<{ email?: string; tokenCaptcha?: string }>({});
     const [loading, setLoading] = useState(false);
-    const ref = useRef();
+    const ref = useRef(null);
     const [tokenCaptcha, setTokenCaptcha] = useState("");
 
     useEffect(() => {
@@ -93,7 +93,7 @@ const Login: React.FC = () => {
                         onSuccess={(token) => {
                             setError((prevErrors) => ({
                                 ...prevErrors,
-                                tokenCaptcha: false,
+                                tokenCaptcha: "",
                             }));
                             setTokenCaptcha(token)
                         }}

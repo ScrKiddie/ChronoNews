@@ -45,6 +45,7 @@ const useSearchPost = () => {
                 summary: searchParams.summary,
                 page: page.toString(),
                 size: size.toString(),
+                userID : 0
             };
             if (role == "journalist") {
                 filters.userID = sub

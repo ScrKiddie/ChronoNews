@@ -29,9 +29,9 @@ const HeadlinePost = ({
                 layout="grid"
                 className="grid-custom"
                 itemTemplate={(post) => (
-                    <div key={post.id} className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg w-full">
+                    <div key={post.id} className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg w-full break-all">
                         <img
-                            src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail}
+                            src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail as string}
                             alt={post.title}
                             className="w-full md:h-[480px] h-[240px] object-cover rounded-t-lg bg-[#f59e0b] cursor-pointer"
                             onClick={() => navigate(`/post?id=${post.id}`)}

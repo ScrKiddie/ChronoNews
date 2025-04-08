@@ -8,7 +8,7 @@ const GuestFormContainer = ({ children, title = "" })=>{
             className=" xl:w-[32%] w-[88%] flex items-center justify-center bg-white flex-col rounded-xl xl:shadow-md my-10">
             <div className="xl:p-10 sm:py-10 w-full">
                 <div className="flex items-center justify-center flex-col">
-                    <img src={ChronoNewsLogo} className="w-[10rem]" alt="ChronoNewsLogo"/>
+                    <img src={ChronoNewsLogo as string} className="w-[10rem]" alt="ChronoNewsLogo"/>
                     <h1 className="m-0 font-extrabold" style={{color: 'var(--surface-600)'}}>
                         CHRONO<span style={{color: 'var(--primary-500)'}}>NEWS</span>
                     </h1>

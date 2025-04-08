@@ -1,4 +1,4 @@
-import {useEffect, useState,} from "react";
+import {useState,} from "react";
 import {z} from "zod";
 import {useAuth} from "./useAuth.tsx";
 import {ProfileService} from "../services/ProfileService";

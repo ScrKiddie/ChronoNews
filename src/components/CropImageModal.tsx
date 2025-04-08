@@ -2,7 +2,7 @@ import Cropper from "cropperjs";
 import "cropperjs/dist/cropper.css";
 import {Dialog} from "primereact/dialog";
 import {Button} from "primereact/button";
-import {useEffect, useState} from "react";
+import {JSX} from "react";
 
 const CropImageModal = ({
                             id = "",
@@ -14,11 +14,11 @@ const CropImageModal = ({
                             imageRef,
                             cropperRef
                         }) => {
-
+    const header: JSX.Element = <h1 className="font-medium m-0 text-xl">Crop Gambar</h1>;
     return (
         <Dialog
             id={id}
-            header={<h1 className="font-medium m-0 text-xl">Crop Gambar</h1>}
+            header={header}
             visible={visible}
             className="w-[94%] md:w-[60%]"
             onHide={onClose}

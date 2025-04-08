@@ -22,7 +22,7 @@ const MainPost = ({mainPost, handleCategoryChange}) => {
         } else {
             const script = document.createElement("script");
             script.src = `https://${import.meta.env.VITE_DISQUS_SHORTNAME}.disqus.com/embed.js`;
-            script.setAttribute("data-timestamp", +new Date());
+            script.setAttribute("data-timestamp", +new Date() as string);
             script.async = true;
             document.body.appendChild(script);
         }
@@ -50,7 +50,7 @@ const MainPost = ({mainPost, handleCategoryChange}) => {
 
     return (
         <>
-            <main>
+            <main className={`break-all`}>
                 <BreadCrumb model={[
                     {
                         label: "Home", template: () => <span
@@ -74,7 +74,7 @@ const MainPost = ({mainPost, handleCategoryChange}) => {
                 <div>
                     <div className={`mb-[-0.5rem]`}>
                         <img
-                            src={mainPost?.thumbnail ? apiUri+"/post_picture/"+mainPost?.thumbnail : thumbnail}
+                            src={mainPost?.thumbnail ? apiUri+"/post_picture/"+mainPost?.thumbnail : thumbnail as string}
                             alt={mainPost.title}
                             className="w-full object-cover bg-[#f59e0b]"
                         />
@@ -85,7 +85,7 @@ const MainPost = ({mainPost, handleCategoryChange}) => {
                         <img
                             src={mainPost.user?.profilePicture
                                 ? `${apiUri}/profile_picture/${mainPost.user.profilePicture}`
-                                : defaultProfilePicture
+                                : defaultProfilePicture as string
                             }
                             className="size-[2.6rem] lg:size-[3rem] rounded-full cursor-pointer"
                             style={{border: "1px solid #d1d5db"}}
@@ -164,7 +164,7 @@ const MainPost = ({mainPost, handleCategoryChange}) => {
                         <img
                             src={mainPost.user?.profilePicture
                                 ? `${apiUri}/profile_picture/${mainPost.user.profilePicture}`
-                                : defaultProfilePicture}
+                                : defaultProfilePicture as string}
                             className="size-[9rem] rounded-full"
                             style={{border: "1px solid #d1d5db"}}
                         />

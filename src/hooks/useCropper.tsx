@@ -1,13 +1,12 @@
 import {useState, useRef} from "react";
 
 export const useCropper = ({
-                               setVisibleModal = () => {
-                               }, setProfilePicture = null, toastRef = null, width = 800 , height = 800
+                               setVisibleModal, setProfilePicture = null, toastRef = null, width = 800 , height = 800
                            } = {}) => {
     const fileInputRef = useRef(null);
-    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedImage, setSelectedImage] = useState<null | string | ArrayBuffer>(null);
     const [visibleCropImageModal, setVisibleCropImageModal] = useState(false);
-    const [croppedImage, setCroppedImage] = useState(null);
+    const [croppedImage, setCroppedImage] = useState({});
     const imageRef = useRef(null);
     const cropperRef = useRef(null);
     const [imageFormat, setImageFormat] = useState("image/jpeg");
