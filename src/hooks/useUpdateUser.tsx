@@ -17,6 +17,7 @@ export const useUpdateUser = (toastRef = null, fetchData = null) => {
         email: "",
         phoneNumber: "",
         password: "",
+        deleteProfilePicture: false
     });
     const [errors, setErrors] = useState({});
     const [profilePicture, setProfilePicture] = useState(null);
@@ -34,6 +35,7 @@ export const useUpdateUser = (toastRef = null, fetchData = null) => {
         handleClickUploadButton,
         handleCrop,
         resetCropper,
+        setCroppedImage
     } = useCropper({setVisibleModal, setProfilePicture, toastRef});
 
     const handleVisibleModal = async (userId) => {
@@ -41,7 +43,7 @@ export const useUpdateUser = (toastRef = null, fetchData = null) => {
         resetCropper();
         setErrors({});
         setModalLoading(true);
-        setData({name: "", role: "", phoneNumber: "", email: "", password: ""});
+        setData({deleteProfilePicture: false, name: "", role: "", phoneNumber: "", email: "", password: ""});
         setProfilePicture(null)
         try {
             const response = await UserService.getUser(userId, token);
@@ -70,6 +72,7 @@ export const useUpdateUser = (toastRef = null, fetchData = null) => {
             const validatedData = UserUpdateSchema.parse(data);
             const request = {
                 ...validatedData,
+                ...(data?.deleteProfilePicture === true ? { deleteProfilePicture: true } : {}),
                 ...(profilePicture instanceof File ? {profilePicture} : {}),
             };
 
@@ -110,6 +113,7 @@ export const useUpdateUser = (toastRef = null, fetchData = null) => {
         handleSubmit,
         setData,
         setVisibleModal,
+        setProfilePicture,
         // props dari useCropper
         fileInputRef,
         selectedImage,
@@ -121,5 +125,6 @@ export const useUpdateUser = (toastRef = null, fetchData = null) => {
         handleImageChange,
         handleCloseCropImageModal,
         handleClickUploadButton,
+        setCroppedImage
     };
 };

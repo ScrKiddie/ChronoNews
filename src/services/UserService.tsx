@@ -69,7 +69,9 @@ export const UserService = {
             if (data.profilePicture) {
                 formData.append("profilePicture", data.profilePicture);
             }
-
+            if (data.deleteProfilePicture) {
+                formData.append("deleteProfilePicture", data.deleteProfilePicture);
+            }
             const response = await axios.put(`${apiUri}/api/user/${id}`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,

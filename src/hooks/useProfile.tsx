@@ -1,4 +1,4 @@
-import {useState,} from "react";
+import {useEffect, useState,} from "react";
 import {z} from "zod";
 import {useAuth} from "./useAuth.tsx";
 import {ProfileService} from "../services/ProfileService";
@@ -27,6 +27,7 @@ export const useProfile = (toastRef = null) => {
         handleClickUploadButton,
         handleCrop,
         resetCropper,
+        setCroppedImage
     } = useCropper({setVisibleModal: setVisibleModal, setProfilePicture: setProfilePicture, toastRef});
 
     const handleVisibleModal = async () => {
@@ -50,7 +51,6 @@ export const useProfile = (toastRef = null) => {
     };
 
     const handleCloseModal = () => setVisibleModal(false);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitLoading(true);
@@ -65,9 +65,9 @@ export const useProfile = (toastRef = null) => {
 
             const request = {
                 ...validatedData,
+                ...(data?.deleteProfilePicture === true ? { deleteProfilePicture: true } : {}),
                 ...(profilePicture instanceof File ? {profilePicture: profilePicture} : {}),
             };
-
             await ProfileService.updateCurrentUser(request, token);
             toastRef.current?.show({
                 severity: "success",
@@ -103,6 +103,7 @@ export const useProfile = (toastRef = null) => {
         handleSubmit,
         setData,
         setVisibleModal,
+        setProfilePicture,
         // props dari useCropper
         fileInputRef,
         selectedImage,
@@ -114,5 +115,6 @@ export const useProfile = (toastRef = null) => {
         handleImageChange,
         handleCloseCropImageModal,
         handleClickUploadButton,
+        setCroppedImage
     };
 };

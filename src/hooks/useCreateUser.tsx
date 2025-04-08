@@ -32,6 +32,7 @@ export const useCreateUser = (toastRef = null, fetchData = null) => {
         handleClickUploadButton,
         handleCrop,
         resetCropper,
+        setCroppedImage
     } = useCropper({setVisibleModal, setProfilePicture, toastRef});
 
     const handleVisibleModal = () => {
@@ -92,6 +93,7 @@ export const useCreateUser = (toastRef = null, fetchData = null) => {
         handleSubmit,
         setData,
         setVisibleModal,
+        setProfilePicture,
         // props dari useCropper
         fileInputRef,
         selectedImage,
@@ -103,5 +105,6 @@ export const useCreateUser = (toastRef = null, fetchData = null) => {
         handleImageChange,
         handleCloseCropImageModal,
         handleClickUploadButton,
+        setCroppedImage
     };
 };

@@ -53,7 +53,9 @@ const Post = () => {
         categoryOptions: categoryOptionsCreate,
         userOptions: userOptionsCreate,
         role: roleCreate,
-        editorContent: editorContentCreate
+        editorContent: editorContentCreate,
+        setThumbnail: setThumbnailCreate,
+        setCroppedImage: setCroppedImageCreate
     } = useCreatePost(toastRef, fetchData);
 
     const {
@@ -79,7 +81,9 @@ const Post = () => {
         categoryOptions: categoryOptionsUpdate,
         userOptions: userOptionsUpdate,
         role: roleUpdate,
-        editorContent: editorContentUpdate
+        editorContent: editorContentUpdate,
+        setThumbnail: setThumbnailUpdate,
+        setCroppedImage: setCroppedImageUpdate
     } = useUpdatePost(toastRef, fetchData);
 
     const {
@@ -183,6 +187,8 @@ const Post = () => {
                 handleImageChange={handleImageChangeCreate}
                 setData={setDataPostCreate}
                 editorContent={editorContentCreate}
+                setCroppedImage={setCroppedImageCreate}
+                setThumbnail={setThumbnailCreate}
             />
 
             {/*modal loading create*/}
@@ -220,6 +226,8 @@ const Post = () => {
                 setData={setDataPostUpdate}
                 categoryOptions={categoryOptionsUpdate}
                 editorContent={editorContentUpdate}
+                setThumbnail={setThumbnailUpdate}
+                setCroppedImage={setCroppedImageUpdate}
             />
 
             {/*modal loading create*/}

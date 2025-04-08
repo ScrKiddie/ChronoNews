@@ -49,6 +49,8 @@ const Journalist = () => {
         handleCrop: handleCropCreate,
         cropperRef: cropperRefCreate,
         imageRef: imageRefCreate,
+        setCroppedImage:setCroppedImageCreate,
+        setProfilePicture: setProfilePictureCreate
     } = useCreateUser(toastRef, fetchData);
 
     const {
@@ -70,7 +72,9 @@ const Journalist = () => {
         handleCrop: handleCropUpdate,
         cropperRef: cropperRefUpdate,
         imageRef: imageRefUpdate,
-        modalLoading
+        modalLoading,
+        setCroppedImage:setCroppedImageUpdate,
+        setProfilePicture: setProfilePictureUpdate
     } = useUpdateUser(toastRef, fetchData);
 
     const {
@@ -151,6 +155,8 @@ const Journalist = () => {
                 handleClickUploadButton={handleClickUploadButtonCreate}
                 handleImageChange={handleImageChangeCreate}
                 setData={setDataUserCreate}
+                setCroppedImage={setCroppedImageCreate}
+                setProfilePicture={setProfilePictureCreate}
             />
 
             {/*modal loading*/}
@@ -171,6 +177,8 @@ const Journalist = () => {
                 handleClickUploadButton={handleClickUploadButtonUpdate}
                 handleImageChange={handleImageChangeUpdate}
                 setData={setDataUserUpdate}
+                setCroppedImage={setCroppedImageUpdate}
+                setProfilePicture={setProfilePictureUpdate}
             />
 
             {/* modal cropper untuk create */}

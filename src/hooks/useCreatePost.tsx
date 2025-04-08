@@ -37,6 +37,7 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
         handleClickUploadButton,
         handleCrop,
         resetCropper,
+        setCroppedImage
     } = useCropper({
         setVisibleModal: setVisibleModal,
         setProfilePicture: setThumbnail,
@@ -136,6 +137,7 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
         setData,
         setVisibleModal,
         editorContent,
+        setThumbnail,
         // props dari useCropper
         fileInputRef,
         selectedImage,
@@ -147,6 +149,7 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
         handleImageChange,
         handleCloseCropImageModal,
         handleClickUploadButton,
-        role
+        role,
+        setCroppedImage
     };
 };

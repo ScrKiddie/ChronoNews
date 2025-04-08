@@ -391,7 +391,6 @@ const usePost = () => {
             const remainingCategories = categories.slice(3);
 
             let foundIndex = primaryCategories.findIndex(cat => cat.name.toLowerCase() === id.toLowerCase());
-            console.log(foundIndex);
 
             if (window.location.pathname === "/beranda") {
                 handleCategoryChange(id);

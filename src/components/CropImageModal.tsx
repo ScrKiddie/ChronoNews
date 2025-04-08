@@ -2,6 +2,7 @@ import Cropper from "cropperjs";
 import "cropperjs/dist/cropper.css";
 import {Dialog} from "primereact/dialog";
 import {Button} from "primereact/button";
+import {useEffect, useState} from "react";
 
 const CropImageModal = ({
                             id = "",
@@ -45,7 +46,7 @@ const CropImageModal = ({
             }}
         >
             <div className="flex flex-col gap-4">
-                <div>
+                <div className={`w-full flex justify-center`}>
                     {selectedImage && (
                         <img
                             ref={imageRef}

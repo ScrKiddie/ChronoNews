@@ -20,6 +20,7 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         content: "",
         userID: 0,
         categoryID: 0,
+        deleteThumbnail: false,
     });
     const [categoryOptions, setCategoryOptions] = useState([]);
     const [userOptions, setUserOptions] = useState([]);
@@ -71,6 +72,7 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         handleClickUploadButton,
         handleCrop,
         resetCropper,
+        setCroppedImage
     } = useCropper({
         setVisibleModal: setVisibleModal,
         setProfilePicture: setThumbnail,
@@ -137,7 +139,6 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
     const handleCloseModal = () => setVisibleModal(false);
 
     const handleSubmit = async (e, editorValue) => {
-        console.log(editorValue)
         e.preventDefault();
         setSubmitLoading(true);
         setErrors({});
@@ -154,6 +155,7 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
             const request = {
                 ...validatedData,
                 content: cleanedContent,
+                ...(data?.deleteThumbnail === true ? { deleteThumbnail: true } : {}),
                 ...(thumbnail instanceof File ? {thumbnail} : {}),
             };
 
@@ -200,6 +202,7 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         setData,
         setVisibleModal,
         editorContent,
+        setThumbnail,
         // props dari useCropper
         fileInputRef,
         selectedImage,
@@ -212,6 +215,7 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         handleCloseCropImageModal,
         handleClickUploadButton,
         role,
-        processContent
+        processContent,
+        setCroppedImage
     };
 };

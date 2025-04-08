@@ -24,6 +24,9 @@ export const ProfileService = {
             if (data.profilePicture) {
                 formData.append("profilePicture", data.profilePicture);
             }
+            if (data.deleteProfilePicture) {
+                formData.append("deleteProfilePicture", data.deleteProfilePicture);
+            }
 
             const response = await axios.patch(`${apiUri}/api/user/current/profile`, formData, {
                 headers: {

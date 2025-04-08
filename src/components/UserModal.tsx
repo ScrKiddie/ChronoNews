@@ -1,9 +1,12 @@
 import {Dialog} from "primereact/dialog";
 import {Button} from "primereact/button";
 import defaultProfilePicture from "../../public/profilepicture.svg";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import InputGroup from "./InputGroup.tsx";
 import SubmitButton from "./SubmitButton.tsx";
+import {ListBox} from "primereact/listbox";
+import {useSidebar} from "../hooks/useSidebar.tsx";
+import {Menu} from "primereact/menu";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 const UserModal = ({
@@ -20,11 +23,59 @@ const UserModal = ({
                        handleImageChange,
                        isUserCreateMode,
                        isUserEditMode,
+                       setProfilePicture,
+                       setCroppedImage
                    }) => {
     const roleOptions = [
         {label: "Admin", value: "admin"},
         {label: "Journalist", value: "journalist"},
     ];
+
+    const {
+        isMenuVisible,
+        setIsMenuVisible,
+        toggleMenuVisibility,
+        key,
+        buttonRef,
+        menuContainerRef,
+    } = useSidebar();
+
+    const [menuItems, setMenuItems] = useState([]);
+
+    useEffect(() => {
+        const items = [];
+        items.push({
+            label: "Ganti",
+            icon: <i className="pi pi-image pr-3" />,
+            command() {
+                setIsMenuVisible(false);
+                handleClickUploadButton();
+            },
+        });
+
+        if (data?.profilePicture || croppedImage) {
+            items.push({
+                label: "Hapus",
+                icon: <i className="pi pi-trash pr-3" />,
+                command() {
+                    setIsMenuVisible(false);
+                    if(setData){
+                        setData(prev => ({...prev, profilePicture: ""}))
+                        setData(prev => ({...prev, deleteProfilePicture: true}))
+                    }
+                    if(setProfilePicture){
+                        setProfilePicture("")
+                    }
+                    if(setCroppedImage){
+                        setCroppedImage("")
+                    }
+                },
+            });
+        }
+
+        setMenuItems(items);
+    }, [data?.profilePicture, croppedImage, handleClickUploadButton]);
+
     return (
         <Dialog
             header={
@@ -55,10 +106,20 @@ const UserModal = ({
                             style={{border: "1px solid #d1d5db"}}
                         />
                         <Button
-                            onClick={handleClickUploadButton}
+                            onClick={
+                                toggleMenuVisibility
+                            }
+                            ref={buttonRef}
                             type="button"
                             className="absolute inset-0 w-full h-full bg-transparent flex items-center justify-center hover:bg-black/20 transition rounded-full"
                         />
+                        <div ref={menuContainerRef}>
+                            <Menu
+                                key={key}
+                                className={`${isMenuVisible ? "visible" : "hidden"} normal text-md w-fit shadow-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 menu-news`}
+                                model={menuItems}
+                            />
+                        </div>
                     </div>
 
                     <input

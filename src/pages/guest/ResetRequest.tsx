@@ -29,7 +29,6 @@ const Login: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        console.log(email)
         const result = ResetRequestSchema.safeParse({email, tokenCaptcha});
 
         if (!result.success) {

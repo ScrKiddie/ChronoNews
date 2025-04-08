@@ -385,3 +385,6 @@ body .navbar-top {
 #disqus_thread button span{
     color: white;
 }
+#editor-resizer .toolbar {
+    border-radius: 6px !important;
+}

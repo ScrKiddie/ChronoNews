@@ -80,6 +80,9 @@ export const PostService = {
             if (data.thumbnail) {
                 formData.append("thumbnail", data.thumbnail);
             }
+            if (data.deleteThumbnail) {
+                formData.append("deleteThumbnail", data.deleteThumbnail);
+            }
 
             const response = await axios.put(`${apiUri}/api/post/${id}`, formData, {
                 headers: {

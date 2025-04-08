@@ -57,7 +57,9 @@ const SidebarResponsive = ({children}) => {
         selectedImage,
         handleCrop,
         cropperRef,
-        imageRef
+        imageRef,
+        setProfilePicture,
+        setCroppedImage
     } = useProfile(toastRef);
 
     const {
@@ -209,6 +211,8 @@ const SidebarResponsive = ({children}) => {
                 handleClickUploadButton={handleClickUploadButton}
                 handleImageChange={handleImageChange}
                 setData={setDataProfile}
+                setProfilePicture={setProfilePicture}
+                setCroppedImage={setCroppedImage}
             />
 
             {/*modal loading*/}

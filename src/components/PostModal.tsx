@@ -4,9 +4,11 @@ import {Editor} from "primereact/editor";
 import {Dropdown} from "primereact/dropdown";
 import useQuillConfig from "../hooks/useQuillConfig.tsx";
 import thumbnail from "../../public/thumbnail.svg";
-import React, {useCallback, useEffect} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {InputTextarea} from "primereact/inputtextarea";
 import InputGroup from "./InputGroup.tsx";
+import {useSidebar} from "../hooks/useSidebar.tsx";
+import {Menu} from "primereact/menu";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 const PostModal = ({
@@ -25,7 +27,9 @@ const PostModal = ({
                        userOptions = [],
                        isEditMode,
                        role = "admin",
-                       editorContent
+                       editorContent,
+                       setThumbnail,
+                       setCroppedImage
                    }) => {
 
     useQuillConfig();
@@ -50,6 +54,51 @@ const PostModal = ({
     const handleFormSubmit = (e) => {
         handleSubmit(e, editorContent.current)
     }
+
+    const {
+        isMenuVisible,
+        setIsMenuVisible,
+        toggleMenuVisibility,
+        key,
+        buttonRef,
+        menuContainerRef,
+    } = useSidebar();
+
+    const [menuItems, setMenuItems] = useState([]);
+
+    useEffect(() => {
+        const items = [];
+        items.push({
+            label: "Ganti",
+            icon: <i className="pi pi-image pr-3" />,
+            command() {
+                setIsMenuVisible(false);
+                handleClickUploadButton();
+            },
+        });
+
+        if (data?.thumbnail || croppedImage) {
+            items.push({
+                label: "Hapus",
+                icon: <i className="pi pi-trash pr-3" />,
+                command() {
+                    setIsMenuVisible(false);
+                    if(setData){
+                        setData(prev => ({...prev, thumbnail: ""}))
+                        setData(prev => ({...prev, deleteThumbnail: true}))
+                    }
+                    if(setThumbnail){
+                        setThumbnail("")
+                    }
+                    if(setCroppedImage){
+                        setCroppedImage("")
+                    }
+                },
+            });
+        }
+
+        setMenuItems(items);
+    }, [data?.thumbnail, croppedImage, handleClickUploadButton]);
 
     return (
         <Dialog
@@ -116,12 +165,22 @@ const PostModal = ({
                             } className="h-full  w-full rounded-md  border-none z-10"
                                  style={{border: "1px solid #d1d5db"}}/>
                             <Button
-                                onClick={handleClickUploadButton}
+                                onClick={
+                                    toggleMenuVisibility
+                                }
+                                ref={buttonRef}
                                 type="button"
                                 text
                                 severity="secondary"
                                 className="absolute inset-0 w-full h-full bg-transparent flex items-center justify-center hover:bg-black/20 transition"
                             />
+                            <div ref={menuContainerRef}>
+                                <Menu
+                                    key={key}
+                                    className={`${isMenuVisible ? "visible" : "hidden"} normal text-md w-fit shadow-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 menu-news`}
+                                    model={menuItems}
+                                />
+                            </div>
                         </div>
 
                         <input
