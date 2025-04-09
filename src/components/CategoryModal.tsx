@@ -15,6 +15,7 @@ const CategoryModal = ({
                        }) => {
     return (
         <Dialog
+            closable={!submitLoading}
             header={
                 <h1 className="font-medium m-0 text-xl">
                     {isEditMode

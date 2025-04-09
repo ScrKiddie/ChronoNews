@@ -3,6 +3,7 @@ import {z} from "zod";
 import {useAuth} from "./useAuth";
 import {CategoryService} from "../services/CategoryService";
 import {CategorySchema} from "../schemas/CategorySchema";
+import {useAbort} from "./useAbort.tsx";
 
 export const useCategory = (toastRef = null) => {
     const {token} = useAuth();
@@ -20,6 +21,9 @@ export const useCategory = (toastRef = null) => {
     const [listData, setListData] = useState([]);
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
     const [visibleLoadingConnection, setVisibleLoadingConnection] = useState(false);
+
+    const { abortController, setAbortController } = useAbort();
+
 
     useEffect(() => {
         fetchData();
@@ -69,10 +73,17 @@ export const useCategory = (toastRef = null) => {
     };
 
     const fetchData = async () => {
+        if (abortController) {
+            abortController.abort();
+        }
+
+        const newAbortController = new AbortController();
+        setAbortController(newAbortController);
+
         setVisibleConnectionError(false);
         setVisibleLoadingConnection(true);
         try {
-            const response = await CategoryService.listCategories(token);
+            const response = await CategoryService.listCategories(newAbortController.signal);
             if (response && Array.isArray(response.data)) {
                 setListData(response.data);
             }

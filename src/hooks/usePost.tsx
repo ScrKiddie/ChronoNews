@@ -83,8 +83,6 @@ const usePost = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
-    const {token} = useAuth();
-
     const [headlineMode, setHeadlineMode] = useState(false);
     const [mainMode, setMainMode] = useState(false);
     const [searchMode, setSearchMode] = useState(false)
@@ -120,7 +118,7 @@ const usePost = () => {
         setError(false)
         setLoading(true)
         try {
-            const response = await CategoryService.listCategories(token);
+            const response = await CategoryService.listCategories();
             if (Array.isArray(response.data)) {
                 setCategories(response.data);
             }
@@ -153,7 +151,7 @@ const usePost = () => {
                 size: headlineSize,
             };
 
-            const response = await PostService.searchPost(token, filters, signal);
+            const response = await PostService.searchPost(filters, signal);
             const {data, pagination} = response;
 
             setHeadlinePost(data.length > 0 ? {
@@ -194,7 +192,7 @@ const usePost = () => {
                 size: searchPostSize,
             };
 
-            const response = await PostService.searchPost(token, filters,signal);
+            const response = await PostService.searchPost(filters,signal);
             const {data, pagination} = response;
 
             setSearchPost(data.map(item => ({
@@ -231,7 +229,7 @@ const usePost = () => {
                 size: topPostSize,
             };
 
-            const response = await PostService.searchPost(token, filters, signal);
+            const response = await PostService.searchPost(filters, signal);
             const {data, pagination} = response;
             setTopPost(data.map(item => ({
                 ...item,
@@ -267,7 +265,7 @@ const usePost = () => {
                 size: postSize,
             };
 
-            const response = await PostService.searchPost(token, filters,signal);
+            const response = await PostService.searchPost(filters,signal);
             const {data, pagination} = response;
             setPost(data.map(item => ({
                 ...item,

@@ -17,16 +17,17 @@ export const CategoryService = {
             throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },
-    listCategories: async (token) => {
+    listCategories: async (signal=null) => {
         try {
             const response = await axios.get(`${apiUri}/api/category`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                signal
             });
 
             return response.data;
         } catch (error) {
+            if (error.name === 'CanceledError') {
+                throw new Error('Request was cancelled');
+            }
             throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },

@@ -30,7 +30,7 @@ export const PostService = {
         }
     },
 
-    searchPost: async (token, filters = {},signal) => {
+    searchPost: async (filters = {},signal) => {
         try {
             const {
                 userID = "",
@@ -45,9 +45,6 @@ export const PostService = {
             const url = `${apiUri}/api/post?${queryParams}`;
 
             const response = await axios.get(url, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                },
                 signal
             });
 

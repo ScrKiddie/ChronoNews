@@ -2,6 +2,7 @@ import {useState, useEffect, useRef} from "react";
 import {UserService} from "../services/UserService";
 import {useToast} from "./useToast.tsx";
 import {useAuth} from "./useAuth.tsx";
+import { useAbort } from "./useAbort";
 
 const useSearchUser = () => {
     const toastRef = useToast();
@@ -13,8 +14,8 @@ const useSearchUser = () => {
     const [totalItem, setTotalItem] = useState(0);
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
     const [visibleLoadingConnection, setVisibleLoadingConnection] = useState(false);
-
     const prevSearchParams = useRef(searchParams);
+    const { abortController, setAbortController } = useAbort();
 
     useEffect(() => {
         if (JSON.stringify(prevSearchParams.current) !== JSON.stringify(searchParams)) {
@@ -30,6 +31,13 @@ const useSearchUser = () => {
     }, [page, searchParams, size]);
 
     const fetchData = async (reset = false) => {
+        if (abortController) {
+            abortController.abort();
+        }
+
+        const newAbortController = new AbortController();
+        setAbortController(newAbortController);
+
         setVisibleConnectionError(false);
         setVisibleLoadingConnection(true);
         try {
@@ -42,7 +50,7 @@ const useSearchUser = () => {
                 size: size.toString(),
             };
 
-            const response = await UserService.searchUser(token, filters);
+            const response = await UserService.searchUser(token, filters, newAbortController.signal);
 
             if (response && response.data) {
                 setData(response.data);

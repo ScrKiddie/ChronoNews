@@ -54,7 +54,7 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
         setThumbnail(null);
         setModalLoading(true);
         try {
-            const responseCategories = await CategoryService.listCategories(token);
+            const responseCategories = await CategoryService.listCategories();
             if (responseCategories && Array.isArray(responseCategories.data)) {
                 setCategoryOptions(responseCategories.data.map(category => ({
                     label: category.name,

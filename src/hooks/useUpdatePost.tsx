@@ -90,7 +90,7 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         setData({deleteThumbnail: false, title: "", summary: "", content: "", userID: 0, categoryID: 0});
         setThumbnail(null);
         try {
-            const categoryResponse = await CategoryService.listCategories(token);
+            const categoryResponse = await CategoryService.listCategories();
             if (categoryResponse && Array.isArray(categoryResponse.data)) {
                 setCategoryOptions(categoryResponse.data.map(category => ({
                     label: category.name,

@@ -26,7 +26,7 @@ export const UserService = {
             throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },
-    searchUser: async (token, filters = {}) => {
+    searchUser: async (token, filters = {},signal) => {
         try {
             const { name = "", phoneNumber = "", email = "", page = "", size = "",role="" } = filters;
             const queryParams = new URLSearchParams({ name, phoneNumber, email, page, size,role }).toString();
@@ -35,11 +35,15 @@ export const UserService = {
             const response = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${token}`
-                }
+                },
+                signal
             });
 
             return response.data;
         } catch (error) {
+            if (error.name === 'CanceledError') {
+                throw new Error('Request was cancelled');
+            }
             throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },

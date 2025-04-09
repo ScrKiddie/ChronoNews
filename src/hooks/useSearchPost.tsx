@@ -2,6 +2,7 @@ import {useState, useEffect, useRef} from "react";
 import {PostService} from "../services/PostService";
 import {useToast} from "./useToast.tsx";
 import {useAuth} from "./useAuth.tsx";
+import {useAbort} from "./useAbort.tsx";
 
 const useSearchPost = () => {
     const toastRef = useToast();
@@ -21,6 +22,8 @@ const useSearchPost = () => {
     const [visibleLoadingConnection, setVisibleLoadingConnection] = useState(false);
 
     const prevSearchParams = useRef(searchParams);
+    const { abortController, setAbortController } = useAbort();
+
 
     useEffect(() => {
         if (JSON.stringify(prevSearchParams.current) !== JSON.stringify(searchParams)) {
@@ -35,6 +38,13 @@ const useSearchPost = () => {
         }
     }, [page, searchParams, size]);
     const fetchData = async () => {
+        if (abortController) {
+            abortController.abort();
+        }
+
+        const newAbortController = new AbortController();
+        setAbortController(newAbortController);
+
         setVisibleConnectionError(false);
         setVisibleLoadingConnection(true);
         try {
@@ -50,7 +60,7 @@ const useSearchPost = () => {
             if (role == "journalist") {
                 filters.userID = sub
             }
-            const response = await PostService.searchPost(token, filters);
+            const response = await PostService.searchPost(filters, newAbortController.signal);
 
             if (response && response.data) {
                 const formattedData = response.data.map(post => ({
