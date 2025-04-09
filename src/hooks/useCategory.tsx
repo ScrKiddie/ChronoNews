@@ -6,7 +6,7 @@ import {CategorySchema} from "../schemas/CategorySchema";
 import {useAbort} from "./useAbort.tsx";
 
 export const useCategory = (toastRef = null) => {
-    const {token} = useAuth();
+    const {token, logout} = useAuth();
 
 
     const [modalLoading, setModalLoading] = useState(false);
@@ -51,11 +51,16 @@ export const useCategory = (toastRef = null) => {
             }
             setVisibleModal(true);
         } catch (error) {
-            toastRef?.current?.show({
-                severity: "error",
-                detail: error.message,
-                life: 2000,
-            });
+            if (error.message === "Unauthorized"){
+                toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
+                logout()
+            } else {
+                toastRef?.current?.show({
+                    severity: "error",
+                    detail: error.message,
+                    life: 2000,
+                });
+            }
         }
 
         setModalLoading(false);
@@ -88,15 +93,8 @@ export const useCategory = (toastRef = null) => {
                 setListData(response.data);
             }
         } catch (error) {
-            if (!error.response) {
-                setVisibleConnectionError(true);
-            } else {
-                toastRef?.current?.show({
-                    severity: "error",
-                    detail: error.message,
-                    life: 2000,
-                });
-            }
+            console.log(error)
+            setVisibleConnectionError(true);
         }
         setVisibleLoadingConnection(false);
     };
@@ -130,11 +128,16 @@ export const useCategory = (toastRef = null) => {
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
-                toastRef?.current?.show({
-                    severity: "error",
-                    detail: error.message,
-                    life: 2000,
-                });
+                if (error.message === "Unauthorized"){
+                    toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
+                    logout()
+                } else {
+                    toastRef?.current?.show({
+                        severity: "error",
+                        detail: error.message,
+                        life: 2000,
+                    });
+                }
             }
         }
         setSubmitLoading(false);
@@ -150,7 +153,16 @@ export const useCategory = (toastRef = null) => {
             }
             setVisibleDeleteModal(false)
         } catch (error) {
-            toastRef?.current?.show({severity: "error", detail: error.message});
+            if (error.message === "Unauthorized"){
+                toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
+                logout()
+            } else {
+                toastRef?.current?.show({
+                    severity: "error",
+                    detail: error.message,
+                    life: 2000,
+                });
+            }
         } finally {
             setSubmitLoading(false);
         }

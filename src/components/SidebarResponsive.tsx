@@ -109,28 +109,25 @@ const SidebarResponsive = ({children}) => {
                             <img
                                 src={ChronoNewsLogo as string}
                                 alt="ChronoNewsLogo"
-                                className={`w-auto px-2 ${collapsed ? "max-h-14 my-1" : "max-h-[80px] mt-3"}`}
+                                className={`w-auto px-2 ${collapsed ? "max-h-14 mt-1 mb-3" : "max-h-[70px] mt-3 "}`}
                             />
-                            <h1 className={`mt-1 font-extrabold ${collapsed ? "hidden" : "block"}`}
+                            <h1
+                                className={`mt-2 mb-4 font-extrabold text-xl ${collapsed ? "hidden" : "block"}`}
                                 style={{color: 'var(--surface-0)'}}>
-                                CHRONO<span style={{color: 'var(--primary-500)'}}>NEWS</span>
+                                CHRONO
+                                <span style={{color: 'var(--primary-500)'}}>NEWS</span>
                             </h1>
-                            <div
-                                className={`border-t-2 h-[2px] ${collapsed ? "mb-2" : "mb-3"} border-[#40916c] ${collapsed ? "w-[80%]" : "w-full"}`}></div>
+
                         </div>
 
                     </Menu>
 
-                    <MenuItemResponsive collapsed={collapsed} icon={`pi pi-qrcode`} label={"Beranda"}
-                                        link={"/admin/beranda"}/>
+                    <MenuItemResponsive collapsed={collapsed} icon={`pi pi-th-large`} label={"Beranda"} link={"/admin/beranda"}/>
                     {role == "admin" ? (<>
-                        <MenuItemResponsive collapsed={collapsed} icon={`pi pi-users
-                    `} label={"Jurnalis"} link={"/admin/jurnalis"}/>
-                        <MenuItemResponsive collapsed={collapsed} icon={`pi pi-paperclip
-                    `} label={"Kategori"} link={"/admin/kategori"}/>
+                        <MenuItemResponsive collapsed={collapsed} icon={`pi pi-users`} label={"Jurnalis"} link={"/admin/jurnalis"}/>
+                        <MenuItemResponsive collapsed={collapsed} icon={`pi pi-paperclip`} label={"Kategori"} link={"/admin/kategori"}/>
                     </>) : ""}
-                    <MenuItemResponsive collapsed={collapsed} icon={`pi pi-file
-                    `} label={"Berita"} link={"/admin/berita"}/>
+                    <MenuItemResponsive collapsed={collapsed} icon={`pi pi-file`} label={"Berita"} link={"/admin/berita"}/>
 
                 </Menu>
             </Sidebar>
@@ -139,13 +136,20 @@ const SidebarResponsive = ({children}) => {
                 <div className="flex items-center px-4 w-full z-40 shadow-md bg-white text-black">
                     <div className="flex py-[17px] w-full items-center gap-4 justify-between">
                         <div className={`flex items-center`}>
-                            <Button severity="secondary" onClick={() => setCollapsed(!collapsed)} text rounded
+                            <Button severity="secondary"
+                                    onClick={() => setCollapsed(!collapsed)}
+                                    text
+                                    rounded
                                     className={`size-8 hidden md:flex`}
-                                    icon={<i
-                                        className={`pi ${collapsed ? "pi-arrow-right" : "pi-arrow-left"} text-xl`}/>}/>
-                            <Button severity="secondary" onClick={() => setToggled(!toggled)} text rounded
+                                    icon={<i className={`pi ${collapsed ? "pi-arrow-right" : "pi-arrow-left"} text-xl`}/>}
+                            />
+                            <Button severity="secondary"
+                                    onClick={() => setToggled(!toggled)}
+                                    text
+                                    rounded
                                     className={`size-8 flex md:hidden`}
-                                    icon={<i className={`pi pi-arrow-right text-md`}/>}/>
+                                    icon={<i className={`pi pi-arrow-right text-md`}/>}
+                            />
                             <p className={`ml-4 text-xl text-[#4b5563] md:hidden block`}>{lastPath}</p>
                         </div>
 

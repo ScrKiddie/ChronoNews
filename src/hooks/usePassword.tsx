@@ -5,7 +5,7 @@ import {PasswordService} from "../services/PasswordService";
 import {useAuth} from "./useAuth.tsx";
 
 export const usePassword = (toastRef = null) => {
-    const {token} = useAuth();
+    const {token, logout} = useAuth();
 
     const [visibleModal, setVisibleModal] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
@@ -45,11 +45,16 @@ export const usePassword = (toastRef = null) => {
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
-                toastRef.current?.show({
-                    severity: "error",
-                    detail: error.message,
-                    life: 2000,
-                });
+                if (error.message === "Unauthorized"){
+                    toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
+                    logout()
+                } else {
+                    toastRef?.current?.show({
+                        severity: "error",
+                        detail: error.message,
+                        life: 2000,
+                    });
+                }
             }
         }
 

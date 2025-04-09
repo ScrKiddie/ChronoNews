@@ -6,7 +6,7 @@ import {UserUpdateSchema} from "../schemas/UserSchema.tsx";
 import {useCropper} from "./useCropper";
 
 export const useUpdateUser = (toastRef = null, fetchData = null) => {
-    const {token} = useAuth();
+    const {token, logout} = useAuth();
 
     const [modalLoading, setModalLoading] = useState(false);
     const [visibleModal, setVisibleModal] = useState(false);
@@ -51,11 +51,16 @@ export const useUpdateUser = (toastRef = null, fetchData = null) => {
             console.log(data)
             setVisibleModal(true);
         } catch (error) {
-            toastRef?.current?.show({
-                severity: "error",
-                detail: error.message,
-                life: 2000,
-            });
+            if (error.message === "Unauthorized"){
+                toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
+                logout()
+            } else {
+                toastRef?.current?.show({
+                    severity: "error",
+                    detail: error.message,
+                    life: 2000,
+                });
+            }
         }
 
         setModalLoading(false);
@@ -90,11 +95,16 @@ export const useUpdateUser = (toastRef = null, fetchData = null) => {
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
-                toastRef?.current?.show({
-                    severity: "error",
-                    detail: error.message,
-                    life: 2000,
-                });
+                if (error.message === "Unauthorized"){
+                    toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
+                    logout()
+                } else {
+                    toastRef?.current?.show({
+                        severity: "error",
+                        detail: error.message,
+                        life: 2000,
+                    });
+                }
             }
         }
 

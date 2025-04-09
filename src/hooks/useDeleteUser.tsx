@@ -2,8 +2,8 @@ import {useState} from "react";
 import {UserService} from "../services/UserService";
 import {useAuth} from "./useAuth.tsx";
 
-export const useDeleteUser = (toast, fetchData, page, setPage, totalItem, size) => {
-    const {token} = useAuth();
+export const useDeleteUser = (toastRef, fetchData, page, setPage, totalItem, size) => {
+    const {token,logout} = useAuth();
     const [submitLoading, setSubmitLoading] = useState(false);
     const [visibleModal, setVisibleModal] = useState(false);
     const [id, setId] = useState(0);
@@ -17,7 +17,7 @@ export const useDeleteUser = (toast, fetchData, page, setPage, totalItem, size) 
         setSubmitLoading(true);
         try {
             await UserService.deleteUser(id, token);
-            toast?.current?.show({severity: "success", detail: "User berhasil dihapus"});
+            toastRef?.current?.show({severity: "success", detail: "User berhasil dihapus"});
 
             const remainingItems = totalItem - 1;
             const remainingPages = Math.ceil(remainingItems / size);
@@ -29,7 +29,16 @@ export const useDeleteUser = (toast, fetchData, page, setPage, totalItem, size) 
             fetchData();
             setVisibleModal(false);
         } catch (error) {
-            toast?.current?.show({severity: "error", detail: error.message});
+            if (error.message === "Unauthorized"){
+                toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
+                logout()
+            } else {
+                toastRef?.current?.show({
+                    severity: "error",
+                    detail: error.message,
+                    life: 2000,
+                });
+            }
         } finally {
             setSubmitLoading(false);
         }

@@ -9,13 +9,14 @@ import {UserService} from "../services/UserService.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 export const useUpdatePost = (toastRef = null, fetchData = null) => {
-    const {token, role} = useAuth();
+    const {token, role, logout} = useAuth();
     const editorContent = useRef("");
     const [modalLoading, setModalLoading] = useState(false);
     const [visibleModal, setVisibleModal] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
     const [data, setData] = useState({
         title: "",
+        thumbnail:"",
         summary: "",
         content: "",
         userID: 0,
@@ -87,7 +88,7 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         setErrors({});
         setModalLoading(true);
         editorContent.current = "";
-        setData({deleteThumbnail: false, title: "", summary: "", content: "", userID: 0, categoryID: 0});
+        setData({thumbnail: "", deleteThumbnail: false, title: "", summary: "", content: "", userID: 0, categoryID: 0});
         setThumbnail(null);
         try {
             const categoryResponse = await CategoryService.listCategories();
@@ -113,22 +114,29 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
             const response = await PostService.getPost(postId);
             if (response) {
                 setData({
+                    thumbnail:response.thumbnail,
                     deleteThumbnail: false,
                     title: response.title || "",
                     summary: response.summary || "",
                     content: processContent(response.content || ""),
                     userID: response.user.id || 0,
                     categoryID: response.category.id || 0
+
                 });
             }
 
             setVisibleModal(true);
         } catch (error) {
-            toastRef?.current?.show({
-                severity: "error",
-                detail: error.message || "Gagal mengambil data post",
-                life: 2000,
-            });
+            if (error.message === "Unauthorized"){
+                toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
+                logout()
+            } else {
+                toastRef?.current?.show({
+                    severity: "error",
+                    detail: error.message,
+                    life: 2000,
+                });
+            }
         }
 
         setModalLoading(false);
@@ -174,11 +182,16 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
-                toastRef?.current?.show({
-                    severity: "error",
-                    detail: error.message || "Gagal memperbarui post",
-                    life: 2000,
-                });
+                if (error.message === "Unauthorized"){
+                    toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
+                    logout()
+                } else {
+                    toastRef?.current?.show({
+                        severity: "error",
+                        detail: error.message,
+                        life: 2000,
+                    });
+                }
             }
         }
 

@@ -6,7 +6,7 @@ import { useAbort } from "./useAbort";
 
 const useSearchUser = () => {
     const toastRef = useToast();
-    const {token} = useAuth();
+    const {token,logout} = useAuth();
     const [data, setData] = useState([]);
     const [searchParams, setSearchParams] = useState({name: "", phoneNumber: "", email: "", role: ""});
     const [page, setPage] = useState(1);
@@ -57,10 +57,11 @@ const useSearchUser = () => {
                 setTotalItem(response.pagination.totalItem);
             }
         } catch (error) {
-            if (!error.response) {
-                setVisibleConnectionError(true);
+            if (error.message === "Unauthorized"){
+                toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
+                logout()
             } else {
-                toastRef.current.show({severity: "error", detail: error.message});
+                setVisibleConnectionError(true);
             }
         }
         setVisibleLoadingConnection(false);

@@ -321,7 +321,7 @@ const usePost = () => {
     const fetchAllCategoryData = (category, mainMode = false) => {
         const promises = [];
 
-        if (!mainMode) {
+        if (!mainMode && headlinePostPage ===1) {
             promises.push(fetchHeadlinePost(category));
         }
 

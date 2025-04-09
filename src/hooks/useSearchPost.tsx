@@ -1,12 +1,10 @@
 import {useState, useEffect, useRef} from "react";
 import {PostService} from "../services/PostService";
-import {useToast} from "./useToast.tsx";
 import {useAuth} from "./useAuth.tsx";
 import {useAbort} from "./useAbort.tsx";
 
 const useSearchPost = () => {
-    const toastRef = useToast();
-    const {token, sub, role} = useAuth();
+    const {sub, role} = useAuth();
     const [data, setData] = useState([]);
     const [searchParams, setSearchParams] = useState({
         title: "",
@@ -81,11 +79,8 @@ const useSearchPost = () => {
                 setTotalPage(response.pagination.totalPage);
             }
         } catch (error) {
-            if (!error.response) {
-                setVisibleConnectionError(true);
-            } else {
-                toastRef.current.show({severity: "error", detail: error.message});
-            }
+            console.log(error)
+            setVisibleConnectionError(true);
         }
         setVisibleLoadingConnection(false);
     };

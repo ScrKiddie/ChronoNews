@@ -140,16 +140,14 @@ const Post: React.FC = () => {
             </div>
 
             <div className="min-h-screen p-4 mx-auto max-w-4xl bg-white xl:pt-[4.6rem] pt-32 rounded-md">
-                {(error || loading) ?
-                    <div className="fixed inset-0 flex items-center justify-center bg-white z-[10] overflow-hidden overflow-y-hidden">
-                        <LoadingRetry  visibleConnectionError={error} className={""} visibleLoadingConnection={loading}
-                                      onRetry={handleRetry}/>
-                    </div>
-
-                    :
                     <div >
+                        {(error || loading) ? <div className="fixed inset-0 flex items-center justify-center bg-white z-[10] overflow-hidden overflow-y-hidden">
+                            <LoadingRetry  visibleConnectionError={error} className={""} visibleLoadingConnection={loading}
+                                           onRetry={handleRetry}/>
+                        </div> : ""}
                         {searchMode ? (
                             <>
+
                                 {searchPost.length > 0 ? (
                                     <>
                                         <h3 className="text-[#4b5563] mb-3" >Hasil Pencarian</h3>
@@ -220,7 +218,6 @@ const Post: React.FC = () => {
                             </>
                         )}
                     </div>
-                }
             </div>
 
 

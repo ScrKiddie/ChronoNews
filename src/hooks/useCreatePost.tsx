@@ -8,7 +8,7 @@ import {useCropper} from "./useCropper";
 import {UserService} from "../services/UserService.tsx";
 
 export const useCreatePost = (toastRef = null, fetchData = null) => {
-    const {token, role} = useAuth();
+    const {token, role,logout} = useAuth();
     const editorContent = useRef("");
     const [visibleModal, setVisibleModal] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
@@ -75,11 +75,16 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
             }
             setVisibleModal(true);
         } catch (error) {
-            toastRef?.current?.show({
-                severity: "error",
-                detail: error.message,
-                life: 2000,
-            });
+            if (error.message === "Unauthorized"){
+                toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
+                logout()
+            } else {
+                toastRef?.current?.show({
+                    severity: "error",
+                    detail: error.message,
+                    life: 2000,
+                });
+            }
         }
         setModalLoading(false);
     };
@@ -112,11 +117,16 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
-                toastRef.current?.show({
-                    severity: "error",
-                    detail: error.message,
-                    life: 2000,
-                });
+                if (error.message === "Unauthorized"){
+                    toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
+                    logout()
+                } else {
+                    toastRef?.current?.show({
+                        severity: "error",
+                        detail: error.message,
+                        life: 2000,
+                    });
+                }
             }
         }
         setSubmitLoading(false);

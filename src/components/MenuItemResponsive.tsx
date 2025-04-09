@@ -13,7 +13,7 @@ const MenuItemResponsive = ({collapsed, icon, link, label}) => {
 
     return (
         <MenuItem
-            className={`${collapsed ? "mb-2 " : "mb-3"} `}
+            className={`${collapsed ? "mb-[14.5px]" : "mb-3"} `}
             icon={<i style={{fontSize: '1.25rem'}} className={`${icon}`}/>}
             component={
 
