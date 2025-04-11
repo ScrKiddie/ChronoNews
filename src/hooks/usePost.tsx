@@ -84,7 +84,6 @@ const usePost = () => {
     const [error, setError] = useState(false);
 
     const [headlineMode, setHeadlineMode] = useState(false);
-    const [mainMode, setMainMode] = useState(false);
     const [searchMode, setSearchMode] = useState(false)
 
     const [mainPost, setMainPost] = useState({});
@@ -227,6 +226,7 @@ const usePost = () => {
                 categoryName: category !== "Beranda" && category !== "beranda" ? category : "",
                 page: topPostPage,
                 size: topPostSize,
+                sort: "-view_count"
             };
 
             const response = await PostService.searchPost(filters, signal);
@@ -352,7 +352,6 @@ const usePost = () => {
                 setSelectedCategory("main")
                 setSearchMode(false);
                 setHeadlineMode(false);
-                setMainMode(true);
                 setActiveIndex(-1);
                 const fetchData = async () => {
                     try {
@@ -370,13 +369,11 @@ const usePost = () => {
         } else if (window.location.pathname === '/search') {
             setSearchQuery(query);
             setActiveIndex(-1);
-            setMainMode(false);
             setHeadlineMode(false)
             setSearchMode(true);
             fetchSearchPost(query);
         }else {
             setSearchMode(false);
-            setMainMode(false);
             setHeadlineMode(true)
             setSearchPostPage(1)
         }

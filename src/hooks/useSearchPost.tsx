@@ -3,7 +3,8 @@ import {PostService} from "../services/PostService";
 import {useAuth} from "./useAuth.tsx";
 import {useAbort} from "./useAbort.tsx";
 
-const useSearchPost = () => {
+const useSearchPost = (params = {}) => {
+    const { countMode = false } = params;
     const {sub, role} = useAuth();
     const [data, setData] = useState([]);
     const [searchParams, setSearchParams] = useState({
@@ -53,8 +54,13 @@ const useSearchPost = () => {
                 summary: searchParams.summary,
                 page: page.toString(),
                 size: size.toString(),
-                userID : 0
+                userID : 0,
+                sort: ""
             };
+            console.log(countMode)
+            if (countMode){
+                filters.sort = "-view_count"
+            }
             if (role == "journalist") {
                 filters.userID = sub
             }
@@ -71,7 +77,8 @@ const useSearchPost = () => {
                     lastUpdated: post.lastUpdated
                         ? new Date(post.lastUpdated * 1000).toLocaleString()
                         : "Belum diperbarui",
-                    thumbnail: post.thumbnail || "Tidak Ada Gambar"
+                    thumbnail: post.thumbnail || "Tidak Ada Gambar",
+                    viewCount: post.viewCount
                 }));
 
                 setData(formattedData);
@@ -79,8 +86,13 @@ const useSearchPost = () => {
                 setTotalPage(response.pagination.totalPage);
             }
         } catch (error) {
-            console.log(error)
-            setVisibleConnectionError(true);
+            if (!error.response) {
+                console.log(error)
+                if (error.message !== 'Request was cancelled') { setVisibleConnectionError(true); }
+            } else {
+                console.log(error)
+                setVisibleConnectionError(true)
+            }
         }
         setVisibleLoadingConnection(false);
     };

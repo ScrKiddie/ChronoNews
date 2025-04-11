@@ -12,10 +12,11 @@ import useSearchPost from "../../hooks/useSearchPost.tsx";
 import {useCreatePost} from "../../hooks/useCreatePost.tsx";
 import {useUpdatePost} from "../../hooks/useUpdatePost.tsx";
 import {useDeletePost} from "../../hooks/useDeletePost.tsx";
+import {useAuth} from "../../hooks/useAuth.tsx";
 
 const Post = () => {
     const toastRef = useToast();
-
+    const {role} = useAuth()
     const {
         data,
         searchParams,
@@ -139,9 +140,9 @@ const Post = () => {
                             </div>
                         )}
                     />
+                    {role == "admin" && <Column className="text-center" field="user"
+                                                header={<p className="text-center font-medium">Penulis</p>}/>}
 
-                    <Column className="text-center" field="user"
-                            header={<p className="text-center font-medium">Penulis</p>}/>
                     <Column
                         header={<p className="text-center font-medium ">Ringkasan</p>}
                         className="text-center max-w-md"

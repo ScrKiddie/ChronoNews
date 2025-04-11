@@ -61,7 +61,13 @@ const useSearchUser = () => {
                 toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
                 logout()
             } else {
-                setVisibleConnectionError(true);
+                if (!error.response) {
+                    console.log(error)
+                    if (error.message !== 'Request was cancelled') { setVisibleConnectionError(true); }
+                } else {
+                    console.log(error)
+                    setVisibleConnectionError(true)
+                }
             }
         }
         setVisibleLoadingConnection(false);

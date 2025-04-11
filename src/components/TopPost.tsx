@@ -25,11 +25,11 @@ const TopPost = ({
                 className="grid-custom"
                 itemTemplate={(post) => (
                     <div key={post.id} className="w-full break-all">
-                        <div className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg min-h-[320px] flex flex-col ">
+                        <div className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg min-h-[350px] flex flex-col ">
                             <img
                                 src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail as string}
                                 alt={post.title}
-                                className="bg-[#f59e0b] w-full h-40 object-cover rounded-t-lg cursor-pointer"
+                                className={`bg-[#f59e0b] w-full h-40 ${topPost.length == 1 ? "md:h-60" : topPost.length == 2 ? "md:h-52" : ""}  object-cover rounded-t-lg cursor-pointer`}
                                 onClick={() => navigate(`/post?id=${post.id}`)}
                             />
                             <div className="p-3">
