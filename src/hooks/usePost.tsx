@@ -3,7 +3,6 @@ import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {PostService} from "../services/PostService";
 import {CategoryService} from "../services/CategoryService";
 import {useUpdatePost} from "./useUpdatePost.tsx";
-import {useAuth} from "./useAuth.tsx";
 
 const getRelativeTime = (timestamp: number) => {
     const now = new Date();
@@ -49,8 +48,6 @@ const formatDate = (timestamp: number) => {
 
     return `${formattedDate}, ${formattedTime}`;
 };
-
-
 
 const usePost = () => {
     const waktuOptions = [
@@ -134,18 +131,23 @@ const usePost = () => {
             if (Array.isArray(response.data)) {
                 setCategories(response.data);
             }
+            setFailedRequests(prev => prev.filter(req => req !== 'categories'));
             setLoading(false)
         } catch (error) {
-            if (!error.response) {
-                if (error.message !== 'Request was cancelled') {
-                    setError(true);
-                }
-            } else {
-                console.log(error)
+            if (error.message === "Terjadi kesalahan jaringan") {
+                setFailedRequests(prev => [...new Set([...prev, 'categories'])]);
                 setError(true);
+            } else if (!error.response) {
+                if (error.message !== 'Request was cancelled') { setError(true); }
+            } else {
+                setFailedRequests(prev => [...new Set([...prev, 'categories'])]);
+                setError(true);
+                console.log(error)
             }
         }
     };
+    const [failedRequests, setFailedRequests] = useState<string[]>([]);
+
     const fetchHeadlinePost = async (category = "") => {
         if (headlineAbortController.current) {
             headlineAbortController.current.abort();
@@ -172,14 +174,18 @@ const usePost = () => {
             } : null);
 
             setHeadlinePostPagination(pagination);
+            setFailedRequests(prev => prev.filter(req => req !== 'headlinePost'));
             setLoading(false);
         } catch (error) {
-            if (!error.response) {
-                console.log(error)
+            if (error.message === "Terjadi kesalahan jaringan") {
+                setFailedRequests(prev => [...new Set([...prev, 'headlinePost'])]);
+                setError(true);
+            } else if (!error.response) {
                 if (error.message !== 'Request was cancelled') { setError(true); }
             } else {
+                setFailedRequests(prev => [...new Set([...prev, 'headlinePost'])]);
+                setError(true);
                 console.log(error)
-                setError(true)
             }
         }
     };
@@ -213,14 +219,18 @@ const usePost = () => {
             })));
 
             setSearchPostPagination(pagination);
+            setFailedRequests(prev => prev.filter(req => req !== 'searchPost'));
             setLoading(false);
         } catch (error) {
-            if (!error.response) {
-                console.log(error)
+            if (error.message === "Terjadi kesalahan jaringan") {
+                setFailedRequests(prev => [...new Set([...prev, 'searchPost'])]);
+                setError(true);
+            } else if (!error.response) {
                 if (error.message !== 'Request was cancelled') { setError(true); }
             } else {
-                console.log(error)
+                setFailedRequests(prev => [...new Set([...prev, 'searchPost'])]);
                 setError(true);
+                console.log(error)
             }
         }
     };
@@ -251,14 +261,18 @@ const usePost = () => {
                 publishedDate: getRelativeTime(item.publishedDate)
             })));
             setTopPostPagination(pagination);
+            setFailedRequests(prev => prev.filter(req => req !== 'topPost'));
             setLoading(false)
         } catch (error) {
-            if (!error.response) {
-                console.log(error)
+            if (error.message === "Terjadi kesalahan jaringan") {
+                setFailedRequests(prev => [...new Set([...prev, 'topPost'])]);
+                setError(true);
+            } else if (!error.response) {
                 if (error.message !== 'Request was cancelled') { setError(true); }
             } else {
-                console.log(error)
+                setFailedRequests(prev => [...new Set([...prev, 'topPost'])]);
                 setError(true);
+                console.log(error)
             }
         }
     };
@@ -275,7 +289,7 @@ const usePost = () => {
 
         try {
             const filters = {
-                categoryName: category !== "Beranda" && category !== "beranda" ? category : "",
+                categoryName: category !== "Beranda" && category !== "beranda" && category !== "main"? category : "",
                 page: postPage,
                 size: postSize,
             };
@@ -287,13 +301,18 @@ const usePost = () => {
                 publishedDate: getRelativeTime(item.publishedDate)
             })));
             setPostPagination(pagination);
+            setFailedRequests(prev => prev.filter(req => req !== 'post'));
             setLoading(false);
         } catch (error) {
-            if (!error.response) {
+            if (error.message === "Terjadi kesalahan jaringan") {
+                setFailedRequests(prev => [...new Set([...prev, 'post'])]);
+                setError(true);
+            } else if (!error.response) {
                 if (error.message !== 'Request was cancelled') { setError(true); }
             } else {
-                console.log(error)
+                setFailedRequests(prev => [...new Set([...prev, 'post'])]);
                 setError(true);
+                console.log(error)
             }
         }
     };
@@ -315,18 +334,19 @@ const usePost = () => {
                 lastUpdated: mainPostResponse.lastUpdated ? formatDate(mainPostResponse.lastUpdated) : "",
             }));
             setNotFound(false);
+            setFailedRequests(prev => prev.filter(req => req !== 'mainPost'));
             setLoading(false)
         } catch (error) {
             if (error.message === "Terjadi kesalahan jaringan") {
+                setFailedRequests(prev => [...new Set([...prev, 'mainPost'])]);
                 setError(true);
-                throw error
             }else if (error.message !== 'Request was cancelled') {
                 if (error.message === "Not found" || error.message === "Bad request") {
                     setNotFound(true);
-                    throw error
                 }else {
+                    setFailedRequests(prev => [...new Set([...prev, 'mainPost'])]);
                     setError(true);
-                    throw error
+                    console.log(error)
                 }
             }
         }
@@ -357,7 +377,7 @@ const usePost = () => {
 
     useEffect(() => {
         fetchCategories();
-    }, [retry]);
+    }, []);
 
     useEffect(() => {
         const query = getQueryFromUrl()
@@ -392,7 +412,7 @@ const usePost = () => {
             setSearchPostPage(1)
         }
 
-    }, [location.search,retry,searchPostPage]);
+    }, [location.search,searchPostPage]);
 
 
     useEffect(() => {
@@ -435,7 +455,7 @@ const usePost = () => {
         }
 
         setNotFound(true);
-    }, [location.pathname, categories, retry]);
+    }, [location.pathname, categories]);
 
     useEffect(() => {
         if (!selectedCategory || window.location.pathname === '/search' || window.location.pathname === '/post') return;
@@ -509,6 +529,35 @@ const usePost = () => {
             window.removeEventListener("scroll", handleScroll);
         };
     }, []);
+
+    useEffect(() => {
+        failedRequests.forEach((req) => {
+            switch (req) {
+                case 'categories':
+                    fetchCategories();
+                    break;
+                case 'headlinePost':
+                    fetchHeadlinePost(selectedCategory);
+                    break;
+                case 'topPost':
+                    fetchTopPost(selectedCategory);
+                    break;
+                case 'post':
+                    fetchPost(selectedCategory);
+                    break;
+                case 'searchPost':
+                    fetchSearchPost(searchQuery);
+                    break;
+                case 'mainPost':
+                    { const query = getQueryFromUrl()
+                    fetchMainPost(query);
+                    break; }
+                default:
+                    break;
+            }
+        });
+        setFailedRequests([]);
+    }, [retry]);
 
 
     return {

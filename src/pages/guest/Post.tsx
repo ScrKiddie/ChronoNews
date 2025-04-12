@@ -80,37 +80,45 @@ const Post: React.FC = () => {
         }
     };
 
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
     useEffect(() => {
-        if (loading || error) {
+        if (loading || error || isModalVisible) {
             document.body.style.overflow = "hidden";
+            document.documentElement.style.overflow = "hidden";
         } else {
             document.body.style.overflow = "auto";
+            document.documentElement.style.overflow = "auto";
         }
+
         return () => {
             document.body.style.overflow = "auto";
+            document.documentElement.style.overflow = "auto";
         };
-    }, [loading, error]);
+    }, [loading, error, isModalVisible]);
 
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [zIndex, setZIndex] = useState(2000);
+
+    const [zIndexClass, setZIndexClass] = useState("z-[2001]");
 
     useEffect(() => {
         if (isModalVisible) {
-            setZIndex(600);
+            setZIndexClass("z-[600]");
         } else {
             const timer = setTimeout(() => {
-                setZIndex(2000);
-            }, 100);
+                setZIndexClass("z-[2001]");
+            }, 300);
 
             return () => clearTimeout(timer);
         }
     }, [isModalVisible]);
 
+
+
     return (
         !notFound ?
             <div className="min-h-screen bg-white ">
-                <ScrollTop className="bg-[#f59e0b] color-[#465569]"/>
-                <div className={`flex flex-col fixed top-0 w-full z-[${zIndex}]`}>
+                <ScrollTop className={`bg-[#f59e0b] color-[#465569] ${loading && "hidden"} ${error && "hidden"} ${isModalVisible && "hidden" }`}/>
+                <div className={`flex flex-col fixed top-0 w-full ${zIndexClass}`}>
                     <nav className="flex justify-between items-center xl:flex-row flex-col bg-white  w-full xl:fixed h-[56px]   bg-none">
                         <div className={`flex xl:block justify-between items-center w-full xl:w-fit mt-2 xl:mt-0`}>
                             <div className="flex items-center h-full ml-3 ">
@@ -136,7 +144,7 @@ const Post: React.FC = () => {
                             </div>
                         </div>
                         <Menu
-                            className="menu-news text-md shadow-[0_1px_6px_rgba(0,0,0,0.1)] flex items-center justify-center"
+                            className="menu-news  text-md shadow-[0_1px_6px_rgba(0,0,0,0.1)] flex items-center justify-center z-[2000]"
                             model={moreCategories} popup ref={menuRef}
                             style={{borderRadius: "5px", width: "fit-content"}}/>
                         <div className="xl:flex hidden h-full w-fit  items-center justify-center">
@@ -171,7 +179,7 @@ const Post: React.FC = () => {
                 <div className="min-h-screen p-4 mx-auto max-w-4xl bg-white xl:pt-[4.6rem] pt-32 rounded-md">
                     <div>
                         {(error || loading) ? <div
-                            className="fixed inset-0 flex items-center justify-center bg-white overflow-hidden overflow-y-hidden">
+                            className="fixed inset-0 flex items-center justify-center bg-white overflow-hidden overflow-y-hidden z-[1999]">
                             <LoadingRetry visibleConnectionError={error} className={""}
                                           visibleLoadingConnection={loading}
                                           onRetry={handleRetry}/>
@@ -217,13 +225,12 @@ const Post: React.FC = () => {
 
                                             </>
                                         ) : (
-                                            <>
                                                 <MainPost mainPost={mainPost}
                                                           setIsModalVisible={setIsModalVisible}
                                                           isModalVisible={isModalVisible}
                                                           handleCategoryChange={handleCategoryChange}
                                                 />
-                                            </>
+
                                         )}
                                         {headlineMode &&
                                             <>
