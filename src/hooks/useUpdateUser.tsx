@@ -48,7 +48,6 @@ export const useUpdateUser = (toastRef = null, fetchData = null) => {
         try {
             const response = await UserService.getUser(userId, token);
             setData(response);
-            console.log(data)
             setVisibleModal(true);
         } catch (error) {
             if (error.message === "Unauthorized"){

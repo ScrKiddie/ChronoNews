@@ -35,21 +35,20 @@ small {
 }
 
 .p-dialog {
-    z-index: 1000 !important;
+    z-index: 1001 !important;
     border: 0;
 }
 
 .p-dialog-mask {
-    z-index: 999 !important;
+    z-index: 1000 !important;
 }
 
 .p-toast {
-    z-index: 2000 !important;
+    z-index: 1004 !important;
 }
 
-.p-menu {
-    z-index: 500 !important;
-    border-radius: 10px;
+.p-dropdown-panel {
+    z-index: 1000 !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -98,7 +97,7 @@ p {
     box-shadow: none !important;
     border-radius: 4px;
     color: black !important;
-    z-index: 9999999 !important;
+    z-index: 3000 !important;
 }
 
 .ql-tooltip input {
@@ -301,7 +300,7 @@ body .navbar-top {
 .grid-custom .p-grid {
     display: flex;
     gap: 14px;
-
+    justify-content: center;
 }
 
 @media screen and (max-width: 768px) {
@@ -338,19 +337,20 @@ body .navbar-top {
 }
 
 .p-scrolltop{
-    z-index: 601 !important;
+    z-index: 15000 !important;
 }
 .p-dialog-header-icons button{
     box-shadow: none !important;
 }
-.p-dataview-emptymessage{
-    margin-top: 1.5rem;
-}
-.p-dataview-emptymessage {
-    visibility: hidden;
-    display: flex;
-    flex-direction: column;
 
+.p-dropdown-item, .p-dropdown-item-label{
+    white-space: normal !important;
+    display: block !important;
+
+}
+
+.p-dropdown-panel{
+    width: 1px;
 }
 
 .p-galleria-thumbnail-next, .p-galleria-thumbnail-prev{
@@ -367,4 +367,12 @@ body .navbar-top {
 }
 #editor-resizer .toolbar {
     border-radius: 6px !important;
+}
+.p-paginator-right-content{
+    margin: 0
+}
+
+.p-input-icon svg:focus {
+    border-radius: 2px;
+    outline:none;
 }

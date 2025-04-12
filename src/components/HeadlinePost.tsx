@@ -60,6 +60,7 @@ const HeadlinePost = ({
                 )}
             />
             <Paginator
+                pageLinkSize={1}
                 first={(headlinePostPage - 1) * headlineSize}
                 rows={headlineSize}
                 totalRecords={headlinePostPagination.totalItem}

@@ -14,7 +14,7 @@ const Login: React.FC = () => {
     const {login, token} = useAuth();
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
-    const [errors, setError] = useState<{ email?: string; tokenCaptcha?: string }>({});
+    const [errors, setError] = useState<{ email?: string;}>({});
     const [loading, setLoading] = useState(false);
     const ref = useRef(null);
     const [tokenCaptcha, setTokenCaptcha] = useState("");
@@ -91,10 +91,6 @@ const Login: React.FC = () => {
                         siteKey={turnstileSiteKey}
 
                         onSuccess={(token) => {
-                            setError((prevErrors) => ({
-                                ...prevErrors,
-                                tokenCaptcha: "",
-                            }));
                             setTokenCaptcha(token)
                         }}
                         onError={() => {
@@ -106,7 +102,6 @@ const Login: React.FC = () => {
                             ref.current?.reset();
                         }}
                     />
-                    {errors.tokenCaptcha && <small className="p-error">{errors.tokenCaptcha}</small>}
                 </div>
 
                 <SubmitButton captchaMode={true} tokenCaptcha={tokenCaptcha} loading={loading}/>

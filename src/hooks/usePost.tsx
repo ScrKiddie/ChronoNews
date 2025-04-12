@@ -50,7 +50,17 @@ const formatDate = (timestamp: number) => {
     return `${formattedDate}, ${formattedTime}`;
 };
 
+
+
 const usePost = () => {
+    const waktuOptions = [
+        { label: 'Hari Ini', value: '1' },
+        { label: '7 Hari Terakhir', value: '7' },
+        { label: '30 Hari Terakhir', value: '30' },
+        { label: 'Semua Waktu', value: 'all' }
+    ];
+    const [range, setRange] = useState('all');
+
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -102,6 +112,9 @@ const usePost = () => {
     const {id} = useParams() || "";
 
     const {processContent} = useUpdatePost();
+
+    const [startDate, setStartDate] = useState(0);
+    const [endDate, setEndDate] = useState(0);
 
     const getQueryFromUrl = () => {
         if (window.location.pathname === '/post') {
@@ -226,7 +239,9 @@ const usePost = () => {
                 categoryName: category !== "Beranda" && category !== "beranda" ? category : "",
                 page: topPostPage,
                 size: topPostSize,
-                sort: "-view_count"
+                sort: "-view_count",
+                startDate: startDate,
+                endDate: endDate
             };
 
             const response = await PostService.searchPost(filters, signal);
@@ -275,7 +290,6 @@ const usePost = () => {
             setLoading(false);
         } catch (error) {
             if (!error.response) {
-                console.log(error)
                 if (error.message !== 'Request was cancelled') { setError(true); }
             } else {
                 console.log(error)
@@ -329,7 +343,7 @@ const usePost = () => {
             promises.push(fetchPost(category));
         }
 
-        if (topPostPage === 1) {
+        if (!mainMode && topPostPage === 1 && (startDate == 0 && endDate ==0)) {
             promises.push(fetchTopPost(category));
         }
 
@@ -429,13 +443,9 @@ const usePost = () => {
     }, [headlinePostPage]);
 
     useEffect(() => {
-        if (selectedCategory && window.location.pathname === '/post') {
-            fetchTopPost("")
-            return;
-        }
         if (!selectedCategory || window.location.pathname === '/search' || window.location.pathname === '/post') return;
         fetchTopPost(selectedCategory);
-    }, [topPostPage]);
+    }, [topPostPage,startDate,endDate]);
 
     useEffect(() => {
         if (selectedCategory &&window.location.pathname === '/post') {
@@ -450,6 +460,9 @@ const usePost = () => {
         setHeadlinePostPage(1);
         setTopPostPage(1);
         setPostPage(1);
+        setStartDate(0)
+        setEndDate(0)
+        setRange("all")
     }, [selectedCategory]);
 
 
@@ -539,7 +552,12 @@ const usePost = () => {
         searchPostSize,
         setSearchPostPage,
         handleRetry,
-        categories
+        categories,
+        setStartDate,
+        setEndDate,
+        waktuOptions,
+        range,
+        setRange
     };
 };
 

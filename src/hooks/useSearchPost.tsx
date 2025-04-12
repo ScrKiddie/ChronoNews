@@ -5,6 +5,8 @@ import {useAbort} from "./useAbort.tsx";
 
 const useSearchPost = (params = {}) => {
     const { countMode = false } = params;
+    const [startDate, setStartDate] = useState(0);
+    const [endDate, setEndDate] = useState(0);
     const {sub, role} = useAuth();
     const [data, setData] = useState([]);
     const [searchParams, setSearchParams] = useState({
@@ -35,7 +37,7 @@ const useSearchPost = (params = {}) => {
         } else {
             fetchData();
         }
-    }, [page, searchParams, size]);
+    }, [page, searchParams, size,startDate,endDate]);
     const fetchData = async () => {
         if (abortController) {
             abortController.abort();
@@ -55,11 +57,16 @@ const useSearchPost = (params = {}) => {
                 page: page.toString(),
                 size: size.toString(),
                 userID : 0,
-                sort: ""
+                sort: "",
+                startDate: 0,
+                endDate: 0
             };
-            console.log(countMode)
             if (countMode){
-                filters.sort = "-view_count"
+                filters.sort = "-view_count";
+                if (startDate !== null && endDate !== null) {
+                    filters.startDate = startDate.toString();
+                    filters.endDate = endDate.toString();
+                }
             }
             if (role == "journalist") {
                 filters.userID = sub
@@ -108,6 +115,8 @@ const useSearchPost = (params = {}) => {
         totalItem,
         totalPage,
         fetchData,
+        setEndDate,
+        setStartDate,
         visibleConnectionError,
         visibleLoadingConnection,
     };

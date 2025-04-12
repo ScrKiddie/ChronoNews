@@ -8,9 +8,8 @@ import {Dialog} from "primereact/dialog";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
-const MainPost = ({mainPost, handleCategoryChange}) => {
+const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVisible}) => {
     const [showLastUpdated, setShowLastUpdated] = useState(false);
-    const [isModalVisible, setIsModalVisible] = useState(false);
 
     useEffect(() => {
         if (window.DISQUS) {
@@ -142,7 +141,7 @@ const MainPost = ({mainPost, handleCategoryChange}) => {
 
                 <div className="w-full my-4 opacity-30" style={{borderTop: "1px solid #8496af"}}></div>
 
-                <Editor key={mainPost.id} className="content-view" headerTemplate={<></>} value={mainPost?.content} readOnly/>
+                <Editor key={mainPost.id} className="content-view min-h-0" headerTemplate={<></>} value={mainPost?.content} readOnly/>
                 <div className="w-full my-4 opacity-30" style={{borderTop: "1px solid #8496af"}}></div>
                 <div id="disqus_thread" className={`mt-8 mb-4`}></div>
             </main>

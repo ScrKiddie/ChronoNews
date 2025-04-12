@@ -9,6 +9,7 @@ import {InputTextarea} from "primereact/inputtextarea";
 import InputGroup from "./InputGroup.tsx";
 import {useSidebar} from "../hooks/useSidebar.tsx";
 import {Menu} from "primereact/menu";
+import {useAuth} from "../hooks/useAuth.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 const PostModal = ({
@@ -46,6 +47,7 @@ const PostModal = ({
         }
     }, [data?.content]);
 
+    const {sub} = useAuth()
 
     const handleTextChange = useCallback((htmlValue) => {
         editorContent.current = htmlValue;
@@ -115,6 +117,7 @@ const PostModal = ({
             className="w-[94%] md:w-[50%]"
             onHide={onClose}
         >
+
             <form onSubmit={handleFormSubmit} className="w-full">
                 <div className="flex flex-col p-4 gap-4">
                     <div className="w-full">
@@ -138,8 +141,7 @@ const PostModal = ({
                                     className="w-full"
                                     filter
                                     invalid={!!errors.userID}
-                                    placeholder="Posting Sebagai Diri Sendiri"
-                                    value={data?.userID || null}
+                                    value={data?.userID === sub ? 0 : data?.userID || 0 }
                                     options={userOptions}
                                     onChange={(e) => {
                                         setData((prev) => ({...prev, userID: e.value}));

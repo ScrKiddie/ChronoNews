@@ -3,6 +3,7 @@ import {DataView} from "primereact/dataview";
 import {Paginator} from "primereact/paginator";
 import {useNavigate} from "react-router-dom";
 import thumbnail from "../../public/thumbnail.svg";
+import emptyData from "../../public/emptydata.webp";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
@@ -20,6 +21,18 @@ const TopPost = ({
     return (
         <div className="mt-4">
             <DataView
+                emptyMessage={(<>
+                        <div className="w-full flex flex-col h-fit justify-center items-center">
+                            <img src={emptyData as string} className="lg:w-[26%] w-[60%]" alt="emptyData"/>
+                            <h3 className="text-[#4d555e] text-2xl font-[600] mt-2 text-center break-all">
+                                Data Tidak Ditemukan
+                            </h3>
+                            <p className="text-[#4d555e] text-center">
+                                Data yang kamu cari belum tersedia.
+                            </p>
+                        </div>
+                    </>
+                )}
                 value={topPost}
                 layout="grid"
                 className="grid-custom"

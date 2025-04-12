@@ -153,13 +153,13 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
             const validatedData = PostUpdateSchema.parse({
                 title: data?.title,
                 summary: data?.summary,
-                userID: data?.userID,
                 categoryID: data?.categoryID,
             });
 
             const cleanedContent = reverseProcessContent(editorValue);
             const request = {
                 ...validatedData,
+                userID: data?.userID,
                 content: cleanedContent,
                 ...(data?.deleteThumbnail === true ? { deleteThumbnail: true } : {}),
                 ...(thumbnail instanceof File ? {thumbnail} : {}),

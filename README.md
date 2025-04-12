@@ -18,4 +18,4 @@ ChronoNews is a minimalist Single Page Application (SPA) designed to display new
 | **VITE_CHRONONEWSAPI_URI**  | `string` | URL of the backend API from [ChronoNewsAPI](https://github.com/ScrKiddie/ChronoNewsAPI) | `http://localhost:6969`   |
 | **VITE_DISQUS_SHORTNAME**   | `string`     | Disqus shortname for your site                                                          | `your-shortname`          |
 ## Preview
-![Image](https://github.com/user-attachments/assets/c09fe337-78ed-4216-a87f-e509dd928ccd)
+![Image](https://github.com/user-attachments/assets/c7b12e41-e63d-49d7-b783-55f27d7388fb)

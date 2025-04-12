@@ -26,7 +26,7 @@ const GuestFooter: React.FC = ({quickLinks = null} ) => {
                             Home
                         </Link>
                     </p>
-                    {quickLinks.slice(0, -1).map((category) => (
+                    {quickLinks.map((category) => (
                         <p key={category.id} className="text-white text-sm">
                             <Link to={`/${category.name.toLowerCase()}`} className="no-underline text-inherit">
                                 {category.name}
@@ -44,7 +44,7 @@ const GuestFooter: React.FC = ({quickLinks = null} ) => {
                     </p>
                 </div>
             </div>
-            <div className="pb-1 pt-2 text-center text-sm mx-6" style={{borderTop: "1px solid"}}>
+            <div className="pb-2 pt-2 text-center text-sm mx-6" style={{borderTop: "1px solid"}}>
                 <p className="flex gap-1 items-center justify-center">
                     &copy; {new Date().getFullYear()} ChronoNews. All rights reserved.
                 </p>

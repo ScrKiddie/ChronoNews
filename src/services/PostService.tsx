@@ -41,8 +41,10 @@ export const PostService = {
                 page = "",
                 size = "",
                 sort="",
+                startDate = "",
+                endDate ="",
             } = filters;
-            const queryParams = new URLSearchParams({ userID, title, categoryName, userName, summary, page, size,sort }).toString();
+            const queryParams = new URLSearchParams({ userID, title, categoryName, userName, summary, page, size,sort,startDate,endDate }).toString();
             const url = `${apiUri}/api/post?${queryParams}`;
 
             const response = await axios.get(url, {

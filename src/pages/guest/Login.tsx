@@ -110,8 +110,14 @@ const Login: React.FC = () => {
                         options={{language: "id", size: "flexible"}}
                         siteKey={turnstileSiteKey}
                         onSuccess={(token) => setData(prev => ({...prev, tokenCaptcha: token}))}
-                        onError={() => setData(prev => ({...prev, tokenCaptcha: ""}))}
-                        onExpire={() => setData(prev => ({...prev, tokenCaptcha: ""}))}
+                        onError={() => {
+                            setData(prev => ({...prev, tokenCaptcha: ""}))
+                            ref.current?.reset();
+                        }}
+                        onExpire={() => {
+                            setData(prev => ({...prev, tokenCaptcha: ""}))
+                            ref.current?.reset();
+                        }}
                     />
                 </div>
                 <SubmitButton loading={loading} captchaMode={true} tokenCaptcha={data.tokenCaptcha}/>

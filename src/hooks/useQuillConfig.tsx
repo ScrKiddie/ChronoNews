@@ -62,7 +62,7 @@ const useQuillConfig = () => {
         }
 
         Quill.register(ImageFormat, true);
-        Quill.register("modules/resize", ResizeModule);
+        Quill.register("modules/resize", ResizeModule, true);
 
         const BlockEmbed = Quill.import("blots/block/embed");
 
@@ -145,7 +145,7 @@ const useQuillConfig = () => {
         VideoBlot.tagName = "iframe";
         VideoBlot.scope = Scope.BLOCK_BLOT;
 
-        Quill.register(VideoBlot);
+        Quill.register(VideoBlot, true);
     }, []);
 };
 
