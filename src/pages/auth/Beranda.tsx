@@ -110,7 +110,7 @@ const Beranda = () => {
                         ))}
                     </div>
                     <div className="w-full px-4 pb-4 h-fit">
-                        <div className="card shadow-md rounded-xl bg-white p-4 min-h-[50vh] md:min-h-[60vh] max-h-fit">
+                        <div className="card shadow-md rounded-xl bg-white p-4 h-fit">
 
                             {visibleLoadingConnection ? (
                                 <LoadingRetry

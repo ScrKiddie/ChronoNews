@@ -165,6 +165,11 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
                 ...(thumbnail instanceof File ? {thumbnail} : {}),
             };
 
+            if (typeof editorValue === 'string' && new Blob([editorValue]).size > 314572800 ) {
+                toastRef.current.show({ severity: "error", detail: "Konten melebihi batas dari server" });
+                setSubmitLoading(false);
+                return;
+            }
 
             await PostService.updatePost(id, request, token);
             toastRef?.current?.show({
@@ -178,7 +183,9 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
             }
             setVisibleModal(false);
         } catch (error) {
-            console.log(error)
+            if (typeof editorValue === 'string' && new Blob([editorValue]).size > 314572800 ) {
+                toastRef.current.show({ severity: "error", detail: "Konten melebihi batas dari server" });
+            }
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {

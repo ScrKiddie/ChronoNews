@@ -3,7 +3,7 @@ import {Button} from "primereact/button";
 import {Editor} from "primereact/editor";
 import {Dropdown} from "primereact/dropdown";
 import useQuillConfig from "../hooks/useQuillConfig.tsx";
-import thumbnail from "../../public/thumbnail.svg";
+import thumbnail from "../assets/thumbnail.svg";
 import React, {useCallback, useEffect, useState} from "react";
 import {InputTextarea} from "primereact/inputtextarea";
 import InputGroup from "./InputGroup.tsx";

@@ -1,4 +1,4 @@
-import emptyData from "../../public/emptydata.webp";
+import emptyData from "../assets/emptydata.webp";
 import React from "react";
 
 const EmptyData = () => {

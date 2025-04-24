@@ -62,7 +62,11 @@ const Post: React.FC = () => {
         setStartDate,
         waktuOptions,
         setRange,
-        range
+        range,
+        searchSort,
+        setSearchSort,
+        previousSearchSort,
+        setPreviousSearchSort,
     } = usePost();
 
     const [dropdownKey, setDropdownKey] = useState(0);
@@ -189,7 +193,20 @@ const Post: React.FC = () => {
 
                                 {searchPost.length > 0 ? (
                                     <>
-                                        <h3 className="text-[#4b5563] mb-3 text-xl">Hasil Pencarian</h3>
+                                        <div
+                                            className={`w-full flex md:items-center  justify-between mb-4  md:flex-row flex-col text-start`}>
+                                            <h3 className="text-[#4b5563] mb-2 md:mb-0 text-xl">Hasil Pencarian</h3>
+                                            <Dropdown
+                                                value={searchSort}
+                                                onChange={(e) => {
+                                                    setSearchSort(e.value);
+                                                }}
+                                                options={[
+                                                    { label: 'Terbaru', value: '-published_date' },
+                                                    { label: 'Terpopuler', value: '-view_count' }
+                                                ]}
+                                            />
+                                        </div>
                                         <RegularPost
                                             post={searchPost}
                                             postPage={searchPostPage}

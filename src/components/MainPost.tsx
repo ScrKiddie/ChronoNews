@@ -2,8 +2,8 @@ import React, {useEffect, useState} from "react";
 import {Editor} from "primereact/editor";
 import {Button} from "primereact/button";
 import {BreadCrumb} from "primereact/breadcrumb";
-import defaultProfilePicture from "../../public/profilepicture.svg";
-import thumbnail from "../../public/thumbnail.svg";
+import defaultProfilePicture from "../assets/profilepicture.svg";
+import thumbnail from "../assets/thumbnail.svg";
 import {Dialog} from "primereact/dialog";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;

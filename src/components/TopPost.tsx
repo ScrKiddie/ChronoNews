@@ -2,8 +2,8 @@ import React from "react";
 import {DataView} from "primereact/dataview";
 import {Paginator} from "primereact/paginator";
 import {useNavigate} from "react-router-dom";
-import thumbnail from "../../public/thumbnail.svg";
-import emptyData from "../../public/emptydata.webp";
+import thumbnail from "../assets/thumbnail.svg";
+import emptyData from "../assets/emptydata.webp";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 

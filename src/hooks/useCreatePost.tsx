@@ -102,6 +102,11 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
                 content: editorValue,
                 ...(thumbnail instanceof File ? {thumbnail: thumbnail} : {}),
             };
+            if (typeof editorValue === 'string' && new Blob([editorValue]).size > 314572800 ) {
+                toastRef.current.show({ severity: "error", detail: "Konten melebihi batas dari server" });
+                setSubmitLoading(false);
+                return;
+            }
             await PostService.createPost(request, token);
             toastRef.current?.show({
                 severity: "success",
@@ -114,6 +119,9 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
             }
             setVisibleModal(false);
         } catch (error) {
+            if (typeof editorValue === 'string' && new Blob([editorValue]).size > 314572800 ) {
+                toastRef.current.show({ severity: "error", detail: "Konten melebihi batas dari server" });
+            }
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {

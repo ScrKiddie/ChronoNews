@@ -3,6 +3,7 @@ import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {PostService} from "../services/PostService";
 import {CategoryService} from "../services/CategoryService";
 import {useUpdatePost} from "./useUpdatePost.tsx";
+import {string} from "zod";
 
 const getRelativeTime = (timestamp: number) => {
     const now = new Date();
@@ -113,6 +114,11 @@ const usePost = () => {
     const [startDate, setStartDate] = useState(0);
     const [endDate, setEndDate] = useState(0);
 
+    const [searchSort, setSearchSort] = useState('-published_date');
+    const [previousSearchSort, setPreviousSearchSort] = useState('-published_date');
+
+
+
     const getQueryFromUrl = () => {
         if (window.location.pathname === '/post') {
             const params = new URLSearchParams(window.location.search);
@@ -189,7 +195,7 @@ const usePost = () => {
             }
         }
     };
-    const fetchSearchPost = async (query = "") => {
+    const fetchSearchPost = async (query = "", sort = "") => {
         if (searchPostAbortController.current) {
             searchPostAbortController.current.abort();
         }
@@ -208,6 +214,7 @@ const usePost = () => {
                 summary: query,
                 page: searchPostPage,
                 size: searchPostSize,
+                sort: sort,
             };
 
             const response = await PostService.searchPost(filters,signal);
@@ -405,15 +412,24 @@ const usePost = () => {
             setActiveIndex(-1);
             setHeadlineMode(false)
             setSearchMode(true);
-            fetchSearchPost(query);
+            if (searchPostPage !=1 && searchSort != previousSearchSort){
+                setSearchPostPage(1)
+                return
+            }
+            fetchSearchPost(query,searchSort);
         }else {
             setSearchMode(false);
             setHeadlineMode(true)
             setSearchPostPage(1)
+            setSearchSort("-published_date")
+            setPreviousSearchSort("-published_date")
         }
+        setPreviousSearchSort(searchSort)
 
-    }, [location.search,searchPostPage]);
-
+    }, [location.search,searchPostPage, searchSort]);
+    useEffect(() => {
+        console.log(previousSearchSort);
+    }, [previousSearchSort]);
 
     useEffect(() => {
         if (categories.length === 0) {
@@ -606,7 +622,11 @@ const usePost = () => {
         setEndDate,
         waktuOptions,
         range,
-        setRange
+        setRange,
+        searchSort,
+        setSearchSort,
+        previousSearchSort,
+        setPreviousSearchSort,
     };
 };
 
