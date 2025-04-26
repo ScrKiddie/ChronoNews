@@ -1,8 +1,9 @@
 import React from "react";
 import ChronoNewsLogo from "../../public/chrononews.svg";
 import {Link} from "react-router-dom";
+import usePost from "../hooks/usePost.tsx";
 
-const GuestFooter: React.FC = ({quickLinks = null} ) => {
+const GuestFooter: React.FC = ({quickLinks = null, truncateText} ) => {
     return (
         <footer className="bg-[#242b35] dark:bg-blackHover dark:text-white pt-10 lg:pb-1">
             <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
@@ -29,7 +30,7 @@ const GuestFooter: React.FC = ({quickLinks = null} ) => {
                     {quickLinks.map((category) => (
                         <p key={category.id} className="text-white text-sm">
                             <Link to={`/${category.name.toLowerCase()}`} className="no-underline text-inherit">
-                                {category.name}
+                                {truncateText(category.name,13)}
                             </Link>
                         </p>
                     ))}

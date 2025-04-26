@@ -4,6 +4,7 @@ import {Paginator} from "primereact/paginator";
 import {useNavigate} from "react-router-dom";
 import thumbnail from "../assets/thumbnail.svg";
 import emptyData from "../assets/emptydata.webp";
+import usePost from "../hooks/usePost.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
@@ -13,11 +14,10 @@ const TopPost = ({
                      setTopPostPage,
                      topPostSize,
                      topPostPagination,
-                     truncateText,
-                     handleCategoryChange
+                     handleCategoryChange,
+                     truncateText
                  }) => {
     const navigate = useNavigate();
-
     return (
         <div className="mt-4">
             <DataView
@@ -37,28 +37,32 @@ const TopPost = ({
                 layout="grid"
                 className="grid-custom"
                 itemTemplate={(post) => (
-                    <div key={post.id} className="w-full break-all">
-                        <div className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg min-h-[350px] flex flex-col ">
+                    <div key={post.id} className="w-full lg:w-1/3 break-all">
+                        <div className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg sm:min-h-[350px] flex flex-col  ">
                             <img
                                 src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail as string}
                                 alt={post.title}
-                                className={`bg-[#f59e0b] w-full h-40 ${topPost.length == 1 ? "md:h-60" : topPost.length == 2 ? "md:h-52" : ""}  object-cover rounded-t-lg cursor-pointer`}
+                                className="w-full h-auto aspect-[16/9] object-cover rounded-t-lg bg-[#f59e0b] cursor-pointer"
                                 onClick={() => navigate(`/post?id=${post.id}`)}
                             />
-                            <div className="p-3">
-                                <h3 className="text-md font-semibold cursor-pointer w-fit"
-                                    onClick={() => navigate(`/post?id=${post.id}`)}>
-                                    {truncateText(post.title, 30)}
+                            <div className="p-4 ">
+                                <h3
+                                    className="text-md font-semibold w-fit cursor-pointer line-clamp-2"
+                                    onClick={() => navigate(`/post?id=${post.id}`)}
+                                >
+                                    {post.title}
                                 </h3>
-                                <p className="text-gray-600 text-xs sm:text-sm mb-1"><span
-                                    className="no-underline text-gray-600 hover:text-gray-600 cursor-pointer"
+                                <p className=""><span
+                                    className="text-base no-underline text-gray-600 hover:text-gray-600 cursor-pointer"
                                     onClick={() => {
                                         handleCategoryChange(post.category?.name.toLowerCase())
                                     }}
                                 >
-                            {post.category?.name}
+                            {truncateText(post.category?.name,13)}
                           </span> - {post.publishedDate}</p>
-                                <p className="text-gray-600 text-sm">{truncateText(post.summary, 100)}</p>
+                                <p className="mt-1 line-clamp-3 text-base">
+                                    {post.summary}
+                                </p>
                             </div>
                         </div>
                     </div>

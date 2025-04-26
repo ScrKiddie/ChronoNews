@@ -16,8 +16,12 @@ small {
 
 * {
     font-family: Poppins;
-}
 
+}
+.menu-news{
+    z-index: 2000 !important;
+
+}
 .p-dropdown {
     box-shadow: none;
 }
@@ -49,10 +53,6 @@ small {
 
 .p-dropdown-panel {
     z-index: 1000 !important;
-}
-
-.menu-news{
-    z-index: 2000 !important;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -379,4 +379,7 @@ body .navbar-top {
 .p-input-icon svg:focus {
     border-radius: 2px;
     outline:none;
+}
+.p-tabmenu-nav{
+    height: 100%;
 }

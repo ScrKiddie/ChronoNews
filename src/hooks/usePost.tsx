@@ -387,13 +387,18 @@ const usePost = () => {
     }, []);
 
     useEffect(() => {
-        const query = getQueryFromUrl()
+        const query = getQueryFromUrl();
+
         if (window.location.pathname === '/post') {
-            if(!isNaN(Number(query)) && Number(query) > 0){
-                setSelectedCategory("main")
+            if (!isNaN(Number(query)) && Number(query) > 0) {
+                setSelectedCategory("main");
                 setSearchMode(false);
                 setHeadlineMode(false);
+                setSearchPostPage(1);
+                setSearchSort("-published_date");
+                setPreviousSearchSort("-published_date");
                 setActiveIndex(-1);
+
                 const fetchData = async () => {
                     try {
                         await fetchMainPost(query);
@@ -403,33 +408,36 @@ const usePost = () => {
                     }
                 };
                 fetchData();
-                return
-            }else {
-                setNotFound(true)
+            } else {
+                setNotFound(true);
             }
-        } else if (window.location.pathname === '/search') {
+        }
+    }, [location.pathname, location.search]);
+
+    useEffect(() => {
+        const query = getQueryFromUrl();
+
+        if (window.location.pathname === '/search') {
             setSearchQuery(query);
             setActiveIndex(-1);
-            setHeadlineMode(false)
+            setHeadlineMode(false);
             setSearchMode(true);
-            if (searchPostPage !=1 && searchSort != previousSearchSort){
-                setSearchPostPage(1)
-                return
-            }
-            fetchSearchPost(query,searchSort);
-        }else {
-            setSearchMode(false);
-            setHeadlineMode(true)
-            setSearchPostPage(1)
-            setSearchSort("-published_date")
-            setPreviousSearchSort("-published_date")
-        }
-        setPreviousSearchSort(searchSort)
 
-    }, [location.search,searchPostPage, searchSort]);
-    useEffect(() => {
-        console.log(previousSearchSort);
-    }, [previousSearchSort]);
+            if (searchPostPage !== 1 && searchSort !== previousSearchSort) {
+                setSearchPostPage(1);
+                return;
+            }
+            fetchSearchPost(query, searchSort);
+        } else if (window.location.pathname !== '/post') {
+            setSearchMode(false);
+            setHeadlineMode(true);
+            setSearchPostPage(1);
+            setSearchSort("-published_date");
+            setPreviousSearchSort("-published_date");
+        }
+
+        setPreviousSearchSort(searchSort);
+    }, [location.pathname, location.search, searchPostPage, searchSort]);
 
     useEffect(() => {
         if (categories.length === 0) {
@@ -512,7 +520,7 @@ const usePost = () => {
     const allCategories = [
         {label: "Beranda", command: () => handleCategoryChange("beranda")},
         ...primaryCategories.map((cat) => ({
-            label: cat.name,
+            label: truncateText(cat.name,13),
             command: () => handleCategoryChange(cat.name.toLowerCase()),
         })),
         ...(remainingCategories.length > 0
@@ -521,7 +529,7 @@ const usePost = () => {
     ];
 
     const moreCategories = remainingCategories.map((cat) => ({
-        label: cat.name,
+        label: truncateText(cat.name,13),
         command: () => {
             handleCategoryChange(cat.name.toLowerCase());
             setActiveIndex(4);
@@ -606,7 +614,6 @@ const usePost = () => {
         headlineMode,
         setHeadlineMode,
         formatDate,
-        truncateText,
         mainPost,
         notFound,
         searchMode,
@@ -627,6 +634,7 @@ const usePost = () => {
         setSearchSort,
         previousSearchSort,
         setPreviousSearchSort,
+        truncateText
     };
 };
 

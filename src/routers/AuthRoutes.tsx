@@ -8,6 +8,7 @@ import Loading from "../pages/guest/Loading.tsx";
 import SidebarResponsive from "../components/SidebarResponsive";
 import Category from "../pages/auth/Category.tsx";
 import Post from "../pages/auth/Post.tsx";
+import {AbortProvider} from "../contexts/AbortContext.tsx";
 
 const GuestRoutes = () => {
     const { token, isAuthChecked, role } = useAuth();
@@ -28,17 +29,19 @@ const GuestRoutes = () => {
         );
     }
     return (
-        <Routes>
-            <Route path="/beranda" element={<SidebarResponsive><Beranda /></SidebarResponsive>} />
-            {role === "admin" ? (
-                <>
-                    <Route path="/jurnalis" element={<SidebarResponsive><Journalist /></SidebarResponsive>} />
-                    <Route path="/kategori" element={<SidebarResponsive><Category /></SidebarResponsive>} />
-                </>
-            ) : null}
-            <Route path="/berita" element={<SidebarResponsive><Post /></SidebarResponsive>} />
-            <Route path="/*" element={<NotFound />} />
-        </Routes>
+        <AbortProvider>
+            <Routes>
+                <Route path="/beranda" element={<SidebarResponsive><Beranda /></SidebarResponsive>} />
+                {role === "admin" ? (
+                    <>
+                        <Route path="/jurnalis" element={<SidebarResponsive><Journalist /></SidebarResponsive>} />
+                        <Route path="/kategori" element={<SidebarResponsive><Category /></SidebarResponsive>} />
+                    </>
+                ) : null}
+                <Route path="/berita" element={<SidebarResponsive><Post /></SidebarResponsive>} />
+                <Route path="/*" element={<NotFound />} />
+            </Routes>
+        </AbortProvider>
     );
 };
 

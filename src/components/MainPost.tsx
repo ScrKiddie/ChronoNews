@@ -5,12 +5,12 @@ import {BreadCrumb} from "primereact/breadcrumb";
 import defaultProfilePicture from "../assets/profilepicture.svg";
 import thumbnail from "../assets/thumbnail.svg";
 import {Dialog} from "primereact/dialog";
+import usePost from "../hooks/usePost.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
-const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVisible}) => {
+const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVisible,truncateText}) => {
     const [showLastUpdated, setShowLastUpdated] = useState(false);
-
     useEffect(() => {
         if (window.DISQUS) {
             window.DISQUS.reset({ reload: true,
@@ -63,7 +63,7 @@ const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVis
                             className="text-[#f59e0b] cursor-pointer font-[600]" onClick={() => {
                             handleCategoryChange(mainPost.category?.name.toLowerCase())
                         }}
-                        > {mainPost.category?.name}</span>
+                        >{truncateText(mainPost.category?.name || "", 13)} </span>
                     }
                 ]}/>
 

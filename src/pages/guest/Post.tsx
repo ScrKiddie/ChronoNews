@@ -47,7 +47,6 @@ const Post: React.FC = () => {
         headlineSize,
         postSize,
         headlineMode,
-        truncateText,
         mainPost,
         notFound,
         searchMode,
@@ -65,8 +64,7 @@ const Post: React.FC = () => {
         range,
         searchSort,
         setSearchSort,
-        previousSearchSort,
-        setPreviousSearchSort,
+        truncateText
     } = usePost();
 
     const [dropdownKey, setDropdownKey] = useState(0);
@@ -148,9 +146,10 @@ const Post: React.FC = () => {
                             </div>
                         </div>
                         <Menu
-                            className="menu-news  text-md shadow-[0_1px_6px_rgba(0,0,0,0.1)] flex items-center justify-center z-[2000]"
+                            className="menu-news  text-md shadow-[0_1px_6px_rgba(0,0,0,0.1)] flex items-center justify-center"
                             model={moreCategories} popup ref={menuRef}
-                            style={{borderRadius: "5px", width: "fit-content"}}/>
+                            style={{borderRadius: "5px", maxWidth: "162px"}}
+                        />
                         <div className="xl:flex hidden h-full w-fit  items-center justify-center">
                             <div className="p-inputgroup  rounded-md mr-2 h-9 w-52">
                                 <InputText placeholder="Cari Berita" onChange={(e) => setSearchQuery(e.target.value)}
@@ -213,8 +212,8 @@ const Post: React.FC = () => {
                                             setPostPage={setSearchPostPage}
                                             postSize={searchPostSize}
                                             postPagination={searchPostPagination}
-                                            truncateText={truncateText}
                                             handleCategoryChange={handleCategoryChange}
+                                            truncateText={truncateText}
                                         />
                                     </>
 
@@ -237,6 +236,7 @@ const Post: React.FC = () => {
                                                     headlinePostPagination={headlinePostPagination}
                                                     headlineSize={headlineSize}
                                                     handleCategoryChange={handleCategoryChange}
+                                                    truncateText={truncateText}
                                                 />
 
 
@@ -246,6 +246,7 @@ const Post: React.FC = () => {
                                                           setIsModalVisible={setIsModalVisible}
                                                           isModalVisible={isModalVisible}
                                                           handleCategoryChange={handleCategoryChange}
+                                                          truncateText={truncateText}
                                                 />
 
                                         )}
@@ -292,8 +293,8 @@ const Post: React.FC = () => {
                                                     setTopPostPage={setTopPostPage}
                                                     topPostSize={topPostSize}
                                                     topPostPagination={topPostPagination}
-                                                    truncateText={truncateText}
                                                     handleCategoryChange={handleCategoryChange}
+                                                    truncateText={truncateText}
                                                 />
 
                                             </>
@@ -309,9 +310,9 @@ const Post: React.FC = () => {
                                             setPostPage={setPostPage}
                                             postSize={postSize}
                                             postPagination={postPagination}
-                                            truncateText={truncateText}
                                             classKu={"mt-4"}
                                             handleCategoryChange={handleCategoryChange}
+                                            truncateText={truncateText}
                                         />
                                     </>
                                 }
@@ -323,7 +324,7 @@ const Post: React.FC = () => {
                 </div>
 
 
-                <GuestFooter quickLinks={categories}/>
+                <GuestFooter quickLinks={categories} truncateText={truncateText}/>
             </div> :
             <NotFound/>
     );

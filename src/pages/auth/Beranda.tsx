@@ -29,6 +29,7 @@ const Beranda = () => {
         setStartDate
     } = useSearchPost({ countMode: true});
 
+
     const handlePageChange = (e) => {
         setPage(e.page + 1);
         setSize(e.rows);
@@ -121,7 +122,7 @@ const Beranda = () => {
                             ) : (
                                 <>
                                     <Chart
-                                        className={`min-h-[50vh] md:min-h-[60vh]`}
+                                        className={`min-h-[50vh] md:min-h-[60vh] `}
                                         type="bar"
                                         data={barData}
                                         options={{
@@ -133,7 +134,7 @@ const Beranda = () => {
                                                     callbacks: {
                                                         title: (tooltipItems) => {
                                                             const index = tooltipItems[0].dataIndex;
-                                                            return data[index]?.title || "Tanpa Judul";
+                                                            return data[index]?.title.substring(0, 30) + "..." || "Tanpa Judul";
                                                         }
                                                     },
                                                     titleFont: {family: "Poppins"},
