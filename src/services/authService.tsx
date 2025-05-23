@@ -1,4 +1,6 @@
 import axios from "axios";
+import {handleResponseError} from "../utils/responseHandler.tsx";
+
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
 export const loginUser = async (data) => {
@@ -6,6 +8,6 @@ export const loginUser = async (data) => {
         const response = await axios.post(apiUri+"/api/user/login", data);
         return response.data;
     } catch (error) {
-        throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+        handleResponseError(error);
     }
 };

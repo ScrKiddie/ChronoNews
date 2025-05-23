@@ -1,6 +1,6 @@
 import { z } from "zod"
-import { validateEmail, validatePassword } from "./UserSchema"
-import { validateTokenCaptcha } from "./AuthSchema.tsx"
+import { validateEmail, validatePassword } from "./userSchema.tsx"
+import { validateTokenCaptcha } from "./authSchema.tsx"
 
 export const ResetRequestSchema = z.object({
     email: validateEmail,

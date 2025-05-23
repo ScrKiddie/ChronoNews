@@ -1,8 +1,9 @@
 import {useState, useEffect, useRef} from "react";
-import {UserService} from "../services/UserService";
+import {UserService} from "../services/userService.tsx";
 import {useToast} from "./useToast.tsx";
 import {useAuth} from "./useAuth.tsx";
 import { useAbort } from "./useAbort";
+import {handleApiErrorWithRetry} from "../utils/toastHandler.tsx";
 
 const useSearchUser = () => {
     const toastRef = useToast();
@@ -57,18 +58,7 @@ const useSearchUser = () => {
                 setTotalItem(response.pagination.totalItem);
             }
         } catch (error) {
-            if (error.message === "Unauthorized"){
-                toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
-                logout()
-            } else {
-                if (!error.response) {
-                    console.log(error)
-                    if (error.message !== 'Request was cancelled') { setVisibleConnectionError(true); }
-                } else {
-                    console.log(error)
-                    setVisibleConnectionError(true)
-                }
-            }
+            handleApiErrorWithRetry(error,toastRef,logout,setVisibleConnectionError)
         }
         setVisibleLoadingConnection(false);
     };

@@ -1,4 +1,5 @@
 import axios from "axios";
+import {handleResponseError} from "../utils/responseHandler.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
@@ -12,7 +13,7 @@ export const ProfileService = {
             });
             return response.data.data;
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            handleResponseError(error);
         }
     },
     updateCurrentUser: async (data, token) => {
@@ -37,7 +38,7 @@ export const ProfileService = {
 
             return response.data.data;
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            handleResponseError(error);
         }
     }
 };

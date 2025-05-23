@@ -5,8 +5,8 @@ import {Menu as PrimeMenu} from "primereact/menu";
 const MenuButton = ({openProfileModal}) => {
     const [isMenuVisible, setIsMenuVisible] = useState(false);
     const [key, setKey] = useState(0);
-    const buttonRef = useRef(null);
-    const menuContainerRef = useRef(null);
+    const buttonRef = useRef<Button>(null);
+    const menuContainerRef = useRef<HTMLDivElement>(null);
 
     const toggleMenuVisibility = (event) => {
         event.stopPropagation();
@@ -19,9 +19,7 @@ const MenuButton = ({openProfileModal}) => {
     const handleClickOutside = (event) => {
         if (
             menuContainerRef.current &&
-            !menuContainerRef.current.contains(event.target) &&
-            buttonRef.current &&
-            !buttonRef.current.contains(event.target)
+            !menuContainerRef.current.contains(event.target) 
         ) {
             setIsMenuVisible(false);
         }

@@ -1,6 +1,6 @@
 import {Sidebar, Menu} from "react-pro-sidebar";
 import ChronoNewsLogo from "../../public/chrononews.svg";
-import React, {useEffect, useRef} from "react";
+import {useEffect, useRef} from "react";
 import MenuItemResponsive from "./MenuItemResponsive.tsx";
 import {Button} from "primereact/button";
 import {Menu as PrimeMenu} from "primereact/menu";
@@ -9,13 +9,13 @@ import CropImageModal from "./CropImageModal.tsx";
 import UserModal from "./UserModal.tsx";
 import LoadingModal from "./LoadingModal.tsx";
 import {useSidebar} from "../hooks/useSidebar.tsx";
-import {useProfile} from "../hooks/useProfile.tsx";
 import LogoutModal from "./LogoutModal.tsx";
 import {usePassword} from "../hooks/usePassword.tsx";
 import PasswordModal from "./PasswordModal.tsx";
 import {useToast} from "../hooks/useToast.tsx";
 import {useAuth} from "../hooks/useAuth.tsx";
 import {useLocation} from "react-router-dom";
+import {useUpdateUser} from "../hooks/useUpdateUser.tsx";
 
 const SidebarResponsive = ({children}) => {
     const {role} = useAuth();
@@ -60,7 +60,7 @@ const SidebarResponsive = ({children}) => {
         imageRef,
         setProfilePicture,
         setCroppedImage
-    } = useProfile(toastRef);
+    } = useUpdateUser(toastRef, null,"current");
 
     const {
         submitLoading: submitPasswordLoading,
@@ -77,8 +77,8 @@ const SidebarResponsive = ({children}) => {
 
     const {pathname} = useLocation();
     useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = 0;
+        if (scrollRef.current as any) {
+            (scrollRef.current as any).scrollTop = 0;
         }
     }, [pathname]);
 

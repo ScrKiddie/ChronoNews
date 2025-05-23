@@ -1,7 +1,7 @@
 import {Dialog} from "primereact/dialog";
 import {Button} from "primereact/button";
 import defaultProfilePicture from "../assets/profilepicture.svg";
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import InputGroup from "./InputGroup.tsx";
 import SubmitButton from "./SubmitButton.tsx";
 import {useSidebar} from "../hooks/useSidebar.tsx";
@@ -20,8 +20,8 @@ const UserModal = ({
                        handleSubmit,
                        handleClickUploadButton,
                        handleImageChange,
-                       isUserCreateMode,
-                       isUserEditMode,
+                       isUserCreateMode=false,
+                       isUserEditMode=false,
                        setProfilePicture,
                        setCroppedImage
                    }) => {
@@ -42,7 +42,7 @@ const UserModal = ({
     const [menuItems, setMenuItems] = useState([]);
 
     useEffect(() => {
-        const items = [];
+        const items: any = [];
         items.push({
             label: "Ganti",
             icon: <i className="pi pi-image pr-3" />,
@@ -52,7 +52,8 @@ const UserModal = ({
             },
         });
 
-        if (data?.profilePicture || croppedImage) {
+        if ((typeof data?.profilePicture === 'string' && data.profilePicture.trim() !== '') || croppedImage)
+        {
             items.push({
                 label: "Hapus",
                 icon: <i className="pi pi-trash pr-3" />,
@@ -98,10 +99,11 @@ const UserModal = ({
                         <img
                             src={
                                 croppedImage ||
-                                (data?.profilePicture
+                                (typeof data?.profilePicture === 'string' && data.profilePicture.trim() !== ''
                                     ? `${apiUri}/profile_picture/${data?.profilePicture}`
                                     : `${defaultProfilePicture}`)
                             }
+
                             className="size-[14rem] rounded-full "
                             style={{border: "1px solid #d1d5db"}}
                         />
@@ -185,7 +187,7 @@ const UserModal = ({
                                 error={errors.password}
                                 setData={(e)=>{ setData(prev => ({ ...prev, password: e }));}}
                                 setError={(e)=>{ errors.password = e }}
-                                tip={(isUserEditMode) && !errors.password && "Kosongkan jika tidak ingin mengubah password"}
+                                tip={(isUserEditMode && !errors.password) ? "Kosongkan jika tidak ingin mengubah password" : ""}
                             />
                         </div>
                     )}

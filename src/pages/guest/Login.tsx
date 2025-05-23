@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../hooks/useAuth.tsx";
-import { loginSchema } from "../../schemas/authSchema";
-import { loginUser } from "../../services/authService";
+import { loginSchema } from "../../schemas/authSchema.tsx";
+import { loginUser } from "../../services/authService.tsx";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "../../hooks/useToast.tsx";
-import { Turnstile } from "@marsidev/react-turnstile";
+import {Turnstile, TurnstileInstance} from "@marsidev/react-turnstile";
 import GuestFormContainer from "../../components/GuestFormContainer.tsx";
 import SubmitButton from "../../components/SubmitButton.tsx";
 import InputGroup from "../../components/InputGroup.tsx";
+import {showErrorToast, showSuccessToast} from "../../utils/toastHandler.tsx";
 
 const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
@@ -26,7 +27,7 @@ const Login: React.FC = () => {
         tokenCaptcha: "",
     });
     const [loading, setLoading] = useState(false);
-    const ref = useRef(null);
+    const ref = useRef<TurnstileInstance>(null);
 
     useEffect(() => {
         if (token) {
@@ -63,10 +64,10 @@ const Login: React.FC = () => {
         try {
             const response = await loginUser(data);
             login(response.data);
-            toastRef.current?.show({ severity: "success", detail: "Berhasil masuk ke sistem", life: 2000 });
+            showSuccessToast(toastRef,"Berhasil masuk ke sistem")
             navigate("/admin/beranda");
         } catch (error) {
-            toastRef.current?.show({ severity: "error", detail: error.message, life: 2000 });
+            showErrorToast(toastRef, (error as any).message)
         } finally {
             setData(prev => ({ ...prev, tokenCaptcha: "" }));
             ref.current?.reset();
@@ -74,8 +75,11 @@ const Login: React.FC = () => {
         }
     };
 
+
     return (
-        <GuestFormContainer title={<p>Masuk Ke Sistem</p>}>
+        <GuestFormContainer
+            // @ts-expect-error: custom title
+            title={<p>Masuk Ke Sistem</p>}>
             <form onSubmit={handleSubmit} className="w-full">
                 <div className="mb-2 mt-2 w-full">
                     <InputGroup

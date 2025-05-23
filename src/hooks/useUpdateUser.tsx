@@ -1,11 +1,14 @@
 import {useState} from "react";
 import {z} from "zod";
 import {useAuth} from "./useAuth.tsx";
-import {UserService} from "../services/UserService";
-import {UserUpdateSchema} from "../schemas/UserSchema.tsx";
+import {UserService} from "../services/userService.tsx";
+import {UserUpdateSchema} from "../schemas/userSchema.tsx";
 import {useCropper} from "./useCropper";
+import { handleApiError, showSuccessToast } from "../utils/toastHandler.tsx";
+import {ProfileSchema} from "../schemas/profileSchema.tsx";
+import {ProfileService} from "../services/profileService.tsx";
 
-export const useUpdateUser = (toastRef = null, fetchData = null) => {
+export const useUpdateUser = (toastRef, fetchData, mode = "default") => {
     const {token, logout} = useAuth();
 
     const [modalLoading, setModalLoading] = useState(false);
@@ -20,7 +23,7 @@ export const useUpdateUser = (toastRef = null, fetchData = null) => {
         deleteProfilePicture: false
     });
     const [errors, setErrors] = useState({});
-    const [profilePicture, setProfilePicture] = useState(null);
+    const [profilePicture, setProfilePicture] = useState<File | null>(null);
     const [id, setId] = useState(0)
 
     const {
@@ -38,30 +41,25 @@ export const useUpdateUser = (toastRef = null, fetchData = null) => {
         setCroppedImage
     } = useCropper({setVisibleModal, setProfilePicture, toastRef});
 
-    const handleVisibleModal = async (userId) => {
-        setId(userId);
+    const handleVisibleModal = async (userId:number = 0) => {
         resetCropper();
         setErrors({});
         setModalLoading(true);
         setData({deleteProfilePicture: false, name: "", role: "", phoneNumber: "", email: "", password: ""});
         setProfilePicture(null)
         try {
-            const response = await UserService.getUser(userId, token);
-            setData(response);
+            if (mode === "default") {
+                const response = await UserService.getUser(userId, token);
+                setId(userId);
+                setData(response);
+            } else if (mode === "current") {
+                const response = await ProfileService.getCurrentUser(token);
+                setData(response);
+            }
             setVisibleModal(true);
         } catch (error) {
-            if (error.message === "Unauthorized"){
-                toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
-                logout()
-            } else {
-                toastRef?.current?.show({
-                    severity: "error",
-                    detail: error.message,
-                    life: 2000,
-                });
-            }
+            handleApiError(error,toastRef,logout)
         }
-
         setModalLoading(false);
     };
 
@@ -73,37 +71,32 @@ export const useUpdateUser = (toastRef = null, fetchData = null) => {
         setErrors({});
 
         try {
-            const validatedData = UserUpdateSchema.parse(data);
+            const schema = mode === "default" ? UserUpdateSchema : ProfileSchema;
+            const validatedData = schema.parse(data);
             const request = {
                 ...validatedData,
                 ...(data?.deleteProfilePicture === true ? { deleteProfilePicture: true } : {}),
                 ...(profilePicture instanceof File ? {profilePicture} : {}),
             };
 
-            await UserService.updateUser(id, request, token);
-            toastRef?.current?.show({
-                severity: "success",
-                detail: "Pengguna berhasil diperbarui",
-                life: 2000,
-            });
-            if (fetchData) {
-                fetchData();
+            if (mode === "default") {
+                await UserService.updateUser(id, request, token);
+                showSuccessToast(toastRef, "Pengguna berhasil diperbarui");
+            } else if (mode === "current") {
+                await ProfileService.updateCurrentUser(request, token);
+                showSuccessToast(toastRef, "Profil berhasil diperbarui");
+            }
+            if (mode === "default") {
+                if (fetchData) {
+                    fetchData();
+                }
             }
             setVisibleModal(false);
         } catch (error) {
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
-                if (error.message === "Unauthorized"){
-                    toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
-                    logout()
-                } else {
-                    toastRef?.current?.show({
-                        severity: "error",
-                        detail: error.message,
-                        life: 2000,
-                    });
-                }
+                handleApiError(error,toastRef,logout)
             }
         }
 

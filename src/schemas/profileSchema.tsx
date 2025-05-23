@@ -3,7 +3,7 @@ import {
     validateName,
     validatePhoneNumber,
     validateEmail,
-} from "./UserSchema"
+} from "./userSchema.tsx"
 
 export const ProfileSchema = z.object({
     name: validateName,

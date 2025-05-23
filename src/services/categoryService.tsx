@@ -1,4 +1,5 @@
 import axios from "axios";
+import {handleResponseError} from "../utils/responseHandler.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
@@ -14,10 +15,10 @@ export const CategoryService = {
 
             return response.data.data;
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            handleResponseError(error);
         }
     },
-    listCategories: async (signal=null) => {
+    listCategories: async (signal?: AbortSignal) => {
         try {
             const response = await axios.get(`${apiUri}/api/category`, {
                 signal
@@ -25,10 +26,10 @@ export const CategoryService = {
 
             return response.data;
         } catch (error) {
-            if (error.name === 'CanceledError') {
+            if ((error as any).name === 'CanceledError') {
                 throw new Error('Request was cancelled');
             }
-            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            handleResponseError(error);
         }
     },
     getCategory: async (id, token) => {
@@ -41,7 +42,7 @@ export const CategoryService = {
 
             return response.data.data;
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            handleResponseError(error);
         }
     },
     updateCategory: async (id, data, token) => {
@@ -55,7 +56,7 @@ export const CategoryService = {
 
             return response.data.data;
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            handleResponseError(error);
         }
     },
     deleteCategory: async (id, token) => {
@@ -68,7 +69,7 @@ export const CategoryService = {
 
             return response.data.message || "Kategori berhasil dihapus";
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            handleResponseError(error);
         }
     }
 };

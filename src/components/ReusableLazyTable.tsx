@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from "react";
+import {useCallback, useState} from "react";
 import {DataTable} from "primereact/datatable";
 import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
@@ -70,7 +70,7 @@ const ReusableLazyTable = ({
                 totalRecords={totalItem}
                 lazy
                 first={(page - 1) * size}
-                onPage={(e) => onPageChange(e.page + 1, e.rows)}
+                onPage={(e) => onPageChange((e.page ?? 0) + 1, e.rows ?? 10)}
                 showGridlines
                 size={"small"}
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"

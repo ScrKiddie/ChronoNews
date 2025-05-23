@@ -33,7 +33,7 @@ export const useSidebar = () => {
 
     useEffect(() => {
         document.querySelectorAll('.ps-menu-label').forEach((menuLabel) => {
-            menuLabel.style.display = collapsed ? "none" : "block";
+            (menuLabel as any).style.display = collapsed ? "none" : "block";
         });
     }, [collapsed]);
 
@@ -68,9 +68,9 @@ export const useSidebar = () => {
         const handleClickOutside = (event) => {
             if (
                 menuContainerRef.current &&
-                !menuContainerRef.current.contains(event.target) &&
+                !(menuContainerRef.current as any).contains(event.target) &&
                 buttonRef.current &&
-                !buttonRef.current.contains(event.target)
+                !(buttonRef.current as any).contains(event.target)
             ) {
                 setIsMenuVisible(false);
             }

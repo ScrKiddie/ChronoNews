@@ -1,4 +1,3 @@
-import React from "react";
 import {Button} from "primereact/button";
 import {useCreateUser} from "../../hooks/useCreateUser.tsx";
 import {useUpdateUser} from "../../hooks/useUpdateUser.tsx";

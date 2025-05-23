@@ -1,4 +1,3 @@
-import React from "react";
 import {Button} from "primereact/button";
 import LoadingRetry from "../../components/LoadingRetry.tsx";
 import {useToast} from "../../hooks/useToast.tsx";

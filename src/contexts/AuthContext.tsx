@@ -1,4 +1,4 @@
-import React, {createContext, useState, useEffect} from "react";
+import {createContext, useState, useEffect} from "react";
 import Cookies from "js-cookie";
 import {jwtDecode} from "jwt-decode";
 
@@ -8,7 +8,17 @@ interface DecodedToken {
     sub: number;
 }
 
-export const AuthContext = createContext(undefined);
+interface AuthContextType {
+    sub: number | null;
+    token: string | null;
+    role: string | null;
+    isAuthChecked: boolean;
+    login: (token: string) => void;
+    logout: () => void;
+}
+
+
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({children}) => {
     const [token, setToken] = useState<string | null>(null);

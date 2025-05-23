@@ -1,4 +1,3 @@
-import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.tsx";
 import Beranda from "../pages/auth/Beranda";

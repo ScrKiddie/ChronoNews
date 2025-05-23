@@ -1,20 +1,21 @@
 import {useRef, useState} from "react";
 import {z} from "zod";
 import {useAuth} from "./useAuth.tsx";
-import {PostService} from "../services/PostService";
-import {CategoryService} from "../services/CategoryService";
-import {PostCreateSchema} from "../schemas/PostSchema.tsx";
+import {PostService} from "../services/postService.tsx";
+import {CategoryService} from "../services/categoryService.tsx";
+import {PostCreateSchema} from "../schemas/postSchema.tsx";
 import {useCropper} from "./useCropper";
-import {UserService} from "../services/UserService.tsx";
+import {UserService} from "../services/userService.tsx";
+import {handleApiError, showErrorToast, showSuccessToast} from "../utils/toastHandler.tsx";
 
-export const useCreatePost = (toastRef = null, fetchData = null) => {
-    const {token, role,logout} = useAuth();
+export const useCreatePost = (toastRef, fetchData) => {
+    const {token, role, logout} = useAuth();
     const editorContent = useRef("");
     const [visibleModal, setVisibleModal] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
     const [modalLoading, setModalLoading] = useState(false);
     const [categoryOptions, setCategoryOptions] = useState([]);
-    const [userOptions, setUserOptions] = useState([]);
+    const [userOptions, setUserOptions] = useState<{ label: string; value: number }[]>([]);
     const [data, setData] = useState({
         title: "",
         summary: "",
@@ -22,7 +23,7 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
         userID: 0,
         categoryID: 0,
     });
-    const [thumbnail, setThumbnail] = useState(null);
+    const [thumbnail, setThumbnail] = useState<File | null>(null);
     const [errors, setErrors] = useState({});
 
     const {
@@ -75,16 +76,7 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
             }
             setVisibleModal(true);
         } catch (error) {
-            if (error.message === "Unauthorized"){
-                toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
-                logout()
-            } else {
-                toastRef?.current?.show({
-                    severity: "error",
-                    detail: error.message,
-                    life: 2000,
-                });
-            }
+            handleApiError(error,toastRef, logout)
         }
         setModalLoading(false);
     };
@@ -102,39 +94,26 @@ export const useCreatePost = (toastRef = null, fetchData = null) => {
                 content: editorValue,
                 ...(thumbnail instanceof File ? {thumbnail: thumbnail} : {}),
             };
-            if (typeof editorValue === 'string' && new Blob([editorValue]).size > 314572800 ) {
-                toastRef.current.show({ severity: "error", detail: "Konten melebihi batas dari server" });
+            if (typeof editorValue === 'string' && new Blob([editorValue]).size > 314572800) {
+                showErrorToast(toastRef, "Konten melebihi batas dari server")
                 setSubmitLoading(false);
                 return;
             }
             await PostService.createPost(request, token);
-            toastRef.current?.show({
-                severity: "success",
-                detail: "Postingan berhasil dibuat",
-                life: 2000,
-            });
-
+            showSuccessToast(toastRef,"Postingan berhasil dibuat")
             if (fetchData) {
                 fetchData();
             }
             setVisibleModal(false);
+
         } catch (error) {
             if (typeof editorValue === 'string' && new Blob([editorValue]).size > 314572800 ) {
-                toastRef.current.show({ severity: "error", detail: "Konten melebihi batas dari server" });
+                showErrorToast(toastRef, "Konten melebihi batas dari server");
             }
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
-                if (error.message === "Unauthorized"){
-                    toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
-                    logout()
-                } else {
-                    toastRef?.current?.show({
-                        severity: "error",
-                        detail: error.message,
-                        life: 2000,
-                    });
-                }
+                handleApiError(error,toastRef, logout)
             }
         }
         setSubmitLoading(false);

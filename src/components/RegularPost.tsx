@@ -1,12 +1,10 @@
-import React from "react";
 import {DataView} from "primereact/dataview";
 import {Paginator} from "primereact/paginator";
 import {useNavigate} from "react-router-dom";
 import thumbnail from "../assets/thumbnail.svg";
-import usePost from "../hooks/usePost.tsx";
+import {truncateText} from "../utils/truncateText.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
-
 
 const RegularPost = ({
                          post,
@@ -16,7 +14,6 @@ const RegularPost = ({
                          postPagination,
                          classKu = "",
                          handleCategoryChange,
-                         truncateText
                      }) => {
     const navigate = useNavigate();
     return (

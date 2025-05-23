@@ -1,4 +1,5 @@
 import axios from "axios";
+import {handleResponseError} from "../utils/responseHandler.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
@@ -26,11 +27,11 @@ export const PostService = {
 
             return response.data.data;
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            handleResponseError(error);
         }
     },
 
-    searchPost: async (filters = {},signal) => {
+    searchPost: async (filters,signal) => {
         try {
             const {
                 userID = "",
@@ -53,21 +54,19 @@ export const PostService = {
 
             return response.data;
         } catch (error) {
-            if (error.name === 'CanceledError') {
+            if ((error as any).name === 'CanceledError') {
                 throw new Error('Request was cancelled');
             }
-            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            handleResponseError(error);
         }
     },
 
     getPost: async (id) => {
         try {
             const response = await axios.get(`${apiUri}/api/post/${id}`);
-
             return response.data.data;
         } catch (error) {
-            console.error("Error details:", error.response || error.message);
-            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            handleResponseError(error);
         }
     },
 
@@ -97,7 +96,7 @@ export const PostService = {
 
             return response.data.data;
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            handleResponseError(error);
         }
     },
 
@@ -111,7 +110,7 @@ export const PostService = {
 
             return response.data.message || "RegularPost berhasil dihapus";
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            handleResponseError(error);
         }
     }
 };

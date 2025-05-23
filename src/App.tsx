@@ -1,4 +1,3 @@
-import React from "react";
 import MainRouter from "./routers/MainRouter";
 import {APIOptions, PrimeReactProvider} from 'primereact/api';
 import "primereact/resources/themes/lara-light-amber/theme.css";

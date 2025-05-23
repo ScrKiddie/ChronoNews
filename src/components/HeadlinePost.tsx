@@ -1,9 +1,8 @@
-import React from "react";
 import {DataView} from "primereact/dataview";
 import {Paginator} from "primereact/paginator";
 import {useNavigate} from "react-router-dom";
 import thumbnail from "../assets/thumbnail.svg";
-import usePost from "../hooks/usePost.tsx";
+import {truncateText} from "../utils/truncateText.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
@@ -14,7 +13,6 @@ const HeadlinePost = ({
                           headlinePostPagination,
                           headlineSize,
                           handleCategoryChange,
-                          truncateText
                       }) => {
 
     const navigate = useNavigate();
@@ -46,7 +44,7 @@ const HeadlinePost = ({
                                     handleCategoryChange(headlinePost.category?.name.toLowerCase())
                                 }}
                             >
-                            {truncateText(post.category?.name,13)}
+                            {truncateText(post.category?.name, 13)}
                           </span> - {post.publishedDate}</p>
                             <p className="mt-1 text-base line-clamp-3">
                                 {post.summary}

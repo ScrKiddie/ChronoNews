@@ -1,14 +1,15 @@
 import {useRef, useState} from "react";
 import {z} from "zod";
 import {useAuth} from "./useAuth.tsx";
-import {PostService} from "../services/PostService";
-import {CategoryService} from "../services/CategoryService";
-import {PostUpdateSchema} from "../schemas/PostSchema.tsx";
+import {PostService} from "../services/postService.tsx";
+import {CategoryService} from "../services/categoryService.tsx";
+import {PostUpdateSchema} from "../schemas/postSchema.tsx";
 import {useCropper} from "./useCropper";
-import {UserService} from "../services/UserService.tsx";
+import {UserService} from "../services/userService.tsx";
+import {handleApiError, showErrorToast, showSuccessToast} from "../utils/toastHandler.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
-export const useUpdatePost = (toastRef = null, fetchData = null) => {
+export const useUpdatePost = (toastRef:any = null, fetchData:any=null) => {
     const {token, role, logout} = useAuth();
     const editorContent = useRef("");
     const [modalLoading, setModalLoading] = useState(false);
@@ -24,9 +25,9 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
         deleteThumbnail: false,
     });
     const [categoryOptions, setCategoryOptions] = useState([]);
-    const [userOptions, setUserOptions] = useState([]);
+    const [userOptions, setUserOptions] = useState<{ label: string; value: number }[]>([]);
     const [errors, setErrors] = useState({});
-    const [thumbnail, setThumbnail] = useState(null);
+    const [thumbnail, setThumbnail] = useState<File | null>(null);
     const [id, setId] = useState(0);
 
     const processContent = (htmlContent) => {
@@ -127,16 +128,7 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
 
             setVisibleModal(true);
         } catch (error) {
-            if (error.message === "Unauthorized"){
-                toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
-                logout()
-            } else {
-                toastRef?.current?.show({
-                    severity: "error",
-                    detail: error.message,
-                    life: 2000,
-                });
-            }
+            handleApiError(error,toastRef,logout)
         }
 
         setModalLoading(false);
@@ -166,39 +158,27 @@ export const useUpdatePost = (toastRef = null, fetchData = null) => {
             };
 
             if (typeof editorValue === 'string' && new Blob([editorValue]).size > 314572800 ) {
-                toastRef.current.show({ severity: "error", detail: "Konten melebihi batas dari server" });
+                showErrorToast(toastRef,"Konten melebihi batas dari server")
                 setSubmitLoading(false);
                 return;
             }
 
             await PostService.updatePost(id, request, token);
-            toastRef?.current?.show({
-                severity: "success",
-                detail: "Postingan berhasil diperbarui",
-                life: 2000,
-            });
+            showSuccessToast(toastRef, "Postingan berhasil diperbarui")
 
             if (fetchData) {
                 fetchData();
             }
+
             setVisibleModal(false);
         } catch (error) {
             if (typeof editorValue === 'string' && new Blob([editorValue]).size > 314572800 ) {
-                toastRef.current.show({ severity: "error", detail: "Konten melebihi batas dari server" });
+                showErrorToast(toastRef, "Konten melebihi batas dari server");
             }
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
-                if (error.message === "Unauthorized"){
-                    toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
-                    logout()
-                } else {
-                    toastRef?.current?.show({
-                        severity: "error",
-                        detail: error.message,
-                        life: 2000,
-                    });
-                }
+               handleApiError(error,toastRef,logout)
             }
         }
 

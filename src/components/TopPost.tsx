@@ -1,10 +1,9 @@
-import React from "react";
 import {DataView} from "primereact/dataview";
 import {Paginator} from "primereact/paginator";
 import {useNavigate} from "react-router-dom";
 import thumbnail from "../assets/thumbnail.svg";
 import emptyData from "../assets/emptydata.webp";
-import usePost from "../hooks/usePost.tsx";
+import {truncateText} from "../utils/truncateText.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
@@ -15,12 +14,14 @@ const TopPost = ({
                      topPostSize,
                      topPostPagination,
                      handleCategoryChange,
-                     truncateText
                  }) => {
     const navigate = useNavigate();
+
+
     return (
         <div className="mt-4">
             <DataView
+                // @ts-expect-error: using custom empty message
                 emptyMessage={(<>
                         <div className="w-full flex flex-col h-fit justify-center items-center">
                             <img src={emptyData as string} className="lg:w-[26%] w-[60%]" alt="emptyData"/>

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import {useState} from "react";
 import {DataTable} from "primereact/datatable";
 import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";

@@ -1,10 +1,11 @@
 import {useState} from "react";
 import {z} from "zod";
-import {PasswordSchema} from "../schemas/PasswordSchema";
-import {PasswordService} from "../services/PasswordService";
+import {PasswordSchema} from "../schemas/passwordSchema.tsx";
+import {PasswordService} from "../services/passwordService.tsx";
 import {useAuth} from "./useAuth.tsx";
+import { handleApiError, showSuccessToast } from "../utils/toastHandler.tsx";
 
-export const usePassword = (toastRef = null) => {
+export const usePassword = (toastRef) => {
     const {token, logout} = useAuth();
 
     const [visibleModal, setVisibleModal] = useState(false);
@@ -33,28 +34,14 @@ export const usePassword = (toastRef = null) => {
             const validatedData = PasswordSchema.parse(data);
 
             await PasswordService.updatePassword(validatedData, token);
-
-            toastRef.current?.show({
-                severity: "success",
-                detail: "Password berhasil diperbarui",
-                life: 2000,
-            });
+            showSuccessToast(toastRef,"Password berhasil diperbarui" )
 
             setVisibleModal(false);
         } catch (error) {
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
-                if (error.message === "Unauthorized"){
-                    toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
-                    logout()
-                } else {
-                    toastRef?.current?.show({
-                        severity: "error",
-                        detail: error.message,
-                        life: 2000,
-                    });
-                }
+                handleApiError(error,toastRef,logout)
             }
         }
 

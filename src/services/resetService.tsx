@@ -1,4 +1,5 @@
 import axios from "axios";
+import {handleResponseError} from "../utils/responseHandler.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
@@ -8,7 +9,7 @@ export const ResetService = {
             const response = await axios.post(apiUri+"/api/reset/request", data);
             return response.data;
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            handleResponseError(error);
         }
     },
     reset: async (data) => {
@@ -16,7 +17,7 @@ export const ResetService = {
             const response = await axios.patch(apiUri+"/api/reset", data);
             return response.data;
         } catch (error) {
-            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
+            handleResponseError(error);
         }
     }
 };

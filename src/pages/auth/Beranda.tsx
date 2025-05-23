@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import {useState} from "react";
 import { Chart } from 'primereact/chart';
 import { Card } from "primereact/card";
 import { Ripple } from "primereact/ripple";
@@ -10,6 +10,7 @@ import LoadingRetry from "../../components/LoadingRetry.tsx";
 import {Dropdown} from "primereact/dropdown";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import {truncateText} from "../../utils/truncateText.tsx";
 dayjs.extend(utc);
 const Beranda = () => {
     const navigate = useNavigate();
@@ -57,11 +58,11 @@ const Beranda = () => {
     ];
 
     const barData = {
-        labels: data.map(item => item.title.length > 15 ? item.title.slice(0, 15) + "..." : item.title),
+        labels: data.map(item => (item as any).title.length > 15 ? truncateText((item as any).title,15) : (item as any).title),
         datasets: [
             {
                 label: "Jumlah Pengunjung",
-                data: data.map(item => item.viewCount || 0),
+                data: data.map(item => (item as any).viewCount || 0),
 
                 backgroundColor: "rgba(245, 158, 11,0.2)",
                 borderColor: "#f59e0b",
@@ -122,11 +123,10 @@ const Beranda = () => {
                             ) : (
                                 <>
                                     <Chart
-                                        className={`min-h-[50vh] md:min-h-[60vh] `}
+                                        className={`min-h-[50vh] md:min-h-[60vh]`}
                                         type="bar"
                                         data={barData}
                                         options={{
-                                            indexAxis: 'y',
                                             responsive: true,
                                             maintainAspectRatio: false,
                                             plugins: {
@@ -134,23 +134,24 @@ const Beranda = () => {
                                                     callbacks: {
                                                         title: (tooltipItems) => {
                                                             const index = tooltipItems[0].dataIndex;
-                                                            return data[index]?.title.substring(0, 30) + "..." || "Tanpa Judul";
+                                                            return truncateText((data[index] as any)?.title,30) || "Tanpa Judul";
                                                         }
                                                     },
-                                                    titleFont: {family: "Poppins"},
-                                                    bodyFont: {family: "Poppins"}
+                                                    titleFont: { family: "Poppins" },
+                                                    bodyFont: { family: "Poppins" }
                                                 },
                                                 legend: {
-                                                    labels: {font: {family: "Poppins", size: 14}}
+                                                    labels: { font: { family: "Poppins", size: 14 } }
                                                 }
                                             },
                                             scales: {
-                                                x: {ticks: {font: {family: "Poppins"}}},
-                                                y: {ticks: {font: {family: "Poppins"}}}
+                                                x: { ticks: { font: { family: "Poppins" } } }, // Sekarang X adalah label post
+                                                y: { ticks: { font: { family: "Poppins" } } }, // Y adalah jumlah view
                                             }
                                         }}
-                                        style={{height: "100%"}}
+                                        style={{ height: "30%" }}
                                     />
+
                                     <span className={`flex w-full items-center  justify-center mb-2`}>
 
                                         </span>
@@ -166,8 +167,8 @@ const Beranda = () => {
                                             onChange={(e) => {
                                                 const value = e.value;
                                                 setRange(value);
-                                                let start = null;
-                                                let end = dayjs().endOf('day').utc().unix();
+                                                let start:any = null;
+                                                let end:any = dayjs().endOf('day').utc().unix();
                                                 if (value === '1') {
                                                     start = dayjs().startOf('day').utc().unix();
                                                 } else if (value === '7') {

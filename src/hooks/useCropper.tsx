@@ -1,12 +1,25 @@
 import {useState, useRef} from "react";
+import {showErrorToast} from "../utils/toastHandler.tsx";
+
+type UseCropperParams = {
+    setVisibleModal?: (visible: boolean) => void;
+    setProfilePicture?: (file: File | null) => void;
+    toastRef?: any;
+    width?: number;
+    height?: number;
+};
 
 export const useCropper = ({
-                               setVisibleModal, setProfilePicture = null, toastRef = null, width = 800 , height = 800
-                           } = {}) => {
+                               setVisibleModal,
+                               setProfilePicture,
+                               toastRef,
+                               width = 800,
+                               height = 800
+                           }: UseCropperParams = {}) => {
     const fileInputRef = useRef(null);
     const [selectedImage, setSelectedImage] = useState<null | string | ArrayBuffer>(null);
     const [visibleCropImageModal, setVisibleCropImageModal] = useState(false);
-    const [croppedImage, setCroppedImage] = useState({});
+    const [croppedImage, setCroppedImage] = useState<string|null>(null);
     const imageRef = useRef(null);
     const cropperRef = useRef(null);
     const [imageFormat, setImageFormat] = useState("image/jpeg");
@@ -18,11 +31,7 @@ export const useCropper = ({
 
         if (!validFormats.includes(file.type)) {
             if (toastRef) {
-                toastRef.current?.show({
-                    severity: "error",
-                    detail: "Format gambar tidak valid",
-                    life: 2000,
-                });
+                showErrorToast(toastRef, "Format gambar tidak valid");
             }
             setSelectedImage(null);
             e.target.value = "";
@@ -51,27 +60,25 @@ export const useCropper = ({
         setSelectedImage(null);
         destroyCropper();
         if (fileInputRef.current) {
-            fileInputRef.current.value = null;
+            (fileInputRef.current as any).value = null;
         }
     };
 
-    const handleClickUploadButton = () => fileInputRef.current?.click();
+    const handleClickUploadButton = () => (fileInputRef.current as any).click();
 
     const handleCrop = () => {
         if (cropperRef.current) {
-            const canvas = cropperRef.current.getCroppedCanvas({width: width, height: height,imageSmoothingEnabled: true,
-                imageSmoothingQuality: "high"});
+            const canvas = (cropperRef.current as any).getCroppedCanvas({
+                width: width, height: height, imageSmoothingEnabled: true,
+                imageSmoothingQuality: "high"
+            });
 
             canvas.toBlob((blob) => {
                 if (blob) {
                     const fileSize = blob.size;
                     if (fileSize > 2 * 1024 * 1024) {
                         if (toastRef) {
-                            toastRef.current?.show({
-                                severity: "error",
-                                detail: "Hasil crop gambar melebihi 2MB",
-                                life: 2000,
-                            });
+                            showErrorToast(toastRef, "Hasil crop gambar melebihi 2MB");
                         }
                         setVisibleCropImageModal(false);
                         if (setVisibleModal) {
@@ -102,7 +109,7 @@ export const useCropper = ({
 
     const destroyCropper = () => {
         if (cropperRef.current) {
-            cropperRef.current.destroy();
+            (cropperRef.current as any).destroy();
             cropperRef.current = null;
         }
     };

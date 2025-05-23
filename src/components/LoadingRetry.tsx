@@ -1,8 +1,19 @@
 import React from "react";
 import {Button} from "primereact/button";
 
+type LoadingRetryProps = {
+    visibleConnectionError?: boolean;
+    visibleLoadingConnection?: boolean;
+    onRetry?: () => void;
+    className?: string;
+};
 
-const LoadingRetry: React.FC = ({visibleConnectionError, onRetry, visibleLoadingConnection, className="p-4"}) => {
+const LoadingRetry: React.FC<LoadingRetryProps> = ({
+                                                       visibleConnectionError,
+                                                       onRetry,
+                                                       visibleLoadingConnection,
+                                                       className = "p-4"
+                                                   }) => {
     if (!visibleConnectionError && !visibleLoadingConnection) return null;
 
     return (

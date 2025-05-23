@@ -1,4 +1,3 @@
-import React from "react";
 import {Button} from "primereact/button";
 import {ConfirmDialog} from "primereact/confirmdialog";
 
@@ -27,7 +26,6 @@ const DeleteModal = ({visibleModal, setVisibleModal, onSubmit, submitLoading}) =
         <ConfirmDialog
             visible={visibleModal}
             closable={false}
-            group="templating"
             header={<h1 className="font-medium m-0 text-xl">Hapus</h1>}
             message="Apakah Anda yakin ingin menghapus data ini?"
             className="w-[94%] md:w-[40%]"
