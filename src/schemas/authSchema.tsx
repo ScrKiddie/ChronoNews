@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { validateEmail, validatePassword } from "./UserSchema.tsx"
+import { validateEmail, validatePassword } from "./userSchema.tsx"
 
 export const validateTokenCaptcha = z.string().superRefine((value, ctx) => {
     if (value.length === 0 || value.length < 10) {

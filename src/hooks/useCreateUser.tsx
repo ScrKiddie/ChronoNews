@@ -1,11 +1,12 @@
 import {useState} from "react";
 import {z} from "zod";
 import {useAuth} from "./useAuth.tsx";
-import {UserService} from "../services/UserService";
-import {UserCreateSchema} from "../schemas/UserSchema.tsx";
+import {UserService} from "../services/userService.tsx";
+import {UserCreateSchema} from "../schemas/userSchema.tsx";
 import {useCropper} from "./useCropper";
+import { handleApiError, showSuccessToast } from "../utils/toastHandler.tsx";
 
-export const useCreateUser = (toastRef = null, fetchData = null) => {
+export const useCreateUser = (toastRef, fetchData) => {
     const {token,logout} = useAuth();
 
     const [visibleModal, setVisibleModal] = useState(false);
@@ -17,7 +18,8 @@ export const useCreateUser = (toastRef = null, fetchData = null) => {
         password: "",
         role: ""
     });
-    const [profilePicture, setProfilePicture] = useState(null)
+
+    const [profilePicture, setProfilePicture] = useState<File | null>(null);
     const [errors, setErrors] = useState({});
 
     const {
@@ -58,30 +60,18 @@ export const useCreateUser = (toastRef = null, fetchData = null) => {
             };
 
             await UserService.createUser(request, token);
-            toastRef.current?.show({
-                severity: "success",
-                detail: "Pengguna berhasil dibuat",
-                life: 2000,
-            });
+            showSuccessToast(toastRef, "Pengguna berhasil dibuat")
 
             if (fetchData) {
                 fetchData();
             }
+
             setVisibleModal(false);
         } catch (error) {
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
-                if (error.message === "Unauthorized"){
-                    toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
-                    logout()
-                } else {
-                    toastRef?.current?.show({
-                        severity: "error",
-                        detail: error.message,
-                        life: 2000,
-                    });
-                }
+                handleApiError(error, toastRef, logout);
             }
         }
         setSubmitLoading(false);

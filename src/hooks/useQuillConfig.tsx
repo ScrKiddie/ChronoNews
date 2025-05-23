@@ -14,6 +14,7 @@ const useQuillConfig = () => {
 
         const BaseImageFormat = Quill.import("formats/image");
 
+        // @ts-expect-error: intentionally overriding type requirement
         class ImageFormat extends BaseImageFormat {
             static formats(domNode) {
                 const formats = {};
@@ -48,11 +49,13 @@ const useQuillConfig = () => {
                         const styleString = Object.entries(newStyles)
                             .map(([key, val]) => `${key}: ${val}`)
                             .join("; ");
-
+                        // @ts-expect-error: intentionally overriding type requirement
                         this.domNode.setAttribute("style", styleString);
                     } else if (value) {
+                        // @ts-expect-error: intentionally overriding type requirement
                         this.domNode.setAttribute(name, value);
                     } else {
+                        // @ts-expect-error: intentionally overriding type requirement
                         this.domNode.removeAttribute(name);
                     }
                 } else {
@@ -61,11 +64,12 @@ const useQuillConfig = () => {
             }
         }
 
+        // @ts-expect-error: intentionally overriding type requirement
         Quill.register(ImageFormat, true);
         Quill.register("modules/resize", ResizeModule, true);
-
         const BlockEmbed = Quill.import("blots/block/embed");
 
+        // @ts-expect-error: intentionally overriding type requirement
         class VideoBlot extends BlockEmbed {
             static create(value) {
                 const node = super.create(value);
@@ -124,11 +128,13 @@ const useQuillConfig = () => {
                         const styleString = Object.entries(newStyles)
                             .map(([key, val]) => `${key}: ${val}`)
                             .join("; ");
-
+                        // @ts-expect-error: intentionally overriding type requirement
                         this.domNode.setAttribute("style", styleString);
                     } else if (value) {
+                        // @ts-expect-error: intentionally overriding type requirement
                         this.domNode.setAttribute(name, value);
                     } else {
+                        // @ts-expect-error: intentionally overriding type requirement
                         this.domNode.removeAttribute(name);
                     }
                 } else {
@@ -141,10 +147,13 @@ const useQuillConfig = () => {
             }
         }
 
+        // @ts-expect-error: intentionally overriding type requirement
         VideoBlot.blotName = "video";
+        // @ts-expect-error: intentionally overriding type requirement
         VideoBlot.tagName = "iframe";
+        // @ts-expect-error: intentionally overriding type requirement
         VideoBlot.scope = Scope.BLOCK_BLOT;
-
+        // @ts-expect-error: intentionally overriding type requirement
         Quill.register(VideoBlot, true);
     }, []);
 };

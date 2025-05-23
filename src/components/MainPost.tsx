@@ -1,19 +1,19 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {Editor} from "primereact/editor";
 import {Button} from "primereact/button";
 import {BreadCrumb} from "primereact/breadcrumb";
 import defaultProfilePicture from "../assets/profilepicture.svg";
 import thumbnail from "../assets/thumbnail.svg";
 import {Dialog} from "primereact/dialog";
-import usePost from "../hooks/usePost.tsx";
+import {truncateText} from "../utils/truncateText.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
-const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVisible,truncateText}) => {
+const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVisible}) => {
     const [showLastUpdated, setShowLastUpdated] = useState(false);
     useEffect(() => {
-        if (window.DISQUS) {
-            window.DISQUS.reset({ reload: true,
+        if ((window as any).DISQUS) {
+            (window as any).DISQUS.reset({ reload: true,
                 config: function () {
                     this.page.identifier = mainPost.id;
                     this.page.url = window.location.href;
@@ -21,7 +21,7 @@ const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVis
         } else {
             const script = document.createElement("script");
             script.src = `https://${import.meta.env.VITE_DISQUS_SHORTNAME}.disqus.com/embed.js`;
-            script.setAttribute("data-timestamp", +new Date() as string);
+            script.setAttribute("data-timestamp", Date.now().toString());
             script.async = true;
             document.body.appendChild(script);
         }

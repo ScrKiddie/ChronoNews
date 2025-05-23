@@ -1,13 +1,14 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useAuth} from "../../hooks/useAuth.tsx";
-import {ResetRequestSchema} from "../../schemas/ResetSchema.tsx";
+import {ResetRequestSchema} from "../../schemas/resetSchema.tsx";
 import {useNavigate} from "react-router-dom";
 import {useToast} from "../../hooks/useToast.tsx";
-import {Turnstile} from "@marsidev/react-turnstile";
+import {Turnstile, TurnstileInstance} from "@marsidev/react-turnstile";
 import GuestFormContainer from "../../components/GuestFormContainer.tsx";
 import InputGroup from "../../components/InputGroup.tsx";
 import SubmitButton from "../../components/SubmitButton.tsx";
-import {ResetService} from "../../services/ResetService.tsx"
+import {ResetService} from "../../services/resetService.tsx"
+import {showErrorToast, showSuccessToast} from "../../utils/toastHandler.tsx";
 const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 const Login: React.FC = () => {
     const toastRef = useToast();
@@ -16,7 +17,7 @@ const Login: React.FC = () => {
     const [email, setEmail] = useState("");
     const [errors, setError] = useState<{ email?: string;}>({});
     const [loading, setLoading] = useState(false);
-    const ref = useRef(null);
+    const ref = useRef<TurnstileInstance>(null);
     const [tokenCaptcha, setTokenCaptcha] = useState("");
 
     useEffect(() => {
@@ -32,7 +33,7 @@ const Login: React.FC = () => {
         const result = ResetRequestSchema.safeParse({email, tokenCaptcha});
 
         if (!result.success) {
-            const errorMessages: { email?: string; tokenCaptcha: string; } = {};
+            const errorMessages: { email?: string; tokenCaptcha?: string; } = {};
             result.error.errors.forEach((err) => {
                 if (err.path.includes("email")) errorMessages.email = err.message;
                 if (err.path.includes("tokenCaptcha")) errorMessages.tokenCaptcha = err.message;
@@ -47,10 +48,10 @@ const Login: React.FC = () => {
         try {
             const response = await ResetService.resetRequest({email, tokenCaptcha});
             login(response.data);
-            toastRef.current?.show({severity: "success", detail: "Cek inbox atau spam pada email anda", life: 2000});
+            showSuccessToast(toastRef,"Cek inbox atau spam pada email anda")
             navigate("/reset");
         } catch (error) {
-            toastRef.current?.show({severity: "error", detail: error.message, life: 2000});
+            showErrorToast(toastRef,(error as any).message)
         } finally {
             setTokenCaptcha("");
             ref.current?.reset();

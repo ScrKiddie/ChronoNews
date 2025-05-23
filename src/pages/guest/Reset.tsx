@@ -1,13 +1,14 @@
 import React, {useEffect, useState} from "react";
 import {useAuth} from "../../hooks/useAuth.tsx";
-import {ResetSchema} from "../../schemas/ResetSchema.tsx";
-import {ResetService} from "../../services/ResetService.tsx"
+import {ResetSchema} from "../../schemas/resetSchema.tsx";
+import {ResetService} from "../../services/resetService.tsx"
 import {useNavigate} from "react-router-dom";
 import {useToast} from "../../hooks/useToast.tsx";
 import GuestFormContainer from "../../components/GuestFormContainer.tsx";
 import InputGroup from "../../components/InputGroup.tsx";
 import SubmitButton from "../../components/SubmitButton.tsx";
 import { useSearchParams } from "react-router-dom";
+import {showErrorToast, showSuccessToast} from "../../utils/toastHandler.tsx";
 
 const Login: React.FC = () => {
     const toastRef = useToast();
@@ -35,7 +36,7 @@ const Login: React.FC = () => {
         const result = ResetSchema.safeParse({code, password, confirmPassword});
 
         if (!result.success) {
-            const errorMessages: { code?: string; password?: string; confirmPassword: string; } = {};
+            const errorMessages: { code?: string; password?: string; confirmPassword?: string; } = {};
             result.error.errors.forEach((err) => {
                 if (err.path.includes("code")) errorMessages.code = err.message;
                 if (err.path.includes("password")) errorMessages.password = err.message;
@@ -51,10 +52,10 @@ const Login: React.FC = () => {
         try {
             const response = await ResetService.reset({code, password, confirmPassword});
             login(response.data);
-            toastRef.current?.show({severity: "success", detail: "Berhasil melakukan reset", life: 2000});
+            showSuccessToast(toastRef, "Berhasil melakukan reset")
             navigate("/login");
         } catch (error) {
-            toastRef.current?.show({severity: "error", detail: error.message, life: 2000});
+            showErrorToast(toastRef, (error as any).message)
         } finally {
             setLoading(false);
         }

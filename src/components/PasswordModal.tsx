@@ -1,6 +1,5 @@
 import {Dialog} from "primereact/dialog";
 import InputGroup from "./InputGroup.tsx";
-import React from "react";
 import SubmitButton from "./SubmitButton.tsx";
 
 const PasswordModal = ({

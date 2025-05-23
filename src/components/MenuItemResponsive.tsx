@@ -1,4 +1,3 @@
-import React from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {MenuItem} from "react-pro-sidebar";
 import {Button} from "primereact/button";

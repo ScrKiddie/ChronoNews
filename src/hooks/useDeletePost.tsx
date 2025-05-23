@@ -1,6 +1,7 @@
 import {useState} from "react";
-import {PostService} from "../services/PostService";
+import {PostService} from "../services/postService.tsx";
 import {useAuth} from "./useAuth.tsx";
+import {handleApiError} from "../utils/toastHandler.tsx";
 
 export const useDeletePost = (toastRef, fetchData, page, setPage, totalItem, size) => {
     const {token,logout} = useAuth();
@@ -17,7 +18,7 @@ export const useDeletePost = (toastRef, fetchData, page, setPage, totalItem, siz
         setSubmitLoading(true);
         try {
             await PostService.deletePost(id, token);
-            toastRef?.current?.show({severity: "success", detail: "RegularPost berhasil dihapus"});
+            toastRef?.current?.show({severity: "success", detail: "Post berhasil dihapus"});
 
             const remainingItems = totalItem - 1;
             const remainingPages = Math.ceil(remainingItems / size);
@@ -29,16 +30,7 @@ export const useDeletePost = (toastRef, fetchData, page, setPage, totalItem, siz
             fetchData();
             setVisibleModal(false);
         } catch (error) {
-            if (error.message === "Unauthorized"){
-                toastRef.current.show({severity: "error", detail: "Sesi berakhir, silahkan login kembali"});
-                logout()
-            } else {
-                toastRef?.current?.show({
-                    severity: "error",
-                    detail: error.message,
-                    life: 2000,
-                });
-            }
+            handleApiError(error,toastRef,logout)
         } finally {
             setSubmitLoading(false);
         }

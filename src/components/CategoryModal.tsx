@@ -1,6 +1,5 @@
 import {Dialog} from "primereact/dialog";
 import InputGroup from "./InputGroup.tsx";
-import React from "react";
 import SubmitButton from "./SubmitButton.tsx";
 
 const CategoryModal = ({
@@ -35,8 +34,10 @@ const CategoryModal = ({
                             label="Nama Kategori"
                             data={data?.name}
                             error={errors.name}
-                            setData={(e)=>{ setData(prev => ({ ...prev, name: e }));}}
-                            setError={(e)=>{ errors.name = e }}
+                            setData={(e) => {
+                                setData(prev => ({...prev, name: e}));
+                            }}
+                            setError={(e) => {errors.name = e}}
                         />
                     </div>
 

@@ -4,7 +4,7 @@ import {Editor} from "primereact/editor";
 import {Dropdown} from "primereact/dropdown";
 import useQuillConfig from "../hooks/useQuillConfig.tsx";
 import thumbnail from "../assets/thumbnail.svg";
-import React, {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {InputTextarea} from "primereact/inputtextarea";
 import InputGroup from "./InputGroup.tsx";
 import {useSidebar} from "../hooks/useSidebar.tsx";
@@ -12,6 +12,7 @@ import {Menu} from "primereact/menu";
 import {useAuth} from "../hooks/useAuth.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
+
 const PostModal = ({
                        visible,
                        onClose,
@@ -24,10 +25,10 @@ const PostModal = ({
                        handleSubmit,
                        handleClickUploadButton,
                        handleImageChange,
-                       categoryOptions = [],
-                       userOptions = [],
+                       categoryOptions,
+                       userOptions,
                        isEditMode,
-                       role = "admin",
+                       role,
                        editorContent,
                        setThumbnail,
                        setCroppedImage
@@ -69,7 +70,7 @@ const PostModal = ({
     const [menuItems, setMenuItems] = useState([]);
 
     useEffect(() => {
-        const items = [];
+        const items:any = [];
         items.push({
             label: "Ganti",
             icon: <i className="pi pi-image pr-3" />,
@@ -263,26 +264,26 @@ const PostModal = ({
                                     <option value="6">Heading 6</option>
                                     <option value="">Normal</option>
                                 </select>
-                                <button className="ql-bold" aria-label="Bold"></button>
-                                <button className="ql-italic" aria-label="Italic"></button>
-                                <button className="ql-underline" aria-label="Underline"></button>
-                                <button className="ql-strike" aria-label="Strike-through"></button>
-                                <button className="ql-blockquote" aria-label="Blockquote"></button>
-                                <button className="ql-list" value="ordered" aria-label="Ordered List"></button>
-                                <button className="ql-list" value="bullet" aria-label="Bullet List"></button>
-                                <button className="ql-indent" value="+1" aria-label="Indent"></button>
-                                <button className="ql-indent" value="-1" aria-label="Outdent"></button>
-                                <button className="ql-align" value="" aria-label="Left Align"></button>
-                                <button className="ql-align" value="center" aria-label="Center Align"></button>
-                                <button className="ql-align" value="right" aria-label="Right Align"></button>
-                                <button className="ql-align" value="justify" aria-label="Justify"></button>
-                                <button className="ql-link" aria-label="Link"></button>
-                                <button className="ql-image" aria-label="Insert Image"></button>
-                                            <select className="ql-color" aria-label="Text Color"></select>
-                                <select className="ql-background" aria-label="Background Color"></select>
-                                <button className="ql-script" value="sub" aria-label="Subscript"></button>
-                                <button className="ql-script" value="super" aria-label="Superscript"></button>
-                                <button className="ql-clean" aria-label="Clear Formatting"></button>
+                                    <button className="ql-bold" aria-label="Bold"></button>
+                                    <button className="ql-italic" aria-label="Italic"></button>
+                                    <button className="ql-underline" aria-label="Underline"></button>
+                                    <button className="ql-strike" aria-label="Strike-through"></button>
+                                    <button className="ql-blockquote" aria-label="Blockquote"></button>
+                                    <button className="ql-list" value="ordered" aria-label="Ordered List"></button>
+                                    <button className="ql-list" value="bullet" aria-label="Bullet List"></button>
+                                    <button className="ql-indent" value="+1" aria-label="Indent"></button>
+                                    <button className="ql-indent" value="-1" aria-label="Outdent"></button>
+                                    <button className="ql-align" value="" aria-label="Left Align"></button>
+                                    <button className="ql-align" value="center" aria-label="Center Align"></button>
+                                    <button className="ql-align" value="right" aria-label="Right Align"></button>
+                                    <button className="ql-align" value="justify" aria-label="Justify"></button>
+                                    <button className="ql-link" aria-label="Link"></button>
+                                    <button className="ql-image" aria-label="Insert Image"></button>
+                                    <select className="ql-color" aria-label="Text Color"></select>
+                                    <select className="ql-background" aria-label="Background Color"></select>
+                                    <button className="ql-script" value="sub" aria-label="Subscript"></button>
+                                    <button className="ql-script" value="super" aria-label="Superscript"></button>
+                                    <button className="ql-clean" aria-label="Clear Formatting"></button>
                             </span>
                             }
 

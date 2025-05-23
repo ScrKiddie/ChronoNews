@@ -1,9 +1,14 @@
 import {InputText} from "primereact/inputtext";
-import React from "react";
 import {Password} from "primereact/password";
 import {Dropdown} from "primereact/dropdown";
 
-const InputGroup = ({type="text", label = "", data = "", setData = (a)=>{return a}, error = false, setError = (a)=>{return a}, tip="",options}) => {
+const InputGroup = ({
+                        type = "text", label = "", data = "", setData = (a) => {
+        return a
+    }, error, setError = (a) => {
+        return a
+    }, tip = "", options=  [] as { label: string; value: string }[]
+                    }) => {
     return (
         <>
             <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}
@@ -31,7 +36,7 @@ const InputGroup = ({type="text", label = "", data = "", setData = (a)=>{return 
                     setError("");
                 }}
             />}
-            {type=="dropdown"&& <Dropdown
+            {type == "dropdown" && <Dropdown
                 id={label.replace(/\s+/g, '').toLowerCase()}
                 className="w-full"
                 options={options}

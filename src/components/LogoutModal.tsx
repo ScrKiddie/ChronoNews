@@ -1,4 +1,3 @@
-import React from "react";
 import {Button} from "primereact/button";
 import {ConfirmDialog} from "primereact/confirmdialog";
 
@@ -25,7 +24,6 @@ const LogoutModal = ({visible, setVisible, onLogout}) => {
         <ConfirmDialog
             visible={visible}
             closable={false}
-            group="templating"
             header={<h1 className="font-medium m-0 text-xl">Keluar</h1>}
             message="Apakah Anda yakin ingin keluar?"
             className="w-[94%] md:w-[40%]"

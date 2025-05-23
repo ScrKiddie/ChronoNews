@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, ReactNode } from "react";
 
 interface AbortContextType {
     abortController: AbortController | null;
@@ -7,7 +7,11 @@ interface AbortContextType {
 
 export const AbortContext = createContext<AbortContextType | undefined>(undefined);
 
-export const AbortProvider: React.FC = ({ children }) => {
+interface AbortProviderProps {
+    children: ReactNode;
+}
+
+export const AbortProvider: React.FC<AbortProviderProps> = ({ children }) => {
     const [abortController, setAbortController] = useState<AbortController | null>(null);
 
     return (
@@ -16,4 +20,3 @@ export const AbortProvider: React.FC = ({ children }) => {
         </AbortContext.Provider>
     );
 };
-

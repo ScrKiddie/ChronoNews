@@ -1,5 +1,5 @@
 import {z} from "zod"
-import {validatePassword} from "./UserSchema"
+import {validatePassword} from "./userSchema.tsx"
 
 export const PasswordSchema =
     z.object({

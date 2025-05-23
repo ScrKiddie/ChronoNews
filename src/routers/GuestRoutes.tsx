@@ -1,4 +1,3 @@
-import React from "react";
 import {Routes, Route, Navigate} from "react-router-dom";
 import Login from "../pages/guest/Login.tsx";
 import NotFound from "../pages/guest/NotFound.tsx";

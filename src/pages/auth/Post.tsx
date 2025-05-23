@@ -1,4 +1,3 @@
-import React from "react";
 import {Button} from "primereact/button";
 import PostModal from "../../components/PostModal.tsx";
 import CropImageModal from "../../components/CropImageModal.tsx";
@@ -208,7 +207,6 @@ const Post = () => {
                 aspectRatio={16 / 9}
             />
 
-
             {/* modal update post /*/}
             <PostModal
                 role={roleUpdate}
@@ -235,7 +233,6 @@ const Post = () => {
             <LoadingModal
                 modalLoading={modalUpdateLoading}
             />
-
 
             {/* modal cropper untuk update */}
             <CropImageModal

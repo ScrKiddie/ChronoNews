@@ -1,9 +1,9 @@
 import {useState, useEffect, useRef} from "react";
-import {PostService} from "../services/PostService";
+import {PostService} from "../services/postService.tsx";
 import {useAuth} from "./useAuth.tsx";
 import {useAbort} from "./useAbort.tsx";
-
-const useSearchPost = (params = {}) => {
+import {handleApiErrorGuest} from "../utils/toastHandler.tsx";
+const useSearchPost = (params: { countMode?: boolean } = {}) => {
     const { countMode = false } = params;
     const [startDate, setStartDate] = useState(0);
     const [endDate, setEndDate] = useState(0);
@@ -24,7 +24,6 @@ const useSearchPost = (params = {}) => {
 
     const prevSearchParams = useRef(searchParams);
     const { abortController, setAbortController } = useAbort();
-
 
     useEffect(() => {
         if (JSON.stringify(prevSearchParams.current) !== JSON.stringify(searchParams)) {
@@ -64,12 +63,12 @@ const useSearchPost = (params = {}) => {
             if (countMode){
                 filters.sort = "-view_count";
                 if (startDate !== null && endDate !== null) {
-                    filters.startDate = startDate.toString();
-                    filters.endDate = endDate.toString();
+                    filters.startDate = startDate
+                    filters.endDate = endDate
                 }
             }
             if (role == "journalist") {
-                filters.userID = sub
+                filters.userID = sub || 0
             }
             const response = await PostService.searchPost(filters, newAbortController.signal);
 
@@ -93,13 +92,7 @@ const useSearchPost = (params = {}) => {
                 setTotalPage(response.pagination.totalPage);
             }
         } catch (error) {
-            if (!error.response) {
-                console.log(error)
-                if (error.message !== 'Request was cancelled') { setVisibleConnectionError(true); }
-            } else {
-                console.log(error)
-                setVisibleConnectionError(true)
-            }
+            handleApiErrorGuest(error,setVisibleConnectionError)
         }
         setVisibleLoadingConnection(false);
     };

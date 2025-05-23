@@ -1,4 +1,3 @@
-import React from "react";
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import GuestRoutes from "./GuestRoutes";
 import AuthRoutes from "./AuthRoutes";

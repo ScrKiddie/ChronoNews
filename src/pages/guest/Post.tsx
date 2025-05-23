@@ -64,7 +64,6 @@ const Post: React.FC = () => {
         range,
         searchSort,
         setSearchSort,
-        truncateText
     } = usePost();
 
     const [dropdownKey, setDropdownKey] = useState(0);
@@ -171,7 +170,7 @@ const Post: React.FC = () => {
                             if (e.index !== 4) {
                                 setActiveIndex(e.index);
                                 if (menuRef.current) {
-                                    menuRef.current.hide(e);
+                                    (menuRef.current as any).hide(e);
                                 }
                             }
                         }}
@@ -213,7 +212,6 @@ const Post: React.FC = () => {
                                             postSize={searchPostSize}
                                             postPagination={searchPostPagination}
                                             handleCategoryChange={handleCategoryChange}
-                                            truncateText={truncateText}
                                         />
                                     </>
 
@@ -236,7 +234,6 @@ const Post: React.FC = () => {
                                                     headlinePostPagination={headlinePostPagination}
                                                     headlineSize={headlineSize}
                                                     handleCategoryChange={handleCategoryChange}
-                                                    truncateText={truncateText}
                                                 />
 
 
@@ -246,7 +243,6 @@ const Post: React.FC = () => {
                                                           setIsModalVisible={setIsModalVisible}
                                                           isModalVisible={isModalVisible}
                                                           handleCategoryChange={handleCategoryChange}
-                                                          truncateText={truncateText}
                                                 />
 
                                         )}
@@ -263,8 +259,8 @@ const Post: React.FC = () => {
                                                         onChange={(e) => {
                                                             const value = e.value;
                                                             setRange(value);
-                                                            let start = null;
-                                                            let end = dayjs().endOf('day').utc().unix();
+                                                            let start:any = null;
+                                                            let end:any = dayjs().endOf('day').utc().unix();
                                                             if (value === '1') {
                                                                 start = dayjs().startOf('day').utc().unix();
                                                             } else if (value === '7') {
@@ -294,7 +290,6 @@ const Post: React.FC = () => {
                                                     topPostSize={topPostSize}
                                                     topPostPagination={topPostPagination}
                                                     handleCategoryChange={handleCategoryChange}
-                                                    truncateText={truncateText}
                                                 />
 
                                             </>
@@ -312,7 +307,6 @@ const Post: React.FC = () => {
                                             postPagination={postPagination}
                                             classKu={"mt-4"}
                                             handleCategoryChange={handleCategoryChange}
-                                            truncateText={truncateText}
                                         />
                                     </>
                                 }
@@ -324,7 +318,7 @@ const Post: React.FC = () => {
                 </div>
 
 
-                <GuestFooter quickLinks={categories} truncateText={truncateText}/>
+                <GuestFooter quickLinks={categories}/>
             </div> :
             <NotFound/>
     );

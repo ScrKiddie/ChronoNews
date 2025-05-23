@@ -1,9 +1,9 @@
 import {useState, useEffect, useRef} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
-import {PostService} from "../services/PostService";
-import {CategoryService} from "../services/CategoryService";
+import {PostService} from "../services/postService.tsx";
+import {CategoryService} from "../services/categoryService.tsx";
 import {useUpdatePost} from "./useUpdatePost.tsx";
-import {string} from "zod";
+import {truncateText} from "../utils/truncateText.tsx";
 
 const getRelativeTime = (timestamp: number) => {
     const now = new Date();
@@ -25,10 +25,6 @@ const getRelativeTime = (timestamp: number) => {
     if (minutes > 0) return `${minutes} menit lalu`;
 
     return "Baru saja";
-};
-
-const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
 };
 
 const formatDate = (timestamp: number) => {
@@ -140,11 +136,11 @@ const usePost = () => {
             setFailedRequests(prev => prev.filter(req => req !== 'categories'));
             setLoading(false)
         } catch (error) {
-            if (error.message === "Terjadi kesalahan jaringan") {
+            if ((error as any).message === "Terjadi kesalahan jaringan") {
                 setFailedRequests(prev => [...new Set([...prev, 'categories'])]);
                 setError(true);
-            } else if (!error.response) {
-                if (error.message !== 'Request was cancelled') { setError(true); }
+            } else if (!(error as any).response) {
+                if ((error as any).message !== 'Request was cancelled') { setError(true); }
             } else {
                 setFailedRequests(prev => [...new Set([...prev, 'categories'])]);
                 setError(true);
@@ -183,11 +179,11 @@ const usePost = () => {
             setFailedRequests(prev => prev.filter(req => req !== 'headlinePost'));
             setLoading(false);
         } catch (error) {
-            if (error.message === "Terjadi kesalahan jaringan") {
+            if ((error as any).message === "Terjadi kesalahan jaringan") {
                 setFailedRequests(prev => [...new Set([...prev, 'headlinePost'])]);
                 setError(true);
-            } else if (!error.response) {
-                if (error.message !== 'Request was cancelled') { setError(true); }
+            } else if (!(error as any).response) {
+                if ((error as any).message !== 'Request was cancelled') { setError(true); }
             } else {
                 setFailedRequests(prev => [...new Set([...prev, 'headlinePost'])]);
                 setError(true);
@@ -229,11 +225,11 @@ const usePost = () => {
             setFailedRequests(prev => prev.filter(req => req !== 'searchPost'));
             setLoading(false);
         } catch (error) {
-            if (error.message === "Terjadi kesalahan jaringan") {
+            if ((error as any).message === "Terjadi kesalahan jaringan") {
                 setFailedRequests(prev => [...new Set([...prev, 'searchPost'])]);
                 setError(true);
-            } else if (!error.response) {
-                if (error.message !== 'Request was cancelled') { setError(true); }
+            } else if (!(error as any).response) {
+                if ((error as any).message !== 'Request was cancelled') { setError(true); }
             } else {
                 setFailedRequests(prev => [...new Set([...prev, 'searchPost'])]);
                 setError(true);
@@ -271,11 +267,11 @@ const usePost = () => {
             setFailedRequests(prev => prev.filter(req => req !== 'topPost'));
             setLoading(false)
         } catch (error) {
-            if (error.message === "Terjadi kesalahan jaringan") {
+            if ((error as any).message === "Terjadi kesalahan jaringan") {
                 setFailedRequests(prev => [...new Set([...prev, 'topPost'])]);
                 setError(true);
-            } else if (!error.response) {
-                if (error.message !== 'Request was cancelled') { setError(true); }
+            } else if (!(error as any).response) {
+                if ((error as any).message !== 'Request was cancelled') { setError(true); }
             } else {
                 setFailedRequests(prev => [...new Set([...prev, 'topPost'])]);
                 setError(true);
@@ -311,11 +307,11 @@ const usePost = () => {
             setFailedRequests(prev => prev.filter(req => req !== 'post'));
             setLoading(false);
         } catch (error) {
-            if (error.message === "Terjadi kesalahan jaringan") {
+            if ((error as any).message === "Terjadi kesalahan jaringan") {
                 setFailedRequests(prev => [...new Set([...prev, 'post'])]);
                 setError(true);
-            } else if (!error.response) {
-                if (error.message !== 'Request was cancelled') { setError(true); }
+            } else if (!(error as any).response) {
+                if ((error as any).message !== 'Request was cancelled') { setError(true); }
             } else {
                 setFailedRequests(prev => [...new Set([...prev, 'post'])]);
                 setError(true);
@@ -344,11 +340,11 @@ const usePost = () => {
             setFailedRequests(prev => prev.filter(req => req !== 'mainPost'));
             setLoading(false)
         } catch (error) {
-            if (error.message === "Terjadi kesalahan jaringan") {
+            if ((error as any).message === "Terjadi kesalahan jaringan") {
                 setFailedRequests(prev => [...new Set([...prev, 'mainPost'])]);
                 setError(true);
-            }else if (error.message !== 'Request was cancelled') {
-                if (error.message === "Not found" || error.message === "Bad request") {
+            }else if ((error as any).message !== 'Request was cancelled') {
+                if ((error as any).message === "Not found" || (error as any).message === "Bad request") {
                     setNotFound(true);
                 }else {
                     setFailedRequests(prev => [...new Set([...prev, 'mainPost'])]);
@@ -360,7 +356,7 @@ const usePost = () => {
     };
 
     const fetchAllCategoryData = (category, mainMode = false) => {
-        const promises = [];
+        const promises: Promise<void>[] = [];
 
         if (!mainMode && headlinePostPage ===1) {
             promises.push(fetchHeadlinePost(category));
@@ -449,7 +445,7 @@ const usePost = () => {
         }
 
         const path = window.location.pathname;
-        const lowerId = id?.toLowerCase();
+        const lowerId:any = id?.toLowerCase();
         const primaryCategories = categories.slice(0, 3);
         const remainingCategories = categories.slice(3);
 
@@ -462,7 +458,7 @@ const usePost = () => {
             return;
         }
 
-        const foundIndex = primaryCategories.findIndex(cat => cat.name.toLowerCase() === lowerId);
+        const foundIndex = primaryCategories.findIndex(cat => (cat as any).name.toLowerCase() === lowerId);
         if (foundIndex !== -1) {
             setSelectedCategory(lowerId);
             setActiveIndex(foundIndex + 1);
@@ -470,7 +466,7 @@ const usePost = () => {
             return;
         }
 
-        const isInMoreCategories = remainingCategories.some(cat => cat.name.toLowerCase() === lowerId);
+        const isInMoreCategories = remainingCategories.some(cat => (cat as any).name.toLowerCase() === lowerId);
         if (isInMoreCategories) {
             setSelectedCategory(lowerId);
             setActiveIndex(4);
@@ -520,18 +516,18 @@ const usePost = () => {
     const allCategories = [
         {label: "Beranda", command: () => handleCategoryChange("beranda")},
         ...primaryCategories.map((cat) => ({
-            label: truncateText(cat.name,13),
-            command: () => handleCategoryChange(cat.name.toLowerCase()),
+            label: truncateText((cat as any).name,13),
+            command: () => handleCategoryChange((cat as any).name.toLowerCase()),
         })),
         ...(remainingCategories.length > 0
-            ? [{label: "Lainnya", command: (e) => menuRef.current?.toggle(e.originalEvent)}]
+            ? [{label: "Lainnya", command: (e) => (menuRef.current as any)?.toggle(e.originalEvent)}]
             : []),
     ];
 
     const moreCategories = remainingCategories.map((cat) => ({
-        label: truncateText(cat.name,13),
+        label: truncateText((cat as any).name,13),
         command: () => {
-            handleCategoryChange(cat.name.toLowerCase());
+            handleCategoryChange((cat as any).name.toLowerCase());
             setActiveIndex(4);
         },
     }));
@@ -545,7 +541,7 @@ const usePost = () => {
 
     useEffect(() => {
         const handleScroll = (event: Event) => {
-            menuRef.current?.hide(event);
+            (menuRef.current as any)?.hide(event);
         };
 
         window.addEventListener("scroll", handleScroll);
@@ -634,7 +630,6 @@ const usePost = () => {
         setSearchSort,
         previousSearchSort,
         setPreviousSearchSort,
-        truncateText
     };
 };
 

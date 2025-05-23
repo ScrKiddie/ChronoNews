@@ -1,9 +1,9 @@
-import React, {createContext, useRef, RefObject} from "react";
+import {createContext, useRef, RefObject} from "react";
 import {Toast} from "primereact/toast";
 
 
-type ToastRef = RefObject<Toast> | null;
-export const ToastContext = createContext<ToastRef>(null);
+type ToastRef = RefObject<Toast | null>;
+export const ToastContext = createContext<ToastRef | null>(null);
 
 export const ToastProvider = ({children}) => {
     const toastRef = useRef<Toast>(null);
