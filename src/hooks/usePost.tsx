@@ -110,8 +110,8 @@ const usePost = () => {
     const [startDate, setStartDate] = useState(0);
     const [endDate, setEndDate] = useState(0);
 
-    const [searchSort, setSearchSort] = useState('-published_date');
-    const [previousSearchSort, setPreviousSearchSort] = useState('-published_date');
+    const [searchSort, setSearchSort] = useState('-created_at');
+    const [previousSearchSort, setPreviousSearchSort] = useState('-created_at');
 
 
 
@@ -323,7 +323,8 @@ const usePost = () => {
         setLoading(true);
         setError(false)
         try {
-            const mainPostResponse = await PostService.getPost(id)
+            await PostService.incrementViewCount(id);
+            const mainPostResponse = await PostService.getPost(id);
             setMainPost(prevPost => ({
                 ...prevPost,
                 category: mainPostResponse.category,
@@ -335,6 +336,7 @@ const usePost = () => {
                 content: processContent(mainPostResponse.content),
                 createdAt: formatDate(mainPostResponse.createdAt),
                 updatedAt: mainPostResponse.updatedAt ? formatDate(mainPostResponse.updatedAt) : "",
+                viewCount: mainPostResponse.viewCount,
             }));
             setNotFound(false);
             setFailedRequests(prev => prev.filter(req => req !== 'mainPost'));
@@ -391,8 +393,8 @@ const usePost = () => {
                 setSearchMode(false);
                 setHeadlineMode(false);
                 setSearchPostPage(1);
-                setSearchSort("-published_date");
-                setPreviousSearchSort("-published_date");
+                setSearchSort("-created_at");
+                setPreviousSearchSort("-created_at");
                 setActiveIndex(-1);
 
                 const fetchData = async () => {
@@ -428,8 +430,8 @@ const usePost = () => {
             setSearchMode(false);
             setHeadlineMode(true);
             setSearchPostPage(1);
-            setSearchSort("-published_date");
-            setPreviousSearchSort("-published_date");
+            setSearchSort("-created_at");
+            setPreviousSearchSort("-created_at");
         }
 
         setPreviousSearchSort(searchSort);

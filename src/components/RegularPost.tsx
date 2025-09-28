@@ -24,13 +24,17 @@ const RegularPost = ({
                 itemTemplate={(post) => (
                     <div key={post.id}
                          className={`flex ${post.id === post[post.length - 1]?.id ? '' : 'mb-3'} break-all justify-between h-40 shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg`}>
-                        <div className="">
+                        <div className="relative">
                             <img
                                 src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail as string}
                                 alt={post.title}
                                 className="h-full md:w-auto w-full object-cover bg-[#f59e0b] rounded-tl-lg rounded-bl-lg cursor-pointer"
                                 onClick={() => navigate(`/post?id=${post.id}`)}
                             />
+                            <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white p-1 px-2 rounded-md flex items-center text-xs">
+                                <i className="pi pi-eye mr-1"></i>
+                                <span>{post.viewCount}</span>
+                            </div>
                         </div>
                         <div className="w-full flex flex-col lg:p-4 p-3">
                             <h3

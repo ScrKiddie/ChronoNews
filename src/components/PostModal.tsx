@@ -87,14 +87,15 @@ const PostModal = ({
         editorContent.current = htmlValue;
     }, []);
 
-    const processContentForSubmit = (htmlContent: string) => {
+    const processContentForSubmit = (htmlContent: string | null | undefined) => {
         if (!htmlContent) return "";
+
+        const contentToProcess = String(htmlContent);
+
         const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlContent, 'text/html');
+        const doc = parser.parseFromString(contentToProcess, 'text/html');
         const images = doc.querySelectorAll('img');
-        images.forEach(img => {
-            img.removeAttribute('src');
-        });
+        images.forEach(img => img.removeAttribute('src'));
         return doc.body.innerHTML;
     };
 

@@ -40,12 +40,18 @@ const TopPost = ({
                 itemTemplate={(post) => (
                     <div key={post.id} className="w-full lg:w-1/3 break-all">
                         <div className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg sm:min-h-[350px] flex flex-col  ">
-                            <img
-                                src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail as string}
-                                alt={post.title}
-                                className="w-full h-auto aspect-[16/9] object-cover rounded-t-lg bg-[#f59e0b] cursor-pointer"
-                                onClick={() => navigate(`/post?id=${post.id}`)}
-                            />
+                            <div className="relative">
+                                <img
+                                    src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail as string}
+                                    alt={post.title}
+                                    className="w-full h-auto aspect-[16/9] object-cover rounded-t-lg bg-[#f59e0b] cursor-pointer"
+                                    onClick={() => navigate(`/post?id=${post.id}`)}
+                                />
+                                <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white p-1 px-2 rounded-md flex items-center text-xs">
+                                    <i className="pi pi-eye mr-1"></i>
+                                    <span>{post.viewCount}</span>
+                                </div>
+                            </div>
                             <div className="p-4 ">
                                 <h3
                                     className="text-md font-semibold w-fit cursor-pointer line-clamp-2"

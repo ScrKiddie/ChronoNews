@@ -200,7 +200,7 @@ const Post: React.FC = () => {
                                                     setSearchSort(e.value);
                                                 }}
                                                 options={[
-                                                    { label: 'Terbaru', value: '-published_date' },
+                                                    { label: 'Terbaru', value: '-created_at' },
                                                     { label: 'Terpopuler', value: '-view_count' }
                                                 ]}
                                             />

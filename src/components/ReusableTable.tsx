@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {DataTable} from "primereact/datatable";
 import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
@@ -8,7 +8,19 @@ const ReusableTable = ({
                            data,
                            children
                        }) => {
+    const [inputValue, setInputValue] = useState("");
     const [globalFilter, setGlobalFilter] = useState("");
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setGlobalFilter(inputValue);
+        }, 300);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [inputValue]);
+
     return (
         <div>
             <div className="flex justify-between mb-4 md:flex-row flex-col gap-2">
@@ -16,8 +28,8 @@ const ReusableTable = ({
                     <div className="p-inputgroup w-full size-11">
                         <InputText
                             placeholder="Search"
-                            value={globalFilter}
-                            onChange={(e) => setGlobalFilter(e.target.value)}
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
                         />
 
                     </div>

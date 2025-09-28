@@ -157,6 +157,8 @@ const Post = () => {
                             header={<p className="text-center font-medium">Publikasi</p>}/>
                     <Column className="text-center" field="updatedAt"
                             header={<p className="text-center font-medium">Revisi</p>}/>
+                    <Column className="text-center" field="viewCount"
+                            header={<p className="text-center font-medium">Viewer</p>}/>
                     <Column body={actionTemplate} className="text-center"
                             header={<p className="text-center font-medium">Aksi</p>}/>
                 </ReusableLazyTable>

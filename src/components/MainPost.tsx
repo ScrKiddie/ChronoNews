@@ -70,13 +70,15 @@ const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVis
                 <h1 className="text-[#475569] font-semibold text-3xl">{mainPost.title}</h1>
                 <small className="text-[#475569] mb-2 mt-2">{mainPost.summary}</small>
 
-                <div>
-                    <div className={`mb-[-0.5rem]`}>
-                        <img
-                            src={mainPost?.thumbnail ? apiUri+"/post_picture/"+mainPost?.thumbnail : thumbnail as string}
-                            alt={mainPost.title}
-                            className="w-full object-cover bg-[#f59e0b]"
-                        />
+                <div className="relative">
+                    <img
+                        src={mainPost?.thumbnail ? apiUri+"/post_picture/"+mainPost?.thumbnail : thumbnail as string}
+                        alt={mainPost.title}
+                        className="w-full object-cover bg-[#f59e0b]"
+                    />
+                    <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white p-1 px-2 rounded-md flex items-center text-xs">
+                        <i className="pi pi-eye mr-1"></i>
+                        <span>{mainPost.viewCount}</span>
                     </div>
                 </div>
                 <div className="flex justify-between my-4 flex-row lg:gap-0 ">
@@ -105,9 +107,14 @@ const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVis
                                     </button>
                                 )}
                             </p>
-                            {showUpdatedAt && mainPost.updatedAt && (
-                                <p className="text-[#475569] text-xs md:text-sm flex items-center ">Diperbarui: {mainPost.updatedAt}</p>
-                            )}
+                            <div className={`transition-all duration-300 ease-in-out overflow-hidden ${showUpdatedAt && mainPost.updatedAt ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>
+                                {mainPost.updatedAt && (
+                                    <p className="text-[#475569] text-xs md:text-sm flex items-center ">
+                                        Diperbarui: {mainPost.updatedAt}
+                                    </p>
+                                )}
+                            </div>
+
 
                         </div>
                     </div>

@@ -70,6 +70,14 @@ export const PostService = {
         }
     },
 
+    incrementViewCount: async (id) => {
+        try {
+            await axios.patch(`${apiUri}/api/post/${id}/view`);
+        } catch (error) {
+            handleResponseError(error);
+        }
+    },
+
     updatePost: async (id, data, token) => {
         try {
             const formData = new FormData();
