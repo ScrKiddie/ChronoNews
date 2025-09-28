@@ -172,7 +172,7 @@ const usePost = () => {
 
             setHeadlinePost(data.length > 0 ? {
                 ...data[0],
-                publishedDate: getRelativeTime(data[0].publishedDate)
+                createdAt: getRelativeTime(data[0].createdAt)
             } : null);
 
             setHeadlinePostPagination(pagination);
@@ -218,7 +218,7 @@ const usePost = () => {
 
             setSearchPost(data.map(item => ({
                 ...item,
-                publishedDate: getRelativeTime(item.publishedDate),
+                createdAt: getRelativeTime(item.createdAt),
             })));
 
             setSearchPostPagination(pagination);
@@ -261,7 +261,7 @@ const usePost = () => {
             const {data, pagination} = response;
             setTopPost(data.map(item => ({
                 ...item,
-                publishedDate: getRelativeTime(item.publishedDate)
+                createdAt: getRelativeTime(item.createdAt)
             })));
             setTopPostPagination(pagination);
             setFailedRequests(prev => prev.filter(req => req !== 'topPost'));
@@ -301,7 +301,7 @@ const usePost = () => {
             const {data, pagination} = response;
             setPost(data.map(item => ({
                 ...item,
-                publishedDate: getRelativeTime(item.publishedDate)
+                createdAt: getRelativeTime(item.createdAt)
             })));
             setPostPagination(pagination);
             setFailedRequests(prev => prev.filter(req => req !== 'post'));
@@ -333,8 +333,8 @@ const usePost = () => {
                 thumbnail: mainPostResponse.thumbnail,
                 user: mainPostResponse.user,
                 content: processContent(mainPostResponse.content),
-                publishedDate: formatDate(mainPostResponse.publishedDate),
-                lastUpdated: mainPostResponse.lastUpdated ? formatDate(mainPostResponse.lastUpdated) : "",
+                createdAt: formatDate(mainPostResponse.createdAt),
+                updatedAt: mainPostResponse.updatedAt ? formatDate(mainPostResponse.updatedAt) : "",
             }));
             setNotFound(false);
             setFailedRequests(prev => prev.filter(req => req !== 'mainPost'));

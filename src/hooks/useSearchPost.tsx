@@ -79,9 +79,9 @@ const useSearchPost = (params: { countMode?: boolean } = {}) => {
                     user: post.user?.name || "Tidak Ada User",
                     title: post.title,
                     summary: post.summary,
-                    publishedDate: new Date(post.publishedDate * 1000).toLocaleString(),
-                    lastUpdated: post.lastUpdated
-                        ? new Date(post.lastUpdated * 1000).toLocaleString()
+                    createdAt: new Date(post.createdAt * 1000).toLocaleString(),
+                    updatedAt: post.updatedAt
+                        ? new Date(post.updatedAt * 1000).toLocaleString()
                         : "Belum diperbarui",
                     thumbnail: post.thumbnail || "Tidak Ada Gambar",
                     viewCount: post.viewCount

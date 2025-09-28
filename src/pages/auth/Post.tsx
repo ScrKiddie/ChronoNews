@@ -153,9 +153,9 @@ const Post = () => {
                     />
                     <Column className="text-center" field="category"
                             header={<p className="text-center font-medium">Kategori</p>}/>
-                    <Column className="text-center " field="publishedDate"
+                    <Column className="text-center " field="createdAt"
                             header={<p className="text-center font-medium">Publikasi</p>}/>
-                    <Column className="text-center" field="lastUpdated"
+                    <Column className="text-center" field="updatedAt"
                             header={<p className="text-center font-medium">Revisi</p>}/>
                     <Column body={actionTemplate} className="text-center"
                             header={<p className="text-center font-medium">Aksi</p>}/>

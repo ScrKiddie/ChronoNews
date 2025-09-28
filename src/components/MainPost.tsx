@@ -10,7 +10,7 @@ import {truncateText} from "../utils/truncateText.tsx";
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
 const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVisible}) => {
-    const [showLastUpdated, setShowLastUpdated] = useState(false);
+    const [showUpdatedAt, setShowUpdatedAt] = useState(false);
     useEffect(() => {
         if ((window as any).DISQUS) {
             (window as any).DISQUS.reset({ reload: true,
@@ -27,8 +27,8 @@ const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVis
         }
     }, [mainPost.id]);
 
-    const toggleLastUpdated = () => {
-        setShowLastUpdated(!showLastUpdated);
+    const toggleUpdatedAt = () => {
+        setShowUpdatedAt(!showUpdatedAt);
     };
     useEffect(() => {
         if (isModalVisible) {
@@ -94,19 +94,19 @@ const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVis
                             <p className="text-[#475569] text:sm md:text-md font-medium flex items-center gap-1 cursor-pointer w-fit"
                                onClick={toggleModal}>{mainPost.user?.name} {mainPost.user?.role === "admin" && (
                                 <i style={{color: 'var(--primary-color)'}} className={`pi pi-verified`}></i>)}</p>
-                            <p className="text-[#475569] text-xs md:text-sm flex items-center">Diterbitkan: {mainPost.publishedDate}
-                                {mainPost.lastUpdated && (
+                            <p className="text-[#475569] text-xs md:text-sm flex items-center">Diterbitkan: {mainPost.createdAt}
+                                {mainPost.updatedAt && (
                                     <button
                                         className="bg-transparent border-none outline-none cursor-pointer"
-                                        onClick={toggleLastUpdated}
+                                        onClick={toggleUpdatedAt}
                                     >
                                         <i style={{color: 'var(--primary-color)'}}
-                                           className={`pi ${showLastUpdated ? 'pi-chevron-up' : 'pi-chevron-down'}`}></i>
+                                           className={`pi ${showUpdatedAt ? 'pi-chevron-up' : 'pi-chevron-down'}`}></i>
                                     </button>
                                 )}
                             </p>
-                            {showLastUpdated && mainPost.lastUpdated && (
-                                <p className="text-[#475569] text-xs md:text-sm flex items-center ">Diperbarui: {mainPost.lastUpdated}</p>
+                            {showUpdatedAt && mainPost.updatedAt && (
+                                <p className="text-[#475569] text-xs md:text-sm flex items-center ">Diperbarui: {mainPost.updatedAt}</p>
                             )}
 
                         </div>

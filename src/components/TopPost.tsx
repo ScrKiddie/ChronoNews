@@ -60,7 +60,7 @@ const TopPost = ({
                                     }}
                                 >
                             {truncateText(post.category?.name,13)}
-                          </span> - {post.publishedDate}</p>
+                          </span> - {post.createdAt}</p>
                                 <p className="mt-1 line-clamp-3 text-base">
                                     {post.summary}
                                 </p>

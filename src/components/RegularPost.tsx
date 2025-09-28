@@ -46,7 +46,7 @@ const RegularPost = ({
                                 }}
                             >
                             {truncateText(post.category?.name,13)}
-                          </span> - {post.publishedDate}</p>
+                          </span> - {post.createdAt}</p>
 
                             <p className="text-gray-600 md:line-clamp-2 line-clamp-5 text-xs sm:text-sm break-all">
                                 {post.summary}

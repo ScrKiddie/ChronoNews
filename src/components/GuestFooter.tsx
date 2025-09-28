@@ -26,9 +26,9 @@ const GuestFooter: React.FC<GuestFooterProps> = ({quickLinks}) => {
                 </div>
                 <div className="flex flex-col mx-auto items-center lg:items-start pt-2">
                     <h2 className="text-xl font-semibold mb-4 text-center text-white">Tautan Cepat</h2>
-                    <p key={"home"} className="text-white text-sm ">
-                        <Link to={`/home`} className="no-underline text-inherit">
-                            Home
+                    <p key={"beranda"} className="text-white text-sm ">
+                        <Link to={`/beranda`} className="no-underline text-inherit">
+                            Beranda
                         </Link>
                     </p>
                     {quickLinks.map((category) => (

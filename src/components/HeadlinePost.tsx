@@ -45,7 +45,7 @@ const HeadlinePost = ({
                                 }}
                             >
                             {truncateText(post.category?.name, 13)}
-                          </span> - {post.publishedDate}</p>
+                          </span> - {post.createdAt}</p>
                             <p className="mt-1 text-base line-clamp-3">
                                 {post.summary}
                             </p>

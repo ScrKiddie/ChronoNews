@@ -383,3 +383,16 @@ body .navbar-top {
 .p-tabmenu-nav{
     height: 100%;
 }
+
+.loading-container {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.75);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 6px;
+}

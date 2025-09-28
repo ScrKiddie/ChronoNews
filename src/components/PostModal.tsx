@@ -34,13 +34,46 @@ const PostModal = ({
                        setCroppedImage
                    }) => {
 
-    useQuillConfig();
+    const [isUploadingImage, setIsUploadingImage] = useState(false);
+    const { getQuillModules, uploadImage, imageHandler } = useQuillConfig({
+        onUploadStateChange: setIsUploadingImage
+    });
 
-    useEffect(() => {
-        if (data?.content) {
-            editorContent.current = data.content;
+    const handleEditorLoad = useCallback((quillInstance: any) => {
+        if (quillInstance) {
+            const toolbar = quillInstance.getModule('toolbar');
+            if (toolbar && toolbar.container) {
+                const imageButton = toolbar.container.querySelector('.ql-image');
+                if (imageButton) {
+                    imageButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        imageHandler.call({ quill: quillInstance });
+                    }, true);
+                }
+            }
+            quillInstance.root.addEventListener('drop', (e: DragEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (e.dataTransfer?.files.length) {
+                    const file = e.dataTransfer.files[0];
+                    if (file.type.startsWith('image/')) {
+                        uploadImage(quillInstance, file);
+                    }
+                }
+            });
+
+            quillInstance.root.addEventListener('paste', (e: ClipboardEvent) => {
+                if (e.clipboardData?.files.length) {
+                    const file = e.clipboardData.files[0];
+                    if (file.type.startsWith('image/')) {
+                        e.preventDefault();
+                        uploadImage(quillInstance, file);
+                    }
+                }
+            });
         }
-    }, [data?.content]);
+    }, [uploadImage, imageHandler]);
 
     useEffect(() => {
         if (data?.content) {
@@ -54,8 +87,19 @@ const PostModal = ({
         editorContent.current = htmlValue;
     }, []);
 
+    const processContentForSubmit = (htmlContent: string) => {
+        if (!htmlContent) return "";
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlContent, 'text/html');
+        const images = doc.querySelectorAll('img');
+        images.forEach(img => {
+            img.removeAttribute('src');
+        });
+        return doc.body.innerHTML;
+    };
+
     const handleFormSubmit = (e) => {
-        handleSubmit(e, editorContent.current)
+        handleSubmit(e, processContentForSubmit(editorContent.current))
     }
 
     const {
@@ -227,28 +271,30 @@ const PostModal = ({
                     </div>
 
 
-                    <div className="w-full">
+                    <div className="w-full ">
                         <label htmlFor="content" className="block mb-1 font-medium">
                             Konten
                         </label>
-                        <Editor
-                            id={`content`}
-                            modules={{
-                                resize: {
-                                    showSize: true,
-                                    locale: {
-                                        altTip: "Hold down the alt key to zoom",
-                                        floatLeft: "Left",
-                                        floatRight: "Right",
-                                        center: "Mid",
-                                        restore: "Reset",
-                                    },
-                                },
-                            }}
-                            value={editorContent?.current || data?.content || ""}
-                            onTextChange={(e) => handleTextChange(e.htmlValue || "")}
-                            headerTemplate={
-                                <span className="ql-formats">
+                        <div className={`w-fit h-fit relative`}>
+                            {isUploadingImage && (
+                                <div className="loading-container">
+                                    <i className="pi pi-spin pi-spinner text-[3rem]"
+                                       style={{color: "#64748b", animationDuration: "1s"}}></i>
+                                    <span className="mt-2 text-slate-600">Mengunggah gambar...</span>
+                                </div>
+
+
+                            )}
+                            <Editor
+                                readOnly={isUploadingImage}
+                                onLoad={handleEditorLoad}
+                                id={`content`}
+                                modules={getQuillModules()}
+                                value={editorContent?.current || data?.content || ""}
+                                onTextChange={(e) => handleTextChange(e.htmlValue || "")}
+
+                                headerTemplate={
+                                    <span className="ql-formats">
                                 <select className="ql-size" aria-label="Font Size">
                                      <option value="small" selected>Small</option>
                                      <option value="">Normal</option>
@@ -285,9 +331,10 @@ const PostModal = ({
                                     <button className="ql-script" value="super" aria-label="Superscript"></button>
                                     <button className="ql-clean" aria-label="Clear Formatting"></button>
                             </span>
-                            }
+                                }
 
-                        />
+                            />
+                        </div>
                         {errors.content && <small className="p-error">{errors.content}</small>}
                     </div>
 
