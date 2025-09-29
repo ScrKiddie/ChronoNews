@@ -1,8 +1,7 @@
-import {useCallback, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {DataTable} from "primereact/datatable";
 import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
-import {debounce} from "lodash";
 
 const ReusableLazyTable = ({
                                handleVisibleCreateModal,
@@ -18,29 +17,42 @@ const ReusableLazyTable = ({
                            }) => {
 
     const [searchValue, setSearchValue] = useState(searchParams.name || "");
-    const debouncedSearch = useCallback(
-        debounce((value) => {
-            setSearchParams((prev) => {
-                return {
-                    ...prev,
-                    email: value,
-                    name: value,
-                    phoneNumber: value,
-                    title: value,
-                    categoryName: value,
-                    userName: value,
-                    summary: value,
-                    role: value
-                };
-            });
-        }, 300),
-        [setSearchParams]
-    );
+    const timerRef = useRef<number | null>(null);
+    
+    useEffect(() => {
+        return () => {
+            if (timerRef.current) {
+                clearTimeout(timerRef.current);
+            }
+        };
+    }, []);
+
+    const debouncedSearch = useCallback((value) => {
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+        }
+        
+        timerRef.current = setTimeout(() => {
+            setSearchParams((prev) => ({
+                ...prev,
+                email: value,
+                name: value,
+                phoneNumber: value,
+                title: value,
+                categoryName: value,
+                userName: value,
+                summary: value,
+                role: value
+            }));
+        }, 300);
+    }, [setSearchParams]);
 
     const handleSearchChange = (e) => {
-        setSearchValue(e.target.value);
-        debouncedSearch(e.target.value);
+        const value = e.target.value;
+        setSearchValue(value);
+        debouncedSearch(value);
     };
+
 
     return (
         <div>

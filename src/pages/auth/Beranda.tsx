@@ -143,8 +143,8 @@ const Beranda = () => {
                                                 }
                                             },
                                             scales: {
-                                                x: { ticks: { font: { family: "Poppins" } } }, // Sekarang X adalah label post
-                                                y: { ticks: { font: { family: "Poppins" } } }, // Y adalah jumlah view
+                                                x: { ticks: { font: { family: "Poppins" } } },
+                                                y: { ticks: { font: { family: "Poppins" } } },
                                             }
                                         }}
                                         style={{ height: "30%" }}

@@ -90,7 +90,7 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
         }
 
         // @ts-expect-error: intentionally overriding type requirement
-        Quill.register(ImageFormat, true); // `true` untuk menimpa blot bawaan
+        Quill.register(ImageFormat, true);
         Quill.register("modules/resize", ResizeModule, true);
         const BlockEmbed = Quill.import("blots/block/embed");
 
