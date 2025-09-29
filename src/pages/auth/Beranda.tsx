@@ -7,11 +7,9 @@ import { useAuth } from "../../hooks/useAuth.tsx";
 import useSearchPost from "../../hooks/useSearchPost.tsx";
 import { Paginator } from 'primereact/paginator';
 import LoadingRetry from "../../components/LoadingRetry.tsx";
-import {Dropdown} from "primereact/dropdown";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import {truncateText} from "../../utils/truncateText.tsx";
-dayjs.extend(utc);
+import { Dropdown } from "primereact/dropdown";
+import { truncateText } from "../../utils/truncateText.tsx";
+import { getDateRangeInUnix } from "../../utils/dateUtils.tsx";
 const Beranda = () => {
     const navigate = useNavigate();
     const { role } = useAuth();
@@ -166,23 +164,11 @@ const Beranda = () => {
                                             options={waktuOptions}
                                             onChange={(e) => {
                                                 const value = e.value;
+                                                const { start, end } = getDateRangeInUnix(value);
                                                 setRange(value);
-                                                let start:any = null;
-                                                let end:any = dayjs().endOf('day').utc().unix();
-                                                if (value === '1') {
-                                                    start = dayjs().startOf('day').utc().unix();
-                                                } else if (value === '7') {
-                                                    start = dayjs().subtract(6, 'day').startOf('day').utc().unix();
-                                                } else if (value === '30') {
-                                                    start = dayjs().subtract(29, 'day').startOf('day').utc().unix();
-                                                } else {
-                                                    start = null;
-                                                    end = null;
-                                                }
-                                                setStartDate(start);
-                                                setEndDate(end);
+                                                setStartDate(start ?? 0);
+                                                setEndDate(end ?? 0);
                                                 setPage(1)
-                                                return
                                             }}
                                             placeholder="Pilih Waktu"
                                             className={`md:w-[200px] w-full`}

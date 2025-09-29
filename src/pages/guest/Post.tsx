@@ -17,7 +17,7 @@ import RegularPost from "../../components/RegularPost.tsx";
 import LoadingRetry from "../../components/LoadingRetry.tsx";
 import EmptyData from "../../components/EmptyData.tsx";
 import {Dropdown} from "primereact/dropdown";
-import dayjs from "dayjs";
+import { getDateRangeInUnix } from "../../utils/dateUtils.tsx";
 
 const Post: React.FC = () => {
     const {
@@ -239,11 +239,11 @@ const Post: React.FC = () => {
 
                                             </>
                                         ) : (
-                                                <MainPost mainPost={mainPost}
-                                                          setIsModalVisible={setIsModalVisible}
-                                                          isModalVisible={isModalVisible}
-                                                          handleCategoryChange={handleCategoryChange}
-                                                />
+                                            <MainPost mainPost={mainPost}
+                                                      setIsModalVisible={setIsModalVisible}
+                                                      isModalVisible={isModalVisible}
+                                                      handleCategoryChange={handleCategoryChange}
+                                            />
 
                                         )}
                                         {headlineMode &&
@@ -258,25 +258,13 @@ const Post: React.FC = () => {
                                                         options={waktuOptions}
                                                         onChange={(e) => {
                                                             const value = e.value;
+                                                            const { start, end } = getDateRangeInUnix(value);
                                                             setRange(value);
-                                                            let start:any = null;
-                                                            let end:any = dayjs().endOf('day').utc().unix();
-                                                            if (value === '1') {
-                                                                start = dayjs().startOf('day').utc().unix();
-                                                            } else if (value === '7') {
-                                                                start = dayjs().subtract(6, 'day').startOf('day').utc().unix();
-                                                            } else if (value === '30') {
-                                                                start = dayjs().subtract(29, 'day').startOf('day').utc().unix();
-                                                            } else {
-                                                                start = null;
-                                                                end = null;
-                                                            }
-                                                            setStartDate(start);
-                                                            setEndDate(end);
+                                                            setStartDate(start ?? 0);
+                                                            setEndDate(end ?? 0);
                                                             if (topPostPage != 1) {
                                                                 setTopPostPage(1)
                                                             }
-                                                            return
                                                         }}
                                                         placeholder="Pilih Waktu"
                                                         className={`md:w-[200px] w-full guest`}
