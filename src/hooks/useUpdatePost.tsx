@@ -6,7 +6,7 @@ import {CategoryService} from "../services/categoryService.tsx";
 import {PostUpdateSchema} from "../schemas/postSchema.tsx";
 import {useCropper} from "./useCropper";
 import {UserService} from "../services/userService.tsx";
-import {handleApiError, showErrorToast, showSuccessToast} from "../utils/toastHandler.tsx";
+import {showErrorToast, showSuccessToast} from "../utils/toastHandler.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 export const useUpdatePost = (toastRef:any = null, fetchData:any=null) => {
@@ -100,7 +100,7 @@ export const useUpdatePost = (toastRef:any = null, fetchData:any=null) => {
                 })));
             }
             if (role == "admin") {
-                const responseUsers = await UserService.searchUser(token);
+                const responseUsers = await UserService.searchUser(token, {}, null, toastRef, logout, () => {});
                 if (responseUsers && Array.isArray(responseUsers.data)) {
                     setUserOptions([
                         {label: "Posting Sebagai Diri Sendiri", value: 0},
@@ -128,7 +128,7 @@ export const useUpdatePost = (toastRef:any = null, fetchData:any=null) => {
 
             setVisibleModal(true);
         } catch (error) {
-            handleApiError(error,toastRef,logout)
+            console.error("An unhandled error occurred while fetching post data for update:", error);
         }
 
         setModalLoading(false);
@@ -136,11 +136,11 @@ export const useUpdatePost = (toastRef:any = null, fetchData:any=null) => {
 
     const handleCloseModal = () => setVisibleModal(false);
 
-    const handleSubmit = async (e, editorValue) => {
+    const handleSubmit = async (e, editorValue: string) => {
         e.preventDefault();
         setSubmitLoading(true);
 
-        const newErrors = {};
+        const newErrors:any = {};
 
         try {
             PostUpdateSchema.parse({
@@ -177,7 +177,7 @@ export const useUpdatePost = (toastRef:any = null, fetchData:any=null) => {
             const request = {
                 ...validatedData,
                 userID: data?.userID,
-                content: cleanedContent,
+                content: cleanedContent || "",
                 ...(data?.deleteThumbnail === true ? { deleteThumbnail: true } : {}),
                 ...(thumbnail instanceof File ? {thumbnail} : {}),
             };
@@ -188,7 +188,7 @@ export const useUpdatePost = (toastRef:any = null, fetchData:any=null) => {
                 return;
             }
 
-            await PostService.updatePost(id, request, token);
+            await PostService.updatePost(id, request, token, toastRef, logout);
             showSuccessToast(toastRef, "Postingan berhasil diperbarui")
 
             if (fetchData) {
@@ -197,7 +197,7 @@ export const useUpdatePost = (toastRef:any = null, fetchData:any=null) => {
 
             setVisibleModal(false);
         } catch (error) {
-            handleApiError(error,toastRef,logout)
+            console.error("An unhandled error occurred during post update:", error);
         }
 
         setSubmitLoading(false);

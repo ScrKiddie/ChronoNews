@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export const showSuccessToast = (toastRef: any, message: string) => {
     toastRef?.current?.show({ severity: "success", detail: message, life: 2000 });
 };
@@ -16,12 +18,23 @@ export const handleApiError = (
     toastRef: any,
     logout: () => void
 ) => {
-    if (error instanceof Error) {
-        if (error.message === "Unauthorized") {
-            handleUnauthorized(toastRef, logout);
-        } else {
-            showErrorToast(toastRef, error.message);
+    if (axios.isAxiosError(error) && error.response) {
+        const status = error.response.status;
+        const apiErrorMessage = error.response.data?.error;
+
+        if (status === 401) {
+            if (apiErrorMessage === "Incorrect old password") {
+                showErrorToast(toastRef, apiErrorMessage);
+            } else {
+                handleUnauthorized(toastRef, logout);
+            }
+            return;
         }
+
+        const message = apiErrorMessage || "Terjadi kesalahan pada server.";
+        showErrorToast(toastRef, message);
+    } else if (error instanceof Error) {
+        showErrorToast(toastRef, error.message);
     } else {
         showErrorToast(toastRef, "Terjadi kesalahan yang tidak diketahui");
     }

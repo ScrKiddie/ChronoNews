@@ -210,7 +210,7 @@ const PostModal = ({
                             Thumbnail
                         </label>
 
-                        <div style={{aspectRatio: "16/9"}} className={`relative rounded-md bg-[#f59e0b]  w-full`}>
+                        <div style={{aspectRatio: "16/9"}} className={`relative rounded-md w-full overflow-hidden`}>
                             <img src={
                                 croppedImage ||
                                 (data?.thumbnail

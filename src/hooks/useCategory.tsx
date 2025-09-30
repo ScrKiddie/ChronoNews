@@ -3,7 +3,7 @@ import {useAuth} from "./useAuth";
 import {CategoryService} from "../services/categoryService.tsx";
 import {CategorySchema} from "../schemas/categorySchema.tsx";
 import {useAbort} from "./useAbort.tsx";
-import { handleApiError, handleApiErrorWithRetry, showSuccessToast } from "../utils/toastHandler.tsx";
+import {handleApiErrorWithRetry, showSuccessToast } from "../utils/toastHandler.tsx";
 import {z} from "zod";
 
 export const useCategory = (toastRef: any) => {
@@ -46,13 +46,13 @@ export const useCategory = (toastRef: any) => {
         setData({name: ""});
 
         try {
-            const categoryData = await CategoryService.getCategory(id, token);
+            const categoryData = await CategoryService.getCategory(id, token, toastRef, logout);
             if (categoryData) {
                 setData(categoryData);
             }
             setVisibleModal(true);
         } catch (error: unknown) {
-            handleApiError(error, toastRef, logout);
+            console.error("Failed to open edit modal:", error);
         }
         setModalLoading(false);
     };
@@ -97,10 +97,10 @@ export const useCategory = (toastRef: any) => {
             const validatedData = CategorySchema.parse(data);
 
             if (isEditMode) {
-                await CategoryService.updateCategory(id, validatedData, token);
+                await CategoryService.updateCategory(id, validatedData, token, toastRef, logout);
                 showSuccessToast(toastRef,"Kategori berhasil diperbarui")
             } else {
-                await CategoryService.createCategory(validatedData, token);
+                await CategoryService.createCategory(validatedData, token, toastRef, logout);
                 showSuccessToast(toastRef,"Kategori berhasil dibuat")
             }
             fetchData();
@@ -109,7 +109,7 @@ export const useCategory = (toastRef: any) => {
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             }else {
-                handleApiError(error, toastRef, logout);
+                console.error("An unhandled error occurred during submit:", error);
             }
         }
         setSubmitLoading(false);
@@ -118,14 +118,14 @@ export const useCategory = (toastRef: any) => {
     const handleSubmitDelete = async () => {
         setSubmitLoading(true);
         try {
-            await CategoryService.deleteCategory(id, token);
+            await CategoryService.deleteCategory(id, token, toastRef, logout);
             showSuccessToast(toastRef,"Kategori berhasil dihapus")
             if (fetchData) {
                 fetchData()
             }
             setVisibleDeleteModal(false)
         } catch (error: unknown) {
-            handleApiError(error, toastRef, logout);
+            console.error("An unhandled error occurred during delete:", error);
         } finally {
             setSubmitLoading(false);
         }

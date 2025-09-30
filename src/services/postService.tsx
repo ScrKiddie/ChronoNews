@@ -1,10 +1,10 @@
 import axios from "axios";
-import {handleResponseError} from "../utils/responseHandler.tsx";
+import {handleApiError} from "../utils/toastHandler.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
 export const PostService = {
-    createPost: async (data, token) => {
+    createPost: async (data, token, toast, logout) => {
         try {
             const formData = new FormData();
             formData.append("title", data.title);
@@ -27,7 +27,8 @@ export const PostService = {
 
             return response.data.data;
         } catch (error) {
-            handleResponseError(error);
+            handleApiError(error, toast, logout);
+            throw error;
         }
     },
 
@@ -53,11 +54,14 @@ export const PostService = {
             });
 
             return response.data;
-        } catch (error) {
+        } catch (error: any) {
             if ((error as any).name === 'CanceledError') {
                 throw new Error('Request was cancelled');
             }
-            handleResponseError(error);
+            if (axios.isAxiosError(error) && error.response) {
+                throw new Error(error.response.data?.error || "Gagal memuat data post");
+            }
+            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },
 
@@ -65,8 +69,11 @@ export const PostService = {
         try {
             const response = await axios.get(`${apiUri}/api/post/${id}`);
             return response.data.data;
-        } catch (error) {
-            handleResponseError(error);
+        } catch (error: any) {
+            if (axios.isAxiosError(error) && error.response) {
+                throw new Error(error.response.data?.error || "Gagal memuat detail post");
+            }
+            throw new Error(error.response?.status === 500 ? "Kesalahan server, coba lagi nanti" : error.response?.data?.error || "Terjadi kesalahan jaringan");
         }
     },
 
@@ -74,11 +81,11 @@ export const PostService = {
         try {
             await axios.patch(`${apiUri}/api/post/${id}/view`);
         } catch (error) {
-            handleResponseError(error);
+            console.error("Failed to increment view count:", error);
         }
     },
 
-    updatePost: async (id, data, token) => {
+    updatePost: async (id, data, token, toast, logout) => {
         try {
             const formData = new FormData();
             formData.append("title", data.title);
@@ -104,11 +111,12 @@ export const PostService = {
 
             return response.data.data;
         } catch (error) {
-            handleResponseError(error);
+            handleApiError(error, toast, logout);
+            throw error;
         }
     },
 
-    deletePost: async (id, token) => {
+    deletePost: async (id, token, toast, logout) => {
         try {
             const response = await axios.delete(`${apiUri}/api/post/${id}`, {
                 headers: {
@@ -118,7 +126,8 @@ export const PostService = {
 
             return response.data.message || "RegularPost berhasil dihapus";
         } catch (error) {
-            handleResponseError(error);
+            handleApiError(error, toast, logout);
+            throw error;
         }
     }
 };

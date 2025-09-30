@@ -3,7 +3,7 @@ import {z} from "zod";
 import {PasswordSchema} from "../schemas/passwordSchema.tsx";
 import {PasswordService} from "../services/passwordService.tsx";
 import {useAuth} from "./useAuth.tsx";
-import { handleApiError, showSuccessToast } from "../utils/toastHandler.tsx";
+import { showSuccessToast } from "../utils/toastHandler.tsx";
 
 export const usePassword = (toastRef) => {
     const {token, logout} = useAuth();
@@ -33,7 +33,7 @@ export const usePassword = (toastRef) => {
         try {
             const validatedData = PasswordSchema.parse(data);
 
-            await PasswordService.updatePassword(validatedData, token);
+            await PasswordService.updatePassword(validatedData, token, toastRef, logout);
             showSuccessToast(toastRef,"Password berhasil diperbarui" )
 
             setVisibleModal(false);
@@ -41,7 +41,7 @@ export const usePassword = (toastRef) => {
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
-                handleApiError(error,toastRef,logout)
+                console.error("An unhandled error occurred during password update:", error);
             }
         }
 

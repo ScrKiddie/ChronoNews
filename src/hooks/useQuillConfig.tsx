@@ -5,7 +5,7 @@ import ResizeModule from "@botom/quill-resize-module";
 import {ImageService} from "../services/imageService.tsx";
 import {useAuth} from "./useAuth.tsx";
 import {useToast} from "./useToast.tsx";
-import {handleApiError, showErrorToast} from "../utils/toastHandler.tsx";
+import {showErrorToast} from "../utils/toastHandler.tsx";
 
 const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChange?: (isLoading: boolean) => void } = {}) => {
     const { token, logout } = useAuth();
@@ -244,16 +244,16 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
         onUploadStateChange(true);
 
         try {
-            const response = await ImageService.uploadImage(file, token as string);
+            const response = await ImageService.uploadImage(file, token as string, toast, logout);
             if (!response) {
-                throw new Error("Upload response was empty.");
+                return;
             }
             const imageUrl = `${apiUri}/post_picture/${response.name}`;
 
             quillInstance.insertEmbed(range.index, 'image', { src: imageUrl, id: String(response.id) }, Quill.sources.USER);
             quillInstance.setSelection(range.index + 1, Quill.sources.SILENT);
         } catch (error) {
-            handleApiError(error, toast, logout);
+            console.error("An unexpected error occurred during image upload:", error);
         } finally {
             onUploadStateChange(false);
         }

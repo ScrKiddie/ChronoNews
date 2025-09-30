@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {UserService} from "../services/userService.tsx";
 import {useAuth} from "./useAuth.tsx";
-import {handleApiError, showSuccessToast} from "../utils/toastHandler.tsx";
+import {showSuccessToast} from "../utils/toastHandler.tsx";
 
 export const useDeleteUser = (toastRef, fetchData, page, setPage, totalItem, size) => {
     const {token, logout} = useAuth();
@@ -17,7 +17,7 @@ export const useDeleteUser = (toastRef, fetchData, page, setPage, totalItem, siz
     const handleSubmit = async () => {
         setSubmitLoading(true);
         try {
-            await UserService.deleteUser(id, token);
+            await UserService.deleteUser(id, token, toastRef, logout);
             showSuccessToast(toastRef, "User berhasil dihapus")
 
             const remainingItems = totalItem - 1;
@@ -30,7 +30,7 @@ export const useDeleteUser = (toastRef, fetchData, page, setPage, totalItem, siz
             fetchData();
             setVisibleModal(false);
         } catch (error) {
-            handleApiError(error, toastRef, logout);
+            console.error("An unhandled error occurred during user deletion:", error);
         } finally {
             setSubmitLoading(false);
         }

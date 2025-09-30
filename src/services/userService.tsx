@@ -1,10 +1,10 @@
 import axios from "axios";
-import {handleResponseError} from "../utils/responseHandler.tsx";
+import {handleApiError, handleApiErrorWithRetry} from "../utils/toastHandler.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
 export const UserService = {
-    createUser: async (data, token) => {
+    createUser: async (data, token, toast, logout) => {
         try {
             const formData = new FormData();
             formData.append("name", data.name);
@@ -24,10 +24,11 @@ export const UserService = {
 
             return response.data.data;
         } catch (error) {
-           handleResponseError(error);
+            handleApiError(error, toast, logout);
+            throw error;
         }
     },
-    searchUser: async (token, filters:any = {},signal: any= null) => {
+    searchUser: async (token, filters: any = {}, signal: any = null, toast, logout, setVisibleConnectionError) => {
         try {
             const { name = "", phoneNumber = "", email = "", page = "", size = "",role="" } = filters;
             const queryParams = new URLSearchParams({ name, phoneNumber, email, page, size,role }).toString();
@@ -45,10 +46,11 @@ export const UserService = {
             if ((error as any).name === 'CanceledError') {
                 throw new Error('Request was cancelled');
             }
-            handleResponseError(error);
+            handleApiErrorWithRetry(error, toast, logout, setVisibleConnectionError);
+            throw error;
         }
     },
-    getUser: async (id, token) => {
+    getUser: async (id, token, toast, logout) => {
         try {
             const response = await axios.get(`${apiUri}/api/user/${id}`, {
                 headers: {
@@ -58,10 +60,11 @@ export const UserService = {
 
             return response.data.data;
         } catch (error) {
-            handleResponseError(error);
+            handleApiError(error, toast, logout);
+            throw error;
         }
     },
-    updateUser: async (id, data, token) => {
+    updateUser: async (id, data, token, toast, logout) => {
         try {
             const formData = new FormData();
             formData.append("name", data.name);
@@ -86,10 +89,11 @@ export const UserService = {
 
             return response.data.data;
         } catch (error) {
-            handleResponseError(error);
+            handleApiError(error, toast, logout);
+            throw error;
         }
     },
-    deleteUser: async (id, token) => {
+    deleteUser: async (id, token, toast, logout) => {
         try {
             const response = await axios.delete(`${apiUri}/api/user/${id}`, {
                 headers: {
@@ -99,7 +103,8 @@ export const UserService = {
 
             return response.data.message || "User berhasil dihapus";
         } catch (error) {
-            handleResponseError(error);
+            handleApiError(error, toast, logout);
+            throw error;
         }
     }
 };

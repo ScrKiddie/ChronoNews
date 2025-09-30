@@ -1,5 +1,4 @@
 import axios from "axios";
-import {handleResponseError} from "../utils/responseHandler.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
@@ -9,7 +8,10 @@ export const ResetService = {
             const response = await axios.post(apiUri+"/api/reset/request", data);
             return response.data;
         } catch (error) {
-            handleResponseError(error);
+            if (axios.isAxiosError(error) && error.response) {
+                throw new Error(error.response.data?.error || "Gagal mengirim permintaan reset");
+            }
+            throw error;
         }
     },
     reset: async (data) => {
@@ -17,7 +19,10 @@ export const ResetService = {
             const response = await axios.patch(apiUri+"/api/reset", data);
             return response.data;
         } catch (error) {
-            handleResponseError(error);
+            if (axios.isAxiosError(error) && error.response) {
+                throw new Error(error.response.data?.error || "Gagal mereset password");
+            }
+            throw error;
         }
     }
 };

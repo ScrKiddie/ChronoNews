@@ -1,10 +1,10 @@
 import axios from "axios";
-import {handleResponseError} from "../utils/responseHandler.tsx";
+import {handleApiError} from "../utils/toastHandler.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
 export const ProfileService = {
-    getCurrentUser: async (token) => {
+    getCurrentUser: async (token, toast, logout) => {
         try {
             const response = await axios.get(apiUri+"/api/user/current", {
                 headers: {
@@ -13,10 +13,11 @@ export const ProfileService = {
             });
             return response.data.data;
         } catch (error) {
-            handleResponseError(error);
+            handleApiError(error, toast, logout);
+            throw error;
         }
     },
-    updateCurrentUser: async (data, token) => {
+    updateCurrentUser: async (data, token, toast, logout) => {
         try {
             const formData = new FormData();
             formData.append("name", data.name);
@@ -38,7 +39,8 @@ export const ProfileService = {
 
             return response.data.data;
         } catch (error) {
-            handleResponseError(error);
+            handleApiError(error, toast, logout);
+            throw error;
         }
     }
 };

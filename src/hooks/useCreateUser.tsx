@@ -4,7 +4,7 @@ import {useAuth} from "./useAuth.tsx";
 import {UserService} from "../services/userService.tsx";
 import {UserCreateSchema} from "../schemas/userSchema.tsx";
 import {useCropper} from "./useCropper";
-import { handleApiError, showSuccessToast } from "../utils/toastHandler.tsx";
+import { showSuccessToast } from "../utils/toastHandler.tsx";
 
 export const useCreateUser = (toastRef, fetchData) => {
     const {token,logout} = useAuth();
@@ -59,7 +59,7 @@ export const useCreateUser = (toastRef, fetchData) => {
                 ...(profilePicture instanceof File ? {profilePicture: profilePicture} : {}),
             };
 
-            await UserService.createUser(request, token);
+            await UserService.createUser(request, token, toastRef, logout);
             showSuccessToast(toastRef, "Pengguna berhasil dibuat")
 
             if (fetchData) {
@@ -71,7 +71,7 @@ export const useCreateUser = (toastRef, fetchData) => {
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
-                handleApiError(error, toastRef, logout);
+                console.error("An unhandled error occurred during user creation:", error);
             }
         }
         setSubmitLoading(false);

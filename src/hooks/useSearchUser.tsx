@@ -1,12 +1,10 @@
 import {useState, useEffect, useRef} from "react";
 import {UserService} from "../services/userService.tsx";
-import {useToast} from "./useToast.tsx";
 import {useAuth} from "./useAuth.tsx";
 import { useAbort } from "./useAbort";
-import {handleApiErrorWithRetry} from "../utils/toastHandler.tsx";
+import {useToast} from "./useToast.tsx";
 
 const useSearchUser = () => {
-    const toastRef = useToast();
     const {token,logout} = useAuth();
     const [data, setData] = useState([]);
     const [searchParams, setSearchParams] = useState({name: "", phoneNumber: "", email: "", role: ""});
@@ -16,6 +14,7 @@ const useSearchUser = () => {
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
     const [visibleLoadingConnection, setVisibleLoadingConnection] = useState(false);
     const prevSearchParams = useRef(searchParams);
+    const toastRef = useToast();
     const { abortController, setAbortController } = useAbort();
 
     useEffect(() => {
@@ -51,14 +50,14 @@ const useSearchUser = () => {
                 size: size.toString(),
             };
 
-            const response = await UserService.searchUser(token, filters, newAbortController.signal);
+            const response = await UserService.searchUser(token, filters, newAbortController.signal, toastRef, logout, setVisibleConnectionError);
 
             if (response && response.data) {
                 setData(response.data);
                 setTotalItem(response.pagination.totalItem);
             }
         } catch (error) {
-            handleApiErrorWithRetry(error,toastRef,logout,setVisibleConnectionError)
+            console.error("An unexpected error occurred during user search:", error);
         }
         setVisibleLoadingConnection(false);
     };

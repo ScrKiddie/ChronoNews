@@ -4,7 +4,7 @@ import {useAuth} from "./useAuth.tsx";
 import {UserService} from "../services/userService.tsx";
 import {UserUpdateSchema} from "../schemas/userSchema.tsx";
 import {useCropper} from "./useCropper";
-import { handleApiError, showSuccessToast } from "../utils/toastHandler.tsx";
+import { showSuccessToast } from "../utils/toastHandler.tsx";
 import {ProfileSchema} from "../schemas/profileSchema.tsx";
 import {ProfileService} from "../services/profileService.tsx";
 
@@ -49,16 +49,16 @@ export const useUpdateUser = (toastRef, fetchData, mode = "default") => {
         setProfilePicture(null)
         try {
             if (mode === "default") {
-                const response = await UserService.getUser(userId, token);
+                const response = await UserService.getUser(userId, token, toastRef, logout);
                 setId(userId);
                 setData(response);
             } else if (mode === "current") {
-                const response = await ProfileService.getCurrentUser(token);
+                const response = await ProfileService.getCurrentUser(token, toastRef, logout);
                 setData(response);
             }
             setVisibleModal(true);
         } catch (error) {
-            handleApiError(error,toastRef,logout)
+            console.error("An unhandled error occurred while fetching user data:", error);
         }
         setModalLoading(false);
     };
@@ -80,10 +80,10 @@ export const useUpdateUser = (toastRef, fetchData, mode = "default") => {
             };
 
             if (mode === "default") {
-                await UserService.updateUser(id, request, token);
+                await UserService.updateUser(id, request, token, toastRef, logout);
                 showSuccessToast(toastRef, "Pengguna berhasil diperbarui");
             } else if (mode === "current") {
-                await ProfileService.updateCurrentUser(request, token);
+                await ProfileService.updateCurrentUser(request, token, toastRef, logout);
                 showSuccessToast(toastRef, "Profil berhasil diperbarui");
             }
             if (mode === "default") {
@@ -96,7 +96,7 @@ export const useUpdateUser = (toastRef, fetchData, mode = "default") => {
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
-                handleApiError(error,toastRef,logout)
+                console.error("An unhandled error occurred during user update:", error);
             }
         }
 

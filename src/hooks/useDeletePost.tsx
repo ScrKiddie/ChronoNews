@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {PostService} from "../services/postService.tsx";
 import {useAuth} from "./useAuth.tsx";
-import {handleApiError} from "../utils/toastHandler.tsx";
+import {showSuccessToast} from "../utils/toastHandler.tsx";
 
 export const useDeletePost = (toastRef, fetchData, page, setPage, totalItem, size) => {
     const {token,logout} = useAuth();
@@ -17,8 +17,8 @@ export const useDeletePost = (toastRef, fetchData, page, setPage, totalItem, siz
     const handleSubmit = async () => {
         setSubmitLoading(true);
         try {
-            await PostService.deletePost(id, token);
-            toastRef?.current?.show({severity: "success", detail: "Post berhasil dihapus"});
+            await PostService.deletePost(id, token, toastRef, logout);
+            showSuccessToast(toastRef, "Post berhasil dihapus");
 
             const remainingItems = totalItem - 1;
             const remainingPages = Math.ceil(remainingItems / size);
@@ -30,7 +30,7 @@ export const useDeletePost = (toastRef, fetchData, page, setPage, totalItem, siz
             fetchData();
             setVisibleModal(false);
         } catch (error) {
-            handleApiError(error,toastRef,logout)
+            console.error("An unexpected error occurred during post deletion:", error);
         } finally {
             setSubmitLoading(false);
         }

@@ -6,7 +6,7 @@ import {CategoryService} from "../services/categoryService.tsx";
 import {PostCreateSchema} from "../schemas/postSchema.tsx";
 import {useCropper} from "./useCropper";
 import {UserService} from "../services/userService.tsx";
-import {handleApiError, showErrorToast, showSuccessToast} from "../utils/toastHandler.tsx";
+import {showErrorToast, showSuccessToast} from "../utils/toastHandler.tsx";
 
 export const useCreatePost = (toastRef, fetchData) => {
     const {token, role, logout} = useAuth();
@@ -19,7 +19,7 @@ export const useCreatePost = (toastRef, fetchData) => {
     const [data, setData] = useState({
         title: "",
         summary: "",
-        content: "",
+        content: editorContent.current,
         userID: 0,
         categoryID: 0,
     });
@@ -63,7 +63,7 @@ export const useCreatePost = (toastRef, fetchData) => {
                 })));
             }
             if (role == "admin") {
-                const responseUsers = await UserService.searchUser(token);
+                const responseUsers = await UserService.searchUser(token, {}, null, toastRef, logout, () => {});
                 if (responseUsers && Array.isArray(responseUsers.data)) {
                     setUserOptions([
                         {label: "Posting Sebagai Diri Sendiri", value: 0},
@@ -76,7 +76,7 @@ export const useCreatePost = (toastRef, fetchData) => {
             }
             setVisibleModal(true);
         } catch (error) {
-            handleApiError(error,toastRef, logout)
+            console.error("Failed to fetch data for create post modal:", error);
         }
         setModalLoading(false);
     };
@@ -87,7 +87,7 @@ export const useCreatePost = (toastRef, fetchData) => {
         e.preventDefault();
         setSubmitLoading(true);
 
-        const newErrors = {};
+        const newErrors: any = {};
 
         try {
             PostCreateSchema.parse(data);
@@ -113,7 +113,7 @@ export const useCreatePost = (toastRef, fetchData) => {
             const validatedData = PostCreateSchema.parse(data);
             const request = {
                 ...validatedData,
-                content: editorValue,
+                content: editorValue || "",
                 ...(thumbnail instanceof File ? {thumbnail: thumbnail} : {}),
             };
             if (typeof editorValue === 'string' && new Blob([editorValue]).size > 314572800) {
@@ -121,7 +121,7 @@ export const useCreatePost = (toastRef, fetchData) => {
                 setSubmitLoading(false);
                 return;
             }
-            await PostService.createPost(request, token);
+            await PostService.createPost(request, token, toastRef, logout);
             showSuccessToast(toastRef,"Postingan berhasil dibuat")
             if (fetchData) {
                 fetchData();
@@ -129,7 +129,7 @@ export const useCreatePost = (toastRef, fetchData) => {
             setVisibleModal(false);
 
         } catch (error) {
-            handleApiError(error,toastRef, logout)
+            console.error("An unhandled error occurred during post creation:", error);
         }
         setSubmitLoading(false);
     };
