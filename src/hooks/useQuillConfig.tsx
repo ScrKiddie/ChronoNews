@@ -187,7 +187,7 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
         const quillInstance = this.quill;
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
-        input.setAttribute('accept', 'image/*');
+        input.setAttribute('accept', ".png, .jpg, .jpeg, .jpe, .jfif, .jif, .jfi");
         input.click();
 
         input.onchange = async () => {

@@ -84,8 +84,13 @@ const PostModal = ({
     const {sub} = useAuth()
 
     const handleTextChange = useCallback((htmlValue) => {
+        if (htmlValue.length > 65535) {
+            if(errors) errors.content = "Konten terlalu panjang";
+        } else {
+            if(errors) errors.content = false;
+        }
         editorContent.current = htmlValue;
-    }, []);
+    }, [errors]);
 
     const processContentForSubmit = (htmlContent: string | null | undefined) => {
         if (!htmlContent) return "";
@@ -236,7 +241,7 @@ const PostModal = ({
                             ref={fileInputRef}
                             id="file-upload"
                             type="file"
-                            accept="image/png, image/jpeg, image/jpg"
+                            accept=".png, .jpg, .jpeg, .jpe, .jfif, .jif, .jfi"
                             onChange={handleImageChange}
                             className="hidden"
                         />
@@ -276,7 +281,7 @@ const PostModal = ({
                         <label htmlFor="content" className="block mb-1 font-medium">
                             Konten
                         </label>
-                        <div className={`w-fit h-fit relative`}>
+                        <div className={`w-full h-fit relative`}>
                             {isUploadingImage && (
                                 <div className="loading-container">
                                     <i className="pi pi-spin pi-spinner text-[3rem]"

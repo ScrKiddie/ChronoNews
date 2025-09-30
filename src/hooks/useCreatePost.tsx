@@ -86,7 +86,29 @@ export const useCreatePost = (toastRef, fetchData) => {
     const handleSubmit = async (e, editorValue) => {
         e.preventDefault();
         setSubmitLoading(true);
+
+        const newErrors = {};
+
+        try {
+            PostCreateSchema.parse(data);
+        } catch (error) {
+            if (error instanceof z.ZodError) {
+                Object.assign(newErrors, error.errors.reduce((acc, err) => ({ ...acc, [err.path[0]]: err.message }), {}));
+            }
+        }
+
+        if (editorValue && editorValue.length > 65535) {
+            newErrors.content = "Konten terlalu panjang";
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            setSubmitLoading(false);
+            return;
+        }
+
         setErrors({});
+
         try {
             const validatedData = PostCreateSchema.parse(data);
             const request = {
@@ -107,14 +129,7 @@ export const useCreatePost = (toastRef, fetchData) => {
             setVisibleModal(false);
 
         } catch (error) {
-            if (typeof editorValue === 'string' && new Blob([editorValue]).size > 314572800 ) {
-                showErrorToast(toastRef, "Konten melebihi batas dari server");
-            }
-            if (error instanceof z.ZodError) {
-                setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
-            } else {
-                handleApiError(error,toastRef, logout)
-            }
+            handleApiError(error,toastRef, logout)
         }
         setSubmitLoading(false);
     };
