@@ -273,7 +273,7 @@ const PostModal = ({
                                 errors.summary = false;
                             }}
                         />
-                        {errors.summary && <small className="p-error mt-[-5px]">{errors.summary}</small>}
+                        {errors.summary && <small className="p-error">{errors.summary}</small>}
                     </div>
 
 
