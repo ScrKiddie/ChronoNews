@@ -52,16 +52,24 @@ const PostModal = ({
                     }, true);
                 }
             }
-            quillInstance.root.addEventListener('drop', (e: DragEvent) => {
+
+            quillInstance.root.addEventListener('dragover', (e: DragEvent) => {
                 e.preventDefault();
                 e.stopPropagation();
-                if (e.dataTransfer?.files.length) {
-                    const file = e.dataTransfer.files[0];
+            });
+
+            quillInstance.root.addEventListener('drop', async (e: DragEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const files = e.dataTransfer?.files;
+                if (files && files.length > 0) {
+                    const file = files[0];
                     if (file.type.startsWith('image/')) {
-                        uploadImage(quillInstance, file);
+                        await uploadImage(quillInstance, file);
                     }
                 }
-            });
+            }, true);
 
             quillInstance.root.addEventListener('paste', (e: ClipboardEvent) => {
                 if (e.clipboardData?.files.length) {
@@ -74,6 +82,7 @@ const PostModal = ({
             });
         }
     }, [uploadImage, imageHandler]);
+
 
     useEffect(() => {
         if (data?.content) {
@@ -155,7 +164,7 @@ const PostModal = ({
 
     return (
         <Dialog
-            closable={!submitLoading}
+            closable={!submitLoading && !isUploadingImage}
             header={
                 <h1 className="font-medium m-0 text-xl">
                     {isEditMode
@@ -345,11 +354,11 @@ const PostModal = ({
                     </div>
 
                     <Button
-                        disabled={submitLoading}
+                        disabled={submitLoading || isUploadingImage}
                         className="w-full flex items-center justify-center font-normal"
                         type="submit"
                     >
-                        {submitLoading ? (
+                        {submitLoading || isUploadingImage ? (
                             <i className="pi pi-spin pi-spinner text-[24px]" style={{color: "#475569"}}></i>
                         ) : (
                             "Submit"

@@ -263,7 +263,13 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
         clipboard: {
             matchers: [
                 ['img', (node: any, delta: any) => {
-                    if (node.src.startsWith('data:image/')) {
+                    if (node.src && node.src.startsWith('data:image/')) {
+                        return { ops: [] };
+                    }
+                    return delta;
+                }],
+                [Node.ELEMENT_NODE, (node: any, delta: any) => {
+                    if (node.tagName === 'IMG' && node.src && node.src.startsWith('data:')) {
                         return { ops: [] };
                     }
                     return delta;
@@ -281,6 +287,7 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
             },
         },
     });
+
 
 
     return { getQuillModules, uploadImage, imageHandler };
