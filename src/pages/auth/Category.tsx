@@ -1,99 +1,85 @@
 import {Button} from "primereact/button";
-import LoadingRetry from "../../components/LoadingRetry.tsx";
-import {useToast} from "../../hooks/useToast.tsx";
 import {Column} from "primereact/column";
-import LoadingModal from "../../components/LoadingModal.tsx";
-import DeleteModal from "../../components/DeleteModal.tsx";
-import CategoryModal from "../../components/CategoryModal.tsx";
+import {useToast} from "../../hooks/useToast.tsx";
 import {useCategory} from "../../hooks/useCategory.tsx";
 import ReusableTable from "../../components/ReusableTable.tsx";
+import LoadingRetry from "../../components/LoadingRetry.tsx";
+import CategoryModal from "../../components/CategoryModal.tsx";
+import LoadingModal from "../../components/LoadingModal.tsx";
+import DeleteModal from "../../components/DeleteModal.tsx";
 
 const Category = () => {
     const toastRef = useToast();
 
     const {
-        visibleModal,
-        modalLoading,
-        submitLoading,
-        data,
-        setData,
+        modalState,
+        formData,
+        setFormData,
         errors,
-        isEditMode,
-        handleOpenCreateModal,
-        handleOpenEditModal,
-        handleCloseModal,
+        listData,
+        connectionState,
+        openModal,
+        closeModal,
         handleSubmit,
         fetchData,
-        visibleLoadingConnection,
-        visibleConnectionError,
-        listData,
-        handleVisibleDeleteModal,
-        setVisibleDeleteModal,
-        visibleDeleteModal,
-        handleSubmitDelete
-    } = useCategory(toastRef);
+    } = useCategory({toastRef});
 
-
-    const actionTemplate = (rowData) => {
-        return (
-            <div className="flex items-center justify-center gap-2">
-                <Button
-                    icon={<i className="pi pi-pen-to-square" style={{fontSize: '1.4rem'}}></i>}
-                    className="size-11"
-                    onClick={() => handleOpenEditModal(rowData.id)}
-                />
-                <Button
-                    icon={<i className="pi pi-trash" style={{fontSize: '1.25rem'}}></i>}
-                    severity="secondary"
-                    className="size-11"
-                    onClick={() => {
-                        handleVisibleDeleteModal(rowData.id)
-                    }}
-                />
-            </div>
-        );
-    };
+    const actionTemplate = (rowData: { id: number }) => (
+        <div className="flex items-center justify-center gap-2">
+            <Button
+                icon={<i className="pi pi-pen-to-square" style={{fontSize: '1.4rem'}}></i>}
+                className="size-11"
+                onClick={() => openModal("edit", rowData.id)}
+            />
+            <Button
+                icon={<i className="pi pi-trash" style={{fontSize: '1.25rem'}}></i>}
+                severity="secondary"
+                className="size-11"
+                onClick={() => openModal("delete", rowData.id)}
+            />
+        </div>
+    );
 
     return (
         <div className="m-4 min-h-full max-h-fit bg-white rounded-xl shadow-md p-4 flex flex-col">
-            <div className={`${(visibleLoadingConnection || visibleConnectionError) ? "hidden" : "block"}`}>
+            <div className={`${(connectionState.isLoading || connectionState.isError) ? "hidden" : "block"}`}>
                 <ReusableTable
                     data={listData}
-                    handleVisibleCreateModal={handleOpenCreateModal}
+                    handleVisibleCreateModal={() => openModal("create")}
                 >
-                    <Column className="text-center" field="name"
-                            header={<p className="text-center font-medium">Kategori</p>}/>
-                    <Column body={actionTemplate} className="text-center"
-                            header={<p className="text-center font-medium">Aksi</p>}/>
+                    <Column className="text-center" field="name" header={<p className="text-center font-medium">Kategori</p>}/>
+                    <Column body={actionTemplate} className="text-center" header={<p className="text-center font-medium">Aksi</p>}/>
                 </ReusableTable>
             </div>
 
+            {/* Connection Error/Loading */}
             <LoadingRetry
-                visibleConnectionError={visibleConnectionError}
+                visibleConnectionError={connectionState.isError}
                 onRetry={fetchData}
-                visibleLoadingConnection={visibleLoadingConnection}
+                visibleLoadingConnection={connectionState.isLoading}
             />
 
+            {/* Create/Update Category Modal */}
             <CategoryModal
-                isEditMode={isEditMode}
-                visible={visibleModal}
-                onClose={handleCloseModal}
-                data={data}
+                isEditMode={modalState.mode === "edit"}
+                visible={modalState.isVisible && (modalState.mode === "create" || modalState.mode === "edit")}
+                onClose={closeModal}
+                data={formData}
                 errors={errors}
-                submitLoading={submitLoading}
+                submitLoading={modalState.isSubmitting}
                 handleSubmit={handleSubmit}
-                setData={setData}
+                setData={setFormData}
             />
 
-            <LoadingModal
-                modalLoading={modalLoading}
-            />
+            {/* Loading Modal for fetching data */}
+            <LoadingModal modalLoading={modalState.isLoading}/>
 
+            {/* Delete Category Modal */}
             <DeleteModal
-                submitLoading={submitLoading}
-                visibleModal={visibleDeleteModal}
-                setVisibleModal={setVisibleDeleteModal}
-                onSubmit={handleSubmitDelete}
+                submitLoading={modalState.isSubmitting}
+                visibleModal={modalState.isVisible && modalState.mode === "delete"}
+                setVisibleModal={(isVisible) => !isVisible && closeModal()}
+                onSubmit={handleSubmit}
             />
         </div>
     );
