@@ -1,7 +1,5 @@
-import axios from "axios";
 import {handleApiError, handleApiErrorWithRetry} from "../utils/toastHandler.tsx";
-
-const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
+import apiClient from "./apiClient.tsx";
 
 export const UserService = {
     createUser: async (data, token, toast, logout) => {
@@ -15,7 +13,7 @@ export const UserService = {
                 formData.append("profilePicture", data.profilePicture);
             }
 
-            const response = await axios.post(`${apiUri}/api/user`, formData, {
+            const response = await apiClient.post(`/user`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data"
@@ -32,9 +30,8 @@ export const UserService = {
         try {
             const { name = "", phoneNumber = "", email = "", page = "", size = "",role="" } = filters;
             const queryParams = new URLSearchParams({ name, phoneNumber, email, page, size,role }).toString();
-            const url = `${apiUri}/api/user?${queryParams}`;
 
-            const response = await axios.get(url, {
+            const response = await apiClient.get(`/user?${queryParams}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 },
@@ -52,7 +49,7 @@ export const UserService = {
     },
     getUser: async (id, token, toast, logout) => {
         try {
-            const response = await axios.get(`${apiUri}/api/user/${id}`, {
+            const response = await apiClient.get(`/user/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -80,7 +77,7 @@ export const UserService = {
             if (data.deleteProfilePicture) {
                 formData.append("deleteProfilePicture", data.deleteProfilePicture);
             }
-            const response = await axios.put(`${apiUri}/api/user/${id}`, formData, {
+            const response = await apiClient.put(`/user/${id}`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data"
@@ -95,7 +92,7 @@ export const UserService = {
     },
     deleteUser: async (id, token, toast, logout) => {
         try {
-            const response = await axios.delete(`${apiUri}/api/user/${id}`, {
+            const response = await apiClient.delete(`/user/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

@@ -1,10 +1,9 @@
 import axios from "axios";
-
-const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
+import apiClient from "./apiClient.tsx";
 
 export const loginUser = async (data) => {
     try {
-        const response = await axios.post(apiUri+"/api/user/login", data);
+        const response = await apiClient.post("/user/login", data);
         return response.data;
     } catch (error) {
         if (axios.isAxiosError(error) && error.response) {

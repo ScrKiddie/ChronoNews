@@ -1,7 +1,6 @@
 import axios from "axios";
 import {handleApiError} from "../utils/toastHandler.tsx";
-
-const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
+import apiClient from "./apiClient.tsx";
 
 export const PostService = {
     createPost: async (data, token, toast, logout) => {
@@ -18,7 +17,7 @@ export const PostService = {
             if (data.thumbnail) {
                 formData.append("thumbnail", data.thumbnail);
             }
-            const response = await axios.post(`${apiUri}/api/post`, formData, {
+            const response = await apiClient.post(`/post`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data"
@@ -47,9 +46,8 @@ export const PostService = {
                 endDate ="",
             } = filters;
             const queryParams = new URLSearchParams({ userID, title, categoryName, userName, summary, page, size,sort,startDate,endDate }).toString();
-            const url = `${apiUri}/api/post?${queryParams}`;
 
-            const response = await axios.get(url, {
+            const response = await apiClient.get(`/post?${queryParams}`, {
                 signal
             });
 
@@ -67,7 +65,7 @@ export const PostService = {
 
     getPost: async (id) => {
         try {
-            const response = await axios.get(`${apiUri}/api/post/${id}`);
+            const response = await apiClient.get(`/post/${id}`);
             return response.data.data;
         } catch (error: any) {
             if (axios.isAxiosError(error) && error.response) {
@@ -79,7 +77,7 @@ export const PostService = {
 
     incrementViewCount: async (id) => {
         try {
-            await axios.patch(`${apiUri}/api/post/${id}/view`);
+            await apiClient.patch(`/post/${id}/view`);
         } catch (error) {
             console.error("Failed to increment view count:", error);
         }
@@ -102,7 +100,7 @@ export const PostService = {
                 formData.append("deleteThumbnail", data.deleteThumbnail);
             }
 
-            const response = await axios.put(`${apiUri}/api/post/${id}`, formData, {
+            const response = await apiClient.put(`/post/${id}`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data"
@@ -118,7 +116,7 @@ export const PostService = {
 
     deletePost: async (id, token, toast, logout) => {
         try {
-            const response = await axios.delete(`${apiUri}/api/post/${id}`, {
+            const response = await apiClient.delete(`/post/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

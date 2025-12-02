@@ -1,12 +1,10 @@
-import axios from "axios";
 import {handleApiError} from "../utils/toastHandler.tsx";
-
-const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
+import apiClient from "./apiClient.tsx";
 
 export const PasswordService = {
     updatePassword: async (data, token, toast, logout) => {
         try {
-            const response = await axios.patch(`${apiUri}/api/user/current/password`, data, {
+            const response = await apiClient.patch(`/user/current/password`, data, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json"

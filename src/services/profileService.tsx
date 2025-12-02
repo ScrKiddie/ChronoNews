@@ -1,12 +1,10 @@
-import axios from "axios";
 import {handleApiError} from "../utils/toastHandler.tsx";
-
-const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
+import apiClient from "./apiClient.tsx";
 
 export const ProfileService = {
     getCurrentUser: async (token, toast, logout) => {
         try {
-            const response = await axios.get(apiUri+"/api/user/current", {
+            const response = await apiClient.get("/user/current", {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -30,7 +28,7 @@ export const ProfileService = {
                 formData.append("deleteProfilePicture", data.deleteProfilePicture);
             }
 
-            const response = await axios.patch(`${apiUri}/api/user/current/profile`, formData, {
+            const response = await apiClient.patch(`/user/current/profile`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data"

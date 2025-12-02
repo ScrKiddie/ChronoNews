@@ -1,11 +1,10 @@
 import axios from "axios";
-
-const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
+import apiClient from "./apiClient.tsx";
 
 export const ResetService = {
     resetRequest: async (data) => {
         try {
-            const response = await axios.post(apiUri+"/api/reset/request", data);
+            const response = await apiClient.post("/reset/request", data);
             return response.data;
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {
@@ -16,7 +15,7 @@ export const ResetService = {
     },
     reset: async (data) => {
         try {
-            const response = await axios.patch(apiUri+"/api/reset", data);
+            const response = await apiClient.patch("/reset", data);
             return response.data;
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {

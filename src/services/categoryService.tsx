@@ -1,12 +1,11 @@
 import axios from "axios";
 import {handleApiError} from "../utils/toastHandler.tsx";
-
-const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
+import apiClient from "./apiClient.tsx";
 
 export const CategoryService = {
     createCategory: async (data, token, toast, logout) => {
         try {
-            const response = await axios.post(`${apiUri}/api/category`, { name: data.name }, {
+            const response = await apiClient.post(`/category`, { name: data.name }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json"
@@ -21,7 +20,7 @@ export const CategoryService = {
     },
     listCategories: async (signal?: AbortSignal) => {
         try {
-            const response = await axios.get(`${apiUri}/api/category`, {
+            const response = await apiClient.get(`/category`, {
                 signal
             });
 
@@ -38,7 +37,7 @@ export const CategoryService = {
     },
     getCategory: async (id, token, toast, logout) => {
         try {
-            const response = await axios.get(`${apiUri}/api/category/${id}`, {
+            const response = await apiClient.get(`/category/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -52,7 +51,7 @@ export const CategoryService = {
     },
     updateCategory: async (id, data, token, toast, logout) => {
         try {
-            const response = await axios.put(`${apiUri}/api/category/${id}`, { name: data.name }, {
+            const response = await apiClient.put(`/category/${id}`, { name: data.name }, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json"
@@ -67,7 +66,7 @@ export const CategoryService = {
     },
     deleteCategory: async (id, token, toast, logout) => {
         try {
-            const response = await axios.delete(`${apiUri}/api/category/${id}`, {
+            const response = await apiClient.delete(`/category/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

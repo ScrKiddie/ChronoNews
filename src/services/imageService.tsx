@@ -1,7 +1,5 @@
-import axios from "axios";
 import {handleApiError} from "../utils/toastHandler.tsx";
-
-const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
+import apiClient from "./apiClient.tsx";
 
 export const ImageService = {
     uploadImage: async (imageFile: File, token: string, toast: any, logout: () => void) => {
@@ -9,7 +7,7 @@ export const ImageService = {
             const formData = new FormData();
             formData.append("image", imageFile);
 
-            const response = await axios.post(`${apiUri}/api/image`, formData, {
+            const response = await apiClient.post(`/image`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "multipart/form-data",
