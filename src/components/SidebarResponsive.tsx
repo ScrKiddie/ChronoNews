@@ -15,7 +15,7 @@ import PasswordModal from "./PasswordModal.tsx";
 import {useToast} from "../hooks/useToast.tsx";
 import {useAuth} from "../hooks/useAuth.tsx";
 import {useLocation} from "react-router-dom";
-import {useUpdateUser} from "../hooks/useUpdateUser.tsx";
+import {useProfile} from "../hooks/useProfile.tsx";
 
 const SidebarResponsive = ({children}) => {
     const {role} = useAuth();
@@ -39,28 +39,15 @@ const SidebarResponsive = ({children}) => {
     } = useSidebar();
 
     const {
-        modalLoading,
-        visibleModal: visibleProfileModal,
-        submitLoading: submitProfileLoading,
-        data: dataProfile,
-        setData: setDataProfile,
+        modalState: profileModalState,
+        formData: profileFormData,
+        setFormData: setProfileFormData,
         errors: profileErrors,
-        handleVisibleModal: handleVisibleProfileModal,
-        handleCloseModal: handleCloseProfileModal,
-        handleSubmit,
-        croppedImage,
-        fileInputRef,
-        handleClickUploadButton,
-        handleImageChange,
-        visibleCropImageModal,
-        handleCloseCropImageModal,
-        selectedImage,
-        handleCrop,
-        cropperRef,
-        imageRef,
-        setProfilePicture,
-        setCroppedImage
-    } = useUpdateUser(toastRef, null,"current");
+        openModal: openProfileModal,
+        closeModal: closeProfileModal,
+        handleSubmit: handleProfileSubmit,
+        cropperProps: profileCropperProps,
+    } = useProfile(toastRef);
 
     const {
         submitLoading: submitPasswordLoading,
@@ -166,7 +153,7 @@ const SidebarResponsive = ({children}) => {
                                         icon: <i className="pi pi-user pr-3"/>,
                                         command() {
                                             setIsMenuVisible(false);
-                                            handleVisibleProfileModal();
+                                            openProfileModal();
                                         }
                                     },
                                     {
@@ -204,35 +191,35 @@ const SidebarResponsive = ({children}) => {
 
             {/*modal update profile*/}
             <UserModal
-                visible={visibleProfileModal}
-                onClose={handleCloseProfileModal}
-                data={dataProfile}
-                croppedImage={croppedImage}
-                fileInputRef={fileInputRef}
+                visible={profileModalState.isVisible}
+                onClose={closeProfileModal}
+                data={profileFormData}
+                croppedImage={profileCropperProps.croppedImage}
+                fileInputRef={profileCropperProps.fileInputRef}
                 errors={profileErrors}
-                submitLoading={submitProfileLoading}
-                handleSubmit={handleSubmit}
-                handleClickUploadButton={handleClickUploadButton}
-                handleImageChange={handleImageChange}
-                setData={setDataProfile}
-                setProfilePicture={setProfilePicture}
-                setCroppedImage={setCroppedImage}
+                submitLoading={profileModalState.isSubmitting}
+                handleSubmit={handleProfileSubmit}
+                handleClickUploadButton={profileCropperProps.handleClickUploadButton}
+                handleImageChange={profileCropperProps.handleImageChange}
+                setData={setProfileFormData}
+                setProfilePicture={profileCropperProps.setProfilePicture}
+                setCroppedImage={profileCropperProps.setCroppedImage}
             />
 
             {/*modal loading*/}
             <LoadingModal
-                modalLoading={modalLoading}
+                modalLoading={profileModalState.isLoading}
             />
 
             {/*modal cropper*/}
             <CropImageModal
                 id={"user-cropper"}
-                visible={visibleCropImageModal}
-                onClose={handleCloseCropImageModal}
-                selectedImage={selectedImage}
-                onCrop={handleCrop}
-                cropperRef={cropperRef}
-                imageRef={imageRef}
+                visible={profileCropperProps.visibleCropImageModal}
+                onClose={profileCropperProps.handleCloseCropImageModal}
+                selectedImage={profileCropperProps.selectedImage}
+                onCrop={profileCropperProps.handleCrop}
+                cropperRef={profileCropperProps.cropperRef}
+                imageRef={profileCropperProps.imageRef}
             />
 
             {/*modal update password */}
