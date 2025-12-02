@@ -3,6 +3,7 @@ import {Paginator} from "primereact/paginator";
 import {useNavigate} from "react-router-dom";
 import thumbnail from "../assets/thumbnail.svg";
 import {truncateText} from "../utils/truncateText.tsx";
+import {slugify} from "../utils/slugify.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
@@ -16,6 +17,13 @@ const HeadlinePost = ({
                       }) => {
 
     const navigate = useNavigate();
+
+    const handleNavigate = (item) => {
+        if (!item) return;
+        const slug = slugify(item.title);
+        navigate(`/post/${item.id}/${slug}`);
+    }
+
     return (
         <div>
             <DataView
@@ -29,7 +37,7 @@ const HeadlinePost = ({
                                 src={post.thumbnail ? `${apiUri}/post_picture/${post.thumbnail}` : thumbnail as string}
                                 alt={post.title}
                                 className="w-full h-auto aspect-[16/9] object-cover rounded-t-lg bg-[#f59e0b] cursor-pointer"
-                                onClick={() => navigate(`/post?id=${post.id}`)}
+                                onClick={() => handleNavigate(post)}
                             />
                             <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white p-1 px-2 rounded-md flex items-center text-xs">
                                 <i className="pi pi-eye mr-1"></i>
@@ -40,7 +48,7 @@ const HeadlinePost = ({
                         <div className="px-4 pb-6 pt-2 ">
                             <h3
                                 className="text-md sm:text-2xl font-semibold w-fit cursor-pointer line-clamp-2"
-                                onClick={() => navigate(`/post?id=${post.id}`)}
+                                onClick={() => handleNavigate(post)}
                             >
                                 {post.title}
                             </h3>
@@ -59,15 +67,17 @@ const HeadlinePost = ({
                     </div>
                 )}
             />
-            <Paginator
-                pageLinkSize={1}
-                first={(headlinePostPage - 1) * headlineSize}
-                rows={headlineSize}
-                totalRecords={headlinePostPagination.totalItem}
-                onPageChange={(e) => setHeadlinePostPage(e.page + 1)}
-                template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
-                className="mt-4"
-            />
+            {headlinePostPagination && headlinePostPagination.totalItem > 0 && (
+                <Paginator
+                    pageLinkSize={1}
+                    first={(headlinePostPage - 1) * headlineSize}
+                    rows={headlineSize}
+                    totalRecords={headlinePostPagination.totalItem}
+                    onPageChange={(e) => setHeadlinePostPage(e.page + 1)}
+                    template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+                    className="mt-4"
+                />
+            )}
         </div>
     );
 };

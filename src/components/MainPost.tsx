@@ -11,7 +11,10 @@ const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
 const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVisible}) => {
     const [showUpdatedAt, setShowUpdatedAt] = useState(false);
+
     useEffect(() => {
+        if (!mainPost || !mainPost.id) return;
+
         if ((window as any).DISQUS) {
             (window as any).DISQUS.reset({ reload: true,
                 config: function () {
@@ -25,11 +28,12 @@ const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVis
             script.async = true;
             document.body.appendChild(script);
         }
-    }, [mainPost.id]);
+    }, [mainPost?.id]);
 
     const toggleUpdatedAt = () => {
         setShowUpdatedAt(!showUpdatedAt);
     };
+
     useEffect(() => {
         if (isModalVisible) {
             document.body.style.overflow = "hidden";
@@ -41,11 +45,14 @@ const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVis
             document.body.style.overflow = "auto";
         };
     }, [isModalVisible]);
-    const toggleModal = () => {
 
+    const toggleModal = () => {
         setIsModalVisible(!isModalVisible);
     };
 
+    if (!mainPost || !mainPost.id) {
+        return null;
+    }
 
     return (
         <>

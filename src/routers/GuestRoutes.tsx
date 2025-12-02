@@ -10,11 +10,16 @@ const GuestRoutes = () => {
         <Routes>
             <Route path="/" element={<Navigate to="/beranda" replace/>}/>
             <Route path="/login" element={<Login/>}/>
-            <Route path="/" element={<Post/>}/>
-            <Route path="/:id" element={<Post/>}/>
-            <Route path="/*" element={<NotFound/>}/>
+
+            <Route path="/beranda" element={<Post/>}/>
+            <Route path="/search" element={<Post/>}/>
+            <Route path="/:category" element={<Post/>}/>
+
+            <Route path="/post/:id/:slug" element={<Post/>}/>
+
             <Route path="/reset" element={<Reset/>}/>
             <Route path="/reset/request" element={<Forgot/>}/>
+            <Route path="/*" element={<NotFound/>}/>
         </Routes>
     );
 };

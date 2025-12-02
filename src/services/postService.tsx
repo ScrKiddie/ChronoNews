@@ -31,7 +31,7 @@ export const PostService = {
         }
     },
 
-    searchPost: async (filters,signal) => {
+    searchPost: async (filters, signal) => {
         try {
             const {
                 userID = "",
@@ -41,17 +41,26 @@ export const PostService = {
                 summary = "",
                 page = "",
                 size = "",
-                sort="",
+                sort = "",
                 startDate = "",
-                endDate ="",
+                endDate = "",
+                excludeIds = "",
             } = filters;
-            const queryParams = new URLSearchParams({ userID, title, categoryName, userName, summary, page, size,sort,startDate,endDate }).toString();
+            const queryParams = new URLSearchParams({ userID, title, categoryName, userName, summary, page, size, sort, startDate, endDate, excludeIds }).toString();
 
             const response = await apiClient.get(`/post?${queryParams}`, {
                 signal
             });
 
-            return response.data;
+            if (response && response.data) {
+                const posts = Array.isArray(response.data.data) ? response.data.data : [];
+                const pagination = response.data.pagination || { totalItem: 0, totalPage: 1, currentPage: 1, size: size || 10 };
+                
+                return { data: posts, pagination: pagination };
+            }
+
+            return { data: [], pagination: { totalItem: 0, totalPage: 1, currentPage: 1, size: size || 10 } };
+
         } catch (error: any) {
             if ((error as any).name === 'CanceledError') {
                 throw new Error('Request was cancelled');
