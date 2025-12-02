@@ -2,8 +2,8 @@ import {useState, useEffect, useRef} from "react";
 import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {PostService} from "../services/postService.tsx";
 import {CategoryService} from "../services/categoryService.tsx";
-import {useUpdatePost} from "./useUpdatePost.tsx";
 import {truncateText} from "../utils/truncateText.tsx";
+import {processContentForEditor} from "../utils/contentProcessor.tsx";
 
 const getRelativeTime = (timestamp: number) => {
     const now = new Date();
@@ -104,8 +104,6 @@ const usePost = () => {
     const searchPostAbortController = useRef<AbortController | null>(null);
 
     const {id} = useParams() || "";
-
-    const {processContent} = useUpdatePost();
 
     const [startDate, setStartDate] = useState(0);
     const [endDate, setEndDate] = useState(0);
@@ -333,7 +331,7 @@ const usePost = () => {
                 title: mainPostResponse.title,
                 thumbnail: mainPostResponse.thumbnail,
                 user: mainPostResponse.user,
-                content: processContent(mainPostResponse.content),
+                content: processContentForEditor(mainPostResponse.content),
                 createdAt: formatDate(mainPostResponse.createdAt),
                 updatedAt: mainPostResponse.updatedAt ? formatDate(mainPostResponse.updatedAt) : "",
                 viewCount: mainPostResponse.viewCount,

@@ -133,6 +133,7 @@ export const useCropper = ({
         handleCrop,
         resetCropper,
         destroyCropper,
-        setCroppedImage
+        setCroppedImage,
+        setProfilePicture
     };
 };
