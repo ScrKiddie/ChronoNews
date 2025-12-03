@@ -1,15 +1,12 @@
-import {useState} from "react";
+import {useState, useCallback} from "react";
 import {z} from "zod";
 import {PasswordSchema} from "../schemas/passwordSchema.tsx";
 import {PasswordService} from "../services/passwordService.tsx";
-import {useAuth} from "./useAuth.tsx";
-import { showSuccessToast } from "../utils/toastHandler.tsx";
+import {handleApiError, showSuccessToast} from "../utils/toastHandler.tsx";
+import {useMutation} from "@tanstack/react-query";
 
 export const usePassword = (toastRef) => {
-    const {token, logout} = useAuth();
-
     const [visibleModal, setVisibleModal] = useState(false);
-    const [submitLoading, setSubmitLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [data, setData] = useState({
         oldPassword: "",
@@ -17,41 +14,51 @@ export const usePassword = (toastRef) => {
         confirmPassword: "",
     });
 
-    const handleVisibleModal = () => {
+    const updatePasswordMutation = useMutation({
+        mutationFn: PasswordService.updatePassword,
+        onSuccess: () => {
+            showSuccessToast(toastRef, "Password berhasil diperbarui");
+            handleCloseModal();
+        },
+        onError: (error: any) => {
+            handleApiError(error, toastRef);
+
+            if (error?.status === 401 && error.message) {
+                setErrors({ oldPassword: error.message });
+            }
+        }
+    });
+
+    const handleVisibleModal = useCallback(() => {
         setErrors({});
         setData({oldPassword: "", password: "", confirmPassword: ""});
         setVisibleModal(true);
-    };
+    }, []);
 
-    const handleCloseModal = () => setVisibleModal(false);
+    const handleCloseModal = useCallback(() => {
+        setVisibleModal(false);
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setSubmitLoading(true);
         setErrors({});
 
         try {
             const validatedData = PasswordSchema.parse(data);
-
-            await PasswordService.updatePassword(validatedData, token, toastRef, logout);
-            showSuccessToast(toastRef,"Password berhasil diperbarui" )
-
-            setVisibleModal(false);
+            await updatePasswordMutation.mutateAsync(validatedData);
         } catch (error) {
             if (error instanceof z.ZodError) {
                 setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
             } else {
-                console.error("An unhandled error occurred during password update:", error);
+                console.error("Caught unexpected error in handleSubmit:", error);
             }
         }
-
-        setSubmitLoading(false);
     };
 
     return {
         toastRef,
         visibleModal,
-        submitLoading,
+        submitLoading: updatePasswordMutation.isPending,
         errors,
         data,
         handleVisibleModal,

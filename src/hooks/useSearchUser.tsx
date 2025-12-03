@@ -1,80 +1,66 @@
-import {useState, useEffect, useRef} from "react";
+import {useState, useEffect} from "react";
 import {UserService} from "../services/userService.tsx";
 import {useAuth} from "./useAuth.tsx";
-import { useAbort } from "./useAbort";
-import {useToast} from "./useToast.tsx";
+import {useQuery, keepPreviousData} from "@tanstack/react-query";
+import {handleApiErrorWithRetry} from "../utils/toastHandler.tsx";
 
 const useSearchUser = () => {
-    const {token,logout} = useAuth();
-    const [data, setData] = useState([]);
+    const {token} = useAuth();
     const [searchParams, setSearchParams] = useState({name: "", phoneNumber: "", email: "", role: ""});
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(5);
-    const [totalItem, setTotalItem] = useState(0);
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
-    const [visibleLoadingConnection, setVisibleLoadingConnection] = useState(false);
-    const prevSearchParams = useRef(searchParams);
-    const toastRef = useToast();
-    const { abortController, setAbortController } = useAbort();
 
     useEffect(() => {
-        if (JSON.stringify(prevSearchParams.current) !== JSON.stringify(searchParams)) {
-            prevSearchParams.current = searchParams;
-            if (page != 1){
-                setPage(1)
-            }else {
-                fetchData()
+        setPage(1);
+    }, [searchParams, size]);
+
+    const queryKey = ['users', 'search', {searchParams, page, size}];
+
+    const {
+        data: searchResult,
+        isError,
+        isLoading,
+        isFetching,
+        error,
+        refetch,
+    } = useQuery({
+        queryKey,
+        queryFn: ({signal}) => {
+            const filters = { ...searchParams, page, size };
+            return UserService.searchUser(filters, signal);
+        },
+        select: (response) => {
+            if (!response || !response.data) {
+                return {users: [], pagination: {totalItem: 0}};
             }
+            return {users: response.data, pagination: response.pagination};
+        },
+        placeholderData: keepPreviousData,
+        enabled: !!token,
+        retry: false,
+    });
+
+    useEffect(() => {
+        if (isError) {
+            handleApiErrorWithRetry(error, setVisibleConnectionError);
         } else {
-            fetchData();
+            setVisibleConnectionError(false);
         }
-    }, [page, searchParams, size]);
-
-    const fetchData = async (reset = false) => {
-        if (abortController) {
-            abortController.abort();
-        }
-
-        const newAbortController = new AbortController();
-        setAbortController(newAbortController);
-
-        setVisibleConnectionError(false);
-        setVisibleLoadingConnection(true);
-        try {
-            const filters = {
-                name: searchParams.name,
-                phoneNumber: searchParams.phoneNumber,
-                email: searchParams.email,
-                role: searchParams.role,
-                page: reset ? 1 : page.toString(),
-                size: size.toString(),
-            };
-
-            const response = await UserService.searchUser(token, filters, newAbortController.signal, toastRef, logout, setVisibleConnectionError);
-
-            if (response && response.data) {
-                setData(response.data);
-                setTotalItem(response.pagination.totalItem);
-            }
-        } catch (error) {
-            console.error("An unexpected error occurred during user search:", error);
-        }
-        setVisibleLoadingConnection(false);
-    };
-
+    }, [isError, error]);
 
     return {
-        data,
+        data: searchResult?.users ?? [],
         searchParams,
         setSearchParams,
         page,
         setPage,
         size,
         setSize,
-        totalItem,
-        fetchData,
+        totalItem: searchResult?.pagination?.totalItem ?? 0,
+        refetch,
         visibleConnectionError,
-        visibleLoadingConnection,
+        visibleLoadingConnection: isLoading || isFetching,
     };
 };
 

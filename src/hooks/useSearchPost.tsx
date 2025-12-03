@@ -1,14 +1,14 @@
-import {useState, useEffect, useRef} from "react";
+import {useState, useEffect} from "react";
 import {PostService} from "../services/postService.tsx";
 import {useAuth} from "./useAuth.tsx";
-import {useAbort} from "./useAbort.tsx";
-import {handleApiErrorGuest} from "../utils/toastHandler.tsx";
+import {useQuery, keepPreviousData} from "@tanstack/react-query";
+import {handleApiErrorWithRetry} from "../utils/toastHandler.tsx";
+
 const useSearchPost = (params: { countMode?: boolean } = {}) => {
     const { countMode = false } = params;
     const [startDate, setStartDate] = useState(0);
     const [endDate, setEndDate] = useState(0);
     const {sub, role} = useAuth();
-    const [data, setData] = useState([]);
     const [searchParams, setSearchParams] = useState({
         title: "",
         categoryName: "",
@@ -17,101 +17,81 @@ const useSearchPost = (params: { countMode?: boolean } = {}) => {
     });
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(5);
-    const [totalItem, setTotalItem] = useState(0);
-    const [totalPage, setTotalPage] = useState(0);
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
-    const [visibleLoadingConnection, setVisibleLoadingConnection] = useState(false);
-
-    const prevSearchParams = useRef(searchParams);
-    const { abortController, setAbortController } = useAbort();
 
     useEffect(() => {
-        if (JSON.stringify(prevSearchParams.current) !== JSON.stringify(searchParams)) {
-            prevSearchParams.current = searchParams;
-            if (page != 1){
-                setPage(1)
-            }else {
-                fetchData()
-            }
-        } else {
-            fetchData();
-        }
-    }, [page, searchParams, size,startDate,endDate]);
-    const fetchData = async () => {
-        if (abortController) {
-            abortController.abort();
-        }
+        setPage(1);
+    }, [searchParams, size, startDate, endDate]);
 
-        const newAbortController = new AbortController();
-        setAbortController(newAbortController);
+    const queryKey = ['posts', 'search', { searchParams, page, size, startDate, endDate, countMode, role, sub }];
 
-        setVisibleConnectionError(false);
-        setVisibleLoadingConnection(true);
-        try {
-            const filters = {
-                title: searchParams.title,
-                categoryName: searchParams.categoryName,
-                userName: searchParams.userName,
-                summary: searchParams.summary,
-                page: page.toString(),
-                size: size.toString(),
-                userID : 0,
-                sort: "",
-                startDate: 0,
-                endDate: 0
+    const { data: searchResult, isLoading, isError, isFetching, error, refetch } = useQuery({
+        queryKey,
+        queryFn: ({ signal }) => {
+            const filters: any = {
+                ...searchParams,
+                page: page,
+                size: size,
             };
-            if (countMode){
+
+            if (countMode) {
                 filters.sort = "-view_count";
-                if (startDate !== null && endDate !== null) {
-                    filters.startDate = startDate
-                    filters.endDate = endDate
-                }
+                if (startDate) filters.startDate = startDate;
+                if (endDate) filters.endDate = endDate;
             }
-            if (role == "journalist") {
-                filters.userID = sub || 0
-            }
-            const response = await PostService.searchPost(filters, newAbortController.signal);
 
-            if (response && response.data) {
-                const formattedData = response.data.map(post => ({
-                    id: post.id,
-                    category: post.category?.name || "Tidak Ada Kategori",
-                    user: post.user?.name || "Tidak Ada User",
-                    title: post.title,
-                    summary: post.summary,
-                    createdAt: new Date(post.createdAt * 1000).toLocaleString(),
-                    updatedAt: post.updatedAt
-                        ? new Date(post.updatedAt * 1000).toLocaleString()
-                        : "Belum diperbarui",
-                    thumbnail: post.thumbnail || "Tidak Ada Gambar",
-                    viewCount: post.viewCount
-                }));
-
-                setData(formattedData);
-                setTotalItem(response.pagination.totalItem);
-                setTotalPage(response.pagination.totalPage);
+            if (role === "journalist" && sub) {
+                filters.userID = sub;
             }
-        } catch (error) {
-            handleApiErrorGuest(error,setVisibleConnectionError)
+
+            return PostService.searchPost(filters, signal);
+        },
+        select: (response) => {
+            if (!response || !response.data) {
+                return { posts: [], pagination: { totalItem: 0, totalPage: 0 } };
+            }
+            const formattedData = response.data.map((post: any) => ({
+                id: post.id,
+                category: post.category?.name || "Tidak Ada Kategori",
+                user: post.user?.name || "Tidak Ada User",
+                title: post.title,
+                summary: post.summary,
+                createdAt: new Date(post.createdAt * 1000).toLocaleString(),
+                updatedAt: post.updatedAt
+                    ? new Date(post.updatedAt * 1000).toLocaleString()
+                    : "Belum diperbarui",
+                thumbnail: post.thumbnail || "Tidak Ada Gambar",
+                viewCount: post.viewCount
+            }));
+            return { posts: formattedData, pagination: response.pagination };
+        },
+        placeholderData: keepPreviousData,
+        retry: false,
+    });
+
+    useEffect(() => {
+        if (isError) {
+            handleApiErrorWithRetry(error, setVisibleConnectionError);
+        } else {
+            setVisibleConnectionError(false);
         }
-        setVisibleLoadingConnection(false);
-    };
+    }, [isError, error]);
 
     return {
-        data,
+        data: searchResult?.posts ?? [],
         searchParams,
         setSearchParams,
         page,
         setPage,
         size,
         setSize,
-        totalItem,
-        totalPage,
-        fetchData,
+        totalItem: searchResult?.pagination?.totalItem ?? 0,
+        totalPage: searchResult?.pagination?.totalPage ?? 0,
         setEndDate,
         setStartDate,
+        refetch,
         visibleConnectionError,
-        visibleLoadingConnection,
+        visibleLoadingConnection: isLoading || isFetching,
     };
 };
 

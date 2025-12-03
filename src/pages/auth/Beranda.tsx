@@ -10,6 +10,7 @@ import LoadingRetry from "../../components/LoadingRetry.tsx";
 import { Dropdown } from "primereact/dropdown";
 import { truncateText } from "../../utils/truncateText.tsx";
 import { getDateRangeInUnix } from "../../utils/dateUtils.tsx";
+
 const Beranda = () => {
     const navigate = useNavigate();
     const { role } = useAuth();
@@ -23,11 +24,10 @@ const Beranda = () => {
         totalItem,
         visibleLoadingConnection,
         visibleConnectionError,
-        fetchData,
+        refetch,
         setEndDate,
         setStartDate
     } = useSearchPost({ countMode: true});
-
 
     const handlePageChange = (e) => {
         setPage(e.page + 1);
@@ -61,7 +61,6 @@ const Beranda = () => {
             {
                 label: "Jumlah Pengunjung",
                 data: data.map(item => (item as any).viewCount || 0),
-
                 backgroundColor: "rgba(245, 158, 11,0.2)",
                 borderColor: "#f59e0b",
                 borderWidth: 1,
@@ -75,9 +74,9 @@ const Beranda = () => {
         { label: 'Semua Waktu', value: 'all' }
     ];
 
-
     const [range, setRange] = useState('all');
     const filteredList = role === 'admin' ? list : list.filter(item => item.title === "Berita");
+
     return (
         <div className={`min-h-screen`}>
             <div className="flex flex-col ">
@@ -111,14 +110,12 @@ const Beranda = () => {
                     </div>
                     <div className="w-full px-4 pb-4 h-fit">
                         <div className="card shadow-md rounded-xl bg-white p-4 h-fit">
-
-                            {visibleLoadingConnection ? (
-                                <LoadingRetry
-                                    visibleConnectionError={visibleConnectionError}
-                                    onRetry={fetchData}
-                                    visibleLoadingConnection={visibleLoadingConnection}
-                                />
-                            ) : (
+                            <LoadingRetry
+                                visibleConnectionError={visibleConnectionError}
+                                onRetry={refetch}
+                                visibleLoadingConnection={visibleLoadingConnection}
+                            />
+                            {!visibleLoadingConnection && !visibleConnectionError && (
                                 <>
                                     <Chart
                                         className={`min-h-[50vh] md:min-h-[60vh]`}
@@ -149,10 +146,6 @@ const Beranda = () => {
                                         }}
                                         style={{ height: "30%" }}
                                     />
-
-                                    <span className={`flex w-full items-center  justify-center mb-2`}>
-
-                                        </span>
                                     <Paginator
                                         first={(page - 1) * size}
                                         rows={size}

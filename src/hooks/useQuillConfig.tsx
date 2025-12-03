@@ -3,12 +3,10 @@ import Quill from "quill";
 import {Scope} from "parchment";
 import ResizeModule from "@botom/quill-resize-module";
 import {ImageService} from "../services/imageService.tsx";
-import {useAuth} from "./useAuth.tsx";
 import {useToast} from "./useToast.tsx";
 import {showErrorToast} from "../utils/toastHandler.tsx";
 
 const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChange?: (isLoading: boolean) => void } = {}) => {
-    const { token, logout } = useAuth();
     const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
     const toast = useToast();
 
@@ -244,7 +242,7 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
         onUploadStateChange(true);
 
         try {
-            const response = await ImageService.uploadImage(file, token as string, toast, logout);
+            const response = await ImageService.uploadImage(file);
             if (!response) {
                 return;
             }

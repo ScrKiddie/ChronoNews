@@ -1,4 +1,4 @@
-import {useState, useCallback, RefObject, useRef} from "react";
+import {useState, useCallback, RefObject, useEffect} from "react";
 import {z} from "zod";
 import {useAuth} from "./useAuth.tsx";
 import {PostService} from "../services/postService.tsx";
@@ -6,8 +6,9 @@ import {CategoryService} from "../services/categoryService.tsx";
 import {UserService} from "../services/userService.tsx";
 import {PostCreateSchema, PostUpdateSchema} from "../schemas/postSchema.tsx";
 import {useCropper} from "./useCropper";
-import {showErrorToast, showSuccessToast} from "../utils/toastHandler.tsx";
+import {handleApiError, showSuccessToast} from "../utils/toastHandler.tsx";
 import {processContentForEditor, reverseProcessContentForServer} from "../utils/contentProcessor.tsx";
+import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
 
 type ModalMode = "create" | "edit" | "delete" | null;
 
@@ -21,14 +22,8 @@ interface PostFormData {
     deleteThumbnail?: boolean;
 }
 
-interface Option {
-    label: string;
-    value: number;
-}
-
 interface UsePostManagementProps {
     toastRef: RefObject<any>;
-    fetchData: () => void;
     pagination: {
         page: number;
         setPage: (page: number | ((prev: number) => number)) => void;
@@ -46,22 +41,18 @@ const INITIAL_FORM_DATA: PostFormData = {
     deleteThumbnail: false,
 };
 
-export const usePostManagement = ({toastRef, fetchData, pagination}: UsePostManagementProps) => {
-    const {token, role, logout} = useAuth();
+export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps) => {
+    const {role} = useAuth();
     const {page, setPage, totalItem, size} = pagination;
+    const queryClient = useQueryClient();
 
     const [modalMode, setModalMode] = useState<ModalMode>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isModalLoading, setIsModalLoading] = useState(false);
     const [formData, setFormData] = useState<PostFormData>(INITIAL_FORM_DATA);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
     const [thumbnail, setThumbnail] = useState<File | null>(null);
-    const [categoryOptions, setCategoryOptions] = useState<Option[]>([]);
-    const [userOptions, setUserOptions] = useState<Option[]>([]);
-    
-    const editorContentRef = useRef("");
+    const [editorContent, setEditorContent] = useState("");
 
     const cropper = useCropper({
         setVisibleModal: setIsModalVisible,
@@ -71,68 +62,6 @@ export const usePostManagement = ({toastRef, fetchData, pagination}: UsePostMana
         height: 675,
     });
 
-    const openModal = useCallback(async (mode: ModalMode, postId?: number) => {
-        cropper.resetCropper();
-        setErrors({});
-        setFormData(INITIAL_FORM_DATA);
-        editorContentRef.current = "";
-        setThumbnail(null);
-        setModalMode(mode);
-        setIsModalLoading(true);
-        setIsModalVisible(true);
-
-        if ((mode === "edit" || mode === "delete") && postId) {
-            setSelectedPostId(postId);
-        }
-        
-        if (mode === 'delete') {
-            setIsModalLoading(false);
-            return;
-        }
-
-        try {
-            const catPromise = CategoryService.listCategories();
-            const userPromise = role === "admin"
-                ? UserService.searchUser(token, {}, null, toastRef, logout, () => {})
-                : Promise.resolve(null);
-
-            const [catResponse, userResponse] = await Promise.all([catPromise, userPromise]);
-
-            if (catResponse && Array.isArray(catResponse.data)) {
-                setCategoryOptions(catResponse.data.map(c => ({label: c.name, value: c.id})));
-            }
-
-            if (userResponse && Array.isArray(userResponse.data)) {
-                setUserOptions([
-                    {label: "Posting Sebagai Diri Sendiri", value: 0},
-                    ...userResponse.data.map(u => ({
-                        label: `${u.name} - ${u.phoneNumber} - ${u.email} - ${u.role}`,
-                        value: u.id,
-                    })),
-                ]);
-            }
-
-            if (mode === "edit" && postId) {
-                const postData = await PostService.getPost(postId);
-                const processedContent = processContentForEditor(postData.content || "");
-                editorContentRef.current = processedContent;
-                setFormData({
-                    ...postData,
-                    content: processedContent,
-                    userID: postData.user.id || 0,
-                    categoryID: postData.category.id || 0,
-                    deleteThumbnail: false,
-                });
-            }
-        } catch (error) {
-            console.error("Failed to fetch data for modal:", error);
-            showErrorToast(toastRef, "Gagal memuat data untuk modal.");
-            setIsModalVisible(false);
-        } finally {
-            setIsModalLoading(false);
-        }
-    }, [token, role, logout, cropper, toastRef]);
-
     const closeModal = useCallback(() => {
         setIsModalVisible(false);
         setTimeout(() => {
@@ -141,105 +70,149 @@ export const usePostManagement = ({toastRef, fetchData, pagination}: UsePostMana
         }, 300);
     }, []);
 
-    const handleDeleteConfirm = useCallback(async () => {
-        if (modalMode !== 'delete' || !selectedPostId) return;
+    const {data: categoryOptions = [], isError: isCatError, error: catError} = useQuery({
+        queryKey: ['categories'],
+        queryFn: () => CategoryService.listCategories().then(res => res.data.map((c: any) => ({label: c.name, value: c.id}))),
+        enabled: isModalVisible && (modalMode === 'create' || modalMode === 'edit'),
+    });
 
-        setIsSubmitting(true);
-        try {
-            await PostService.deletePost(selectedPostId, token, toastRef, logout);
-            showSuccessToast(toastRef, "Postingan berhasil dihapus");
-            
-            const remainingItems = totalItem - 1;
-            const remainingPages = Math.ceil(remainingItems / size);
-            if (remainingItems > 0 && remainingPages < page) {
-                setPage((prev) => Math.max(1, prev - 1));
-            }
-            
-            fetchData();
+    const {data: userOptions = [], isError: isUserError, error: userError} = useQuery({
+        queryKey: ['users', 'all'],
+        queryFn: () => UserService.searchUser({size: 1000}).then(res => [
+            {label: "Posting Sebagai Diri Sendiri", value: 0},
+            ...res.data.map((u: any) => ({label: `${u.name} - ${u.phoneNumber} - ${u.email} - ${u.role}`, value: u.id})),
+        ]),
+        enabled: isModalVisible && role === 'admin' && (modalMode === 'create' || modalMode === 'edit'),
+    });
+
+    const {data: postDataForEdit, isLoading: isModalLoading, isError: isPostError, error: postError} = useQuery({
+        queryKey: ['post', selectedPostId],
+        queryFn: async () => {
+            const postData = await PostService.getPost(selectedPostId!);
+            return {
+                ...postData,
+                content: processContentForEditor(postData.content || ""),
+                userID: postData.user.id || 0,
+                categoryID: postData.category.id || 0,
+                deleteThumbnail: false,
+            };
+        },
+        enabled: modalMode === 'edit' && !!selectedPostId && isModalVisible,
+    });
+    
+    useEffect(() => {
+        if (isCatError || isUserError || isPostError) {
+            handleApiError(catError || userError || postError, toastRef);
             closeModal();
-        } catch (error) {
-            console.error("An unhandled error occurred during post deletion:", error);
-        } finally {
-            setIsSubmitting(false);
         }
-    }, [selectedPostId, token, logout, toastRef, totalItem, size, page, setPage, fetchData, closeModal, modalMode]);
+    }, [isCatError, isUserError, isPostError, catError, userError, postError, toastRef, closeModal]);
 
-    const handleSubmit = useCallback(async (e: React.FormEvent, editorValue: string = "") => {
-        e.preventDefault();
-        if (modalMode !== 'create' && modalMode !== 'edit') return;
+    useEffect(() => {
+        if (postDataForEdit) {
+            setFormData(postDataForEdit);
+            setEditorContent(postDataForEdit.content);
+        }
+    }, [postDataForEdit]);
 
-        setIsSubmitting(true);
+    const openModal = useCallback((mode: ModalMode, postId?: number) => {
+        cropper.resetCropper();
+        setErrors({});
+        setFormData(INITIAL_FORM_DATA);
+        setEditorContent("");
+        setThumbnail(null);
+        setSelectedPostId(postId || null);
+        setModalMode(mode);
+        setIsModalVisible(true);
+    }, [cropper]);
 
-        const newErrors: Record<string, string> = {};
-        const validationSchema = modalMode === 'create' ? PostCreateSchema : PostUpdateSchema;
-        
-        try {
-            validationSchema.parse(formData);
-        } catch (error) {
-            if (error instanceof z.ZodError) {
-                Object.assign(newErrors, error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
+    const handleMutationSuccess = (message: string) => {
+        showSuccessToast(toastRef, message);
+        queryClient.invalidateQueries({queryKey: ['posts', 'search']});
+        closeModal();
+    };
+
+    const handleMutationError = (error: unknown) => {
+        if (error instanceof z.ZodError) {
+            const formErrors = error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {});
+            setErrors(formErrors);
+        } else {
+            handleApiError(error, toastRef);
+        }
+    };
+
+    const createPostMutation = useMutation({
+        mutationFn: PostService.createPost,
+        onSuccess: () => handleMutationSuccess("Postingan berhasil dibuat"),
+        onError: handleMutationError,
+    });
+
+    const updatePostMutation = useMutation({
+        mutationFn: ({id, request}: { id: number, request: any }) => PostService.updatePost(id, request),
+        onSuccess: () => handleMutationSuccess("Postingan berhasil diperbarui"),
+        onError: handleMutationError,
+    });
+
+    const deletePostMutation = useMutation({
+        mutationFn: PostService.deletePost,
+        onSuccess: () => {
+            showSuccessToast(toastRef, "Postingan berhasil dihapus");
+            const remainingItems = totalItem - 1;
+            const totalPages = Math.ceil(remainingItems / size);
+            if (page > totalPages && totalPages > 0) {
+                setPage(totalPages);
+            } else {
+                queryClient.invalidateQueries({queryKey: ['posts', 'search']});
             }
-        }
-        if (editorValue && editorValue.length > 65535) {
-            newErrors.content = "Konten terlalu panjang";
-        }
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-            setIsSubmitting(false);
-            return;
-        }
+            closeModal();
+        },
+        onError: handleMutationError,
+    });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
         setErrors({});
 
-        if (typeof editorValue === 'string' && new Blob([editorValue]).size > 314572800) {
-            showErrorToast(toastRef, "Konten melebihi batas ukuran dari server.");
-            setIsSubmitting(false);
-            return;
-        }
-
+        const validationSchema = modalMode === 'create' ? PostCreateSchema : PostUpdateSchema;
         try {
-            if (modalMode === "create") {
-                const validatedData = validationSchema.parse(formData);
-                const request = {
-                    ...validatedData,
-                    content: editorValue || "",
-                    ...(thumbnail instanceof File ? {thumbnail} : {}),
-                };
-                await PostService.createPost(request, token, toastRef, logout);
-                showSuccessToast(toastRef, "Postingan berhasil dibuat");
-            } else if (modalMode === "edit") {
-                if (!selectedPostId) throw new Error("No post selected for update");
-                const validatedData = validationSchema.parse(formData);
-                const cleanedContent = reverseProcessContentForServer(editorValue);
-                const request = {
-                    ...validatedData,
-                    userID: formData.userID,
-                    content: cleanedContent || "",
-                    ...(formData.deleteThumbnail === true ? {deleteThumbnail: true} : {}),
-                    ...(thumbnail instanceof File ? {thumbnail} : {}),
-                };
-                await PostService.updatePost(selectedPostId, request, token, toastRef, logout);
-                showSuccessToast(toastRef, "Postingan berhasil diperbarui");
-            }
+            const validatedData = validationSchema.parse(formData);
             
-            fetchData();
-            closeModal();
+            if (editorContent.length > 65535) {
+                setErrors({ content: "Konten terlalu panjang" });
+                return;
+            }
 
+            if (modalMode === "create") {
+                const request = {...validatedData, content: editorContent || "", ...(thumbnail && {thumbnail})};
+                await createPostMutation.mutateAsync(request);
+            } else if (modalMode === "edit" && selectedPostId) {
+                const cleanedContent = reverseProcessContentForServer(editorContent);
+                const request = {
+                    ...validatedData,
+                    content: cleanedContent || "",
+                    ...(formData.deleteThumbnail && {deleteThumbnail: true}),
+                    ...(thumbnail && {thumbnail}),
+                };
+                await updatePostMutation.mutateAsync({id: selectedPostId, request});
+            }
         } catch (error) {
-            console.error("An unhandled error occurred:", error);
-        } finally {
-            setIsSubmitting(false);
+            handleMutationError(error);
         }
-    }, [
-        modalMode, formData, thumbnail, selectedPostId, token, logout,
-        fetchData, closeModal, toastRef
-    ]);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (selectedPostId) {
+            await deletePostMutation.mutateAsync(selectedPostId);
+        }
+    };
+    
+    const isSubmitting = createPostMutation.isPending || updatePostMutation.isPending || deletePostMutation.isPending;
 
     return {
         modalState: {
             isVisible: isModalVisible,
             mode: modalMode,
             isLoading: isModalLoading,
-            isSubmitting: isSubmitting,
+            isSubmitting,
         },
         formData,
         setFormData,
@@ -248,10 +221,11 @@ export const usePostManagement = ({toastRef, fetchData, pagination}: UsePostMana
         closeModal,
         handleSubmit,
         handleDeleteConfirm,
-        editorContentRef,
+        editorContent,
+        setEditorContent,
         cropperProps: {
             ...cropper,
-            setThumbnail: cropper.setProfilePicture,
+            setThumbnail: setThumbnail,
         },
         options: {
             category: categoryOptions,

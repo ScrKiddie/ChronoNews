@@ -1,10 +1,10 @@
-import {useState, useCallback, RefObject} from "react";
+import {useState, useCallback, RefObject, useEffect} from "react";
 import {z} from "zod";
-import {useAuth} from "./useAuth.tsx";
 import {UserService} from "../services/userService.tsx";
 import {UserCreateSchema, UserUpdateSchema} from "../schemas/userSchema.tsx";
 import {useCropper} from "./useCropper";
-import {showSuccessToast} from "../utils/toastHandler.tsx";
+import {handleApiError, showSuccessToast} from "../utils/toastHandler.tsx";
+import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
 
 type ModalMode = "create" | "edit" | "delete" | null;
 
@@ -19,7 +19,6 @@ interface UserFormData {
 
 interface UseUserManagementProps {
     toastRef: RefObject<any>;
-    fetchData: () => void;
     pagination: {
         page: number;
         setPage: (page: number | ((prev: number) => number)) => void;
@@ -37,14 +36,12 @@ const INITIAL_FORM_DATA: UserFormData = {
     deleteProfilePicture: false,
 };
 
-export const useUserManagement = ({toastRef, fetchData, pagination}: UseUserManagementProps) => {
-    const {token, logout} = useAuth();
+export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps) => {
     const {page, setPage, totalItem, size} = pagination;
+    const queryClient = useQueryClient();
 
     const [modalMode, setModalMode] = useState<ModalMode>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isModalLoading, setIsModalLoading] = useState(false);
     const [formData, setFormData] = useState<UserFormData>(INITIAL_FORM_DATA);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
@@ -56,34 +53,6 @@ export const useUserManagement = ({toastRef, fetchData, pagination}: UseUserMana
         toastRef
     });
 
-    const openModal = useCallback(async (mode: ModalMode, userId?: number) => {
-        cropper.resetCropper();
-        setErrors({});
-        setFormData(INITIAL_FORM_DATA);
-        setProfilePicture(null);
-        setModalMode(mode);
-
-        if ((mode === "edit" || mode === "delete") && userId) {
-            setSelectedUserId(userId);
-        }
-
-        if (mode === "edit" && userId) {
-            setIsModalLoading(true);
-            setIsModalVisible(true);
-            try {
-                const userData = await UserService.getUser(userId, token, toastRef, logout);
-                setFormData(userData);
-            } catch (error) {
-                console.error("Failed to fetch user data:", error);
-                setIsModalVisible(false);
-            } finally {
-                setIsModalLoading(false);
-            }
-        } else {
-            setIsModalVisible(true);
-        }
-    }, [token, logout, cropper, toastRef]);
-
     const closeModal = useCallback(() => {
         setIsModalVisible(false);
         setTimeout(() => {
@@ -94,10 +63,96 @@ export const useUserManagement = ({toastRef, fetchData, pagination}: UseUserMana
         }, 300);
     }, []);
 
+    const {
+        data: userDataForEdit,
+        isLoading: isModalLoading,
+        isError,
+        error
+    } = useQuery({
+        queryKey: ['user', selectedUserId],
+        queryFn: () => UserService.getUser(selectedUserId!),
+        enabled: modalMode === 'edit' && !!selectedUserId && isModalVisible,
+        retry: false,
+    });
+
+    useEffect(() => {
+        if (isError) {
+            handleApiError(error, toastRef);
+            closeModal();
+        }
+    }, [isError, error, toastRef, closeModal]);
+
+    useEffect(() => {
+        if (userDataForEdit) {
+            setFormData(userDataForEdit);
+        }
+    }, [userDataForEdit]);
+
+    const openModal = useCallback((mode: ModalMode, userId?: number) => {
+        cropper.resetCropper();
+        setErrors({});
+        setFormData(INITIAL_FORM_DATA);
+        setProfilePicture(null);
+        setSelectedUserId(userId || null);
+        setModalMode(mode);
+        setIsModalVisible(true);
+    }, [cropper]);
+
+    const handleMutationError = (error: any) => {
+        if (error instanceof z.ZodError) {
+            const formErrors = error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {});
+            setErrors(formErrors);
+        } else {
+            handleApiError(error, toastRef);
+            if (error?.status === 409 && error.message) {
+                if (error.message.toLowerCase().includes('email')) {
+                    setErrors({ email: error.message });
+                } else if (error.message.toLowerCase().includes('telepon') || error.message.toLowerCase().includes('phone')) {
+                    setErrors({ phoneNumber: error.message });
+                }
+            }
+        }
+    };
+
+    const createUserMutation = useMutation({
+        mutationFn: UserService.createUser,
+        onSuccess: () => {
+            showSuccessToast(toastRef, "Pengguna berhasil dibuat");
+            queryClient.invalidateQueries({queryKey: ['users']});
+            closeModal();
+        },
+        onError: handleMutationError,
+    });
+
+    const updateUserMutation = useMutation({
+        mutationFn: ({id, request}: { id: number, request: any }) => UserService.updateUser(id, request),
+        onSuccess: (_, variables) => {
+            showSuccessToast(toastRef, "Pengguna berhasil diperbarui");
+            queryClient.invalidateQueries({queryKey: ['users']});
+            queryClient.invalidateQueries({queryKey: ['user', variables.id]});
+            closeModal();
+        },
+        onError: handleMutationError,
+    });
+
+    const deleteUserMutation = useMutation({
+        mutationFn: UserService.deleteUser,
+        onSuccess: () => {
+            showSuccessToast(toastRef, "Pengguna berhasil dihapus");
+            const remainingItems = totalItem - 1;
+            const remainingPages = Math.ceil(remainingItems / size);
+            if (remainingItems > 0 && page > remainingPages) {
+                setPage(remainingPages);
+            } else {
+                queryClient.invalidateQueries({queryKey: ['users']});
+            }
+            closeModal();
+        },
+        onError: handleMutationError,
+    });
 
     const handleSubmit = useCallback(async (e?: React.FormEvent) => {
         e?.preventDefault();
-        setIsSubmitting(true);
         setErrors({});
 
         try {
@@ -108,8 +163,7 @@ export const useUserManagement = ({toastRef, fetchData, pagination}: UseUserMana
                         ...validatedData,
                         ...(profilePicture instanceof File ? {profilePicture} : {}),
                     };
-                    await UserService.createUser(request, token, toastRef, logout);
-                    showSuccessToast(toastRef, "Pengguna berhasil dibuat");
+                    await createUserMutation.mutateAsync(request);
                     break;
                 }
                 case "edit": {
@@ -120,43 +174,28 @@ export const useUserManagement = ({toastRef, fetchData, pagination}: UseUserMana
                         ...(formData.deleteProfilePicture === true ? {deleteProfilePicture: true} : {}),
                         ...(profilePicture instanceof File ? {profilePicture} : {}),
                     };
-                    await UserService.updateUser(selectedUserId, request, token, toastRef, logout);
-                    showSuccessToast(toastRef, "Pengguna berhasil diperbarui");
+                    await updateUserMutation.mutateAsync({id: selectedUserId, request});
                     break;
                 }
                 case "delete": {
                     if (!selectedUserId) throw new Error("No user selected for deletion");
-                    await UserService.deleteUser(selectedUserId, token, toastRef, logout);
-                    showSuccessToast(toastRef, "Pengguna berhasil dihapus");
-
-                    const remainingItems = totalItem - 1;
-                    const remainingPages = Math.ceil(remainingItems / size);
-                    if (remainingItems > 0 && remainingPages < page) {
-                        setPage((prev) => Math.max(1, prev - 1));
-                    }
+                    await deleteUserMutation.mutateAsync(selectedUserId);
                     break;
                 }
                 default:
                     throw new Error("Invalid modal mode");
             }
-            
-            fetchData();
-            closeModal();
-
         } catch (error) {
             if (error instanceof z.ZodError) {
-                const formErrors = error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {});
-                setErrors(formErrors);
-            } else {
-                console.error("An unhandled error occurred:", error);
+                handleMutationError(error)
             }
-        } finally {
-            setIsSubmitting(false);
         }
     }, [
-        modalMode, formData, profilePicture, selectedUserId, token, logout,
-        fetchData, closeModal, toastRef, totalItem, size, page, setPage
+        modalMode, formData, profilePicture, selectedUserId,
+        createUserMutation, updateUserMutation, deleteUserMutation
     ]);
+
+    const isSubmitting = createUserMutation.isPending || updateUserMutation.isPending || deleteUserMutation.isPending;
 
     return {
         modalState: {

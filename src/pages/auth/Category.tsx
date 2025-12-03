@@ -21,7 +21,7 @@ const Category = () => {
         openModal,
         closeModal,
         handleSubmit,
-        fetchData,
+        refetch,
     } = useCategory({toastRef});
 
     const actionTemplate = (rowData: { id: number }) => (
@@ -55,7 +55,7 @@ const Category = () => {
             {/* Connection Error/Loading */}
             <LoadingRetry
                 visibleConnectionError={connectionState.isError}
-                onRetry={fetchData}
+                onRetry={refetch}
                 visibleLoadingConnection={connectionState.isLoading}
             />
 

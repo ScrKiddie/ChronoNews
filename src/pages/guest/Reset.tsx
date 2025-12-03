@@ -1,25 +1,27 @@
 import React, {useEffect, useState} from "react";
 import {useAuth} from "../../hooks/useAuth.tsx";
 import {ResetSchema} from "../../schemas/resetSchema.tsx";
-import {ResetService} from "../../services/resetService.tsx"
-import {useNavigate} from "react-router-dom";
+import {ResetService} from "../../services/resetService.tsx";
+import {useNavigate, useSearchParams} from "react-router-dom";
 import {useToast} from "../../hooks/useToast.tsx";
 import GuestFormContainer from "../../components/GuestFormContainer.tsx";
 import InputGroup from "../../components/InputGroup.tsx";
 import SubmitButton from "../../components/SubmitButton.tsx";
-import { useSearchParams } from "react-router-dom";
-import {showErrorToast, showSuccessToast} from "../../utils/toastHandler.tsx";
+import {handleApiError, showSuccessToast} from "../../utils/toastHandler.tsx";
+import {useMutation} from "@tanstack/react-query";
+import {z} from "zod";
 
-const Login: React.FC = () => {
+const Reset: React.FC = () => {
     const toastRef = useToast();
-    const {login, token} = useAuth();
+    const {token} = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [code, setCode] = useState(searchParams.get("code") || "");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [errors, setErrors] = useState<{ code?: string; password?: string; confirmPassword?: string }>({});
-    const [loading, setLoading] = useState(false);
+    const [data, setData] = useState({
+        code: searchParams.get("code") || "",
+        password: "",
+        confirmPassword: "",
+    });
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
         if (token) {
@@ -27,37 +29,33 @@ const Login: React.FC = () => {
         }
     }, [token, navigate]);
 
+    const resetMutation = useMutation({
+        mutationFn: ResetService.reset,
+        onSuccess: () => {
+            showSuccessToast(toastRef, "Berhasil melakukan reset");
+            navigate("/login");
+        },
+        onError: (error: any) => {
+            handleApiError(error, toastRef);
 
+            if (error?.status === 400 && error.message) {
+                setErrors({ code: error.message });
+            }
+        }
+    });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
-
-        const result = ResetSchema.safeParse({code, password, confirmPassword});
-
-        if (!result.success) {
-            const errorMessages: { code?: string; password?: string; confirmPassword?: string; } = {};
-            result.error.errors.forEach((err) => {
-                if (err.path.includes("code")) errorMessages.code = err.message;
-                if (err.path.includes("password")) errorMessages.password = err.message;
-                if (err.path.includes("confirmPassword")) errorMessages.confirmPassword = err.message;
-            });
-            setErrors(errorMessages);
-            setLoading(false);
-            return;
-        }
-
         setErrors({});
 
         try {
-            const response = await ResetService.reset({code, password, confirmPassword});
-            login(response.data);
-            showSuccessToast(toastRef, "Berhasil melakukan reset")
-            navigate("/login");
+            const validatedData = ResetSchema.parse(data);
+            await resetMutation.mutateAsync(validatedData);
         } catch (error) {
-            showErrorToast(toastRef, (error as any).message)
-        } finally {
-            setLoading(false);
+            if (error instanceof z.ZodError) {
+                const formErrors = error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {});
+                setErrors(formErrors);
+            }
         }
     };
 
@@ -67,54 +65,42 @@ const Login: React.FC = () => {
                 <div className="mb-2 mt-2 w-full">
                     <InputGroup
                         label="Kode Reset"
-                        data={code}
+                        data={data.code}
                         error={errors.code}
-                        setData={(e) => {
-                            setCode(e)
-                        }}
-                        setError={(e) => {
-                            setErrors(prev => ({...prev, code: e}));
-                        }}
+                        setData={(e) => setData(prev => ({...prev, code: e}))}
+                        setError={(e) => setErrors(prev => ({...prev, code: e}))}
                         tip={"Salin kode reset dari email Anda dan tempel"}
                     />
-                        </div>
-                        <div className="mb-2">
-                        <InputGroup
+                </div>
+                <div className="mb-2">
+                    <InputGroup
                         type="password"
                         label="Password Baru"
-                        data={password}
-                     error={errors.password}
-                     setData={(e) => {
-                         setPassword(e);
-                     }}
-                     setError={(e) => {
-                         setErrors(prev => ({...prev, password: e}));
-                     }}
-                />
-            </div>
-            <div className="mb-2">
-                <InputGroup
-                    type="password"
-                    label="Konfirmasi Password Baru"
-                    data={confirmPassword}
-                    error={errors.confirmPassword}
-                    setData={(e) => {
-                        setConfirmPassword(e)
-                    }}
-                    setError={(e) => {
-                        setErrors(prev => ({...prev, confirmPassword: e}));
-                        }}
+                        data={data.password}
+                        error={errors.password}
+                        setData={(e) => setData(prev => ({...prev, password: e}))}
+                        setError={(e) => setErrors(prev => ({...prev, password: e}))}
                     />
                 </div>
-                <SubmitButton loading={loading}/>
+                <div className="mb-2">
+                    <InputGroup
+                        type="password"
+                        label="Konfirmasi Password Baru"
+                        data={data.confirmPassword}
+                        error={errors.confirmPassword}
+                        setData={(e) => setData(prev => ({...prev, confirmPassword: e}))}
+                        setError={(e) => setErrors(prev => ({...prev, confirmPassword: e}))}
+                    />
+                </div>
+                <SubmitButton loading={resetMutation.isPending}/>
                 <h1 className="m-0 mt-2  text-sm font-normal text-center" style={{color: 'var(--surface-600)'}}>
                     Belum Memiliki Kode Reset? <span
                     onClick={() => navigate('/reset/request')}
                     style={{color: 'var(--primary-500)', fontWeight: '500'}}
                     className="cursor-pointer"
                 >
-        Permintaan Reset
-      </span>
+                    Permintaan Reset
+                </span>
                 </h1>
                 <h1 className="m-0 text-sm font-normal text-center" style={{color: 'var(--surface-600)'}}>
                     Kembali Ke <span
@@ -122,12 +108,12 @@ const Login: React.FC = () => {
                     style={{color: 'var(--primary-500)', fontWeight: '500'}}
                     className="cursor-pointer"
                 >
-        Halaman Login
-      </span>
+                    Halaman Login
+                </span>
                 </h1>
             </form>
         </GuestFormContainer>
     );
 };
 
-export default Login;
+export default Reset;

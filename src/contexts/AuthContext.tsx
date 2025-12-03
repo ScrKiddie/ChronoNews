@@ -1,6 +1,7 @@
 import {createContext, useState, useEffect} from "react";
 import Cookies from "js-cookie";
 import {jwtDecode} from "jwt-decode";
+import apiClient, {setOnUnauthorized} from "../services/apiClient.tsx";
 
 interface DecodedToken {
     role: string;
@@ -17,26 +18,33 @@ interface AuthContextType {
     logout: () => void;
 }
 
-
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({children}) => {
-    const [token, setToken] = useState<string | null>(null);
+    const [token, setToken] = useState<string | null>(() => Cookies.get("token") || null);
     const [sub, setSub] = useState<number | null>(null);
     const [role, setRole] = useState<string | null>(null);
     const [isAuthChecked, setIsAuthChecked] = useState(false);
 
+    const logout = () => {
+        setToken(null);
+        setRole(null);
+        setSub(null);
+        Cookies.remove("token");
+    };
+
     useEffect(() => {
-        const savedToken = Cookies.get("token");
-        if (savedToken) {
+        setOnUnauthorized(() => logout());
+
+        if (token) {
             try {
-                const decoded: DecodedToken = jwtDecode(savedToken);
+                const decoded: DecodedToken = jwtDecode(token);
                 const currentTime = Math.floor(Date.now() / 1000);
 
                 if (decoded.exp < currentTime) {
                     logout();
                 } else {
-                    setToken(savedToken);
+                    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                     setRole(decoded.role);
                     setSub(decoded.sub);
                 }
@@ -44,40 +52,29 @@ export const AuthProvider = ({children}) => {
                 console.error("Token tidak valid", error);
                 logout();
             }
+        } else {
+            delete apiClient.defaults.headers.common['Authorization'];
         }
         setIsAuthChecked(true);
-    }, []);
+    }, [token]);
 
-    const login = (token: string) => {
+    const login = (newToken: string) => {
         try {
-            const decoded: DecodedToken = jwtDecode(token);
-
-            setToken(token);
-            setRole(decoded.role);
-            setSub(decoded.sub);
-            setIsAuthChecked(true);
-
+            const decoded: DecodedToken = jwtDecode(newToken);
             const currentTime = Math.floor(Date.now() / 1000);
             const expiresInSeconds = decoded.exp - currentTime;
             const expiresInDays = expiresInSeconds / (60 * 60 * 24);
 
-            Cookies.set("token", token, {
+            Cookies.set("token", newToken, {
                 expires: expiresInDays,
                 secure: true,
                 sameSite: "Strict",
             });
-
+            setToken(newToken);
         } catch (error) {
             console.error("Token tidak valid", error);
             logout();
         }
-    };
-
-    const logout = () => {
-        setToken(null);
-        setRole(null);
-        setSub(null)
-        Cookies.remove("token");
     };
 
     return (
@@ -86,3 +83,5 @@ export const AuthProvider = ({children}) => {
         </AuthContext.Provider>
     );
 };
+
+

@@ -1,10 +1,9 @@
 import {useState, useCallback, RefObject, useEffect} from "react";
 import {z} from "zod";
-import {useAuth} from "./useAuth";
 import {CategoryService} from "../services/categoryService.tsx";
 import {CategorySchema} from "../schemas/categorySchema.tsx";
-import {useAbort} from "./useAbort.tsx";
-import {handleApiErrorWithRetry, showSuccessToast} from "../utils/toastHandler.tsx";
+import {handleApiError, handleApiErrorWithRetry, showSuccessToast} from "../utils/toastHandler.tsx";
+import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
 
 type ModalMode = "create" | "edit" | "delete" | null;
 
@@ -21,74 +20,28 @@ const INITIAL_FORM_DATA: CategoryFormData = {
 };
 
 export const useCategory = ({toastRef}: UseCategoryProps) => {
-    const {token, logout} = useAuth();
+    const queryClient = useQueryClient();
 
     const [modalMode, setModalMode] = useState<ModalMode>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isModalLoading, setIsModalLoading] = useState(false);
     const [formData, setFormData] = useState<CategoryFormData>(INITIAL_FORM_DATA);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-
-    const [listData, setListData] = useState([]);
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
-    const [visibleLoadingConnection, setVisibleLoadingConnection] = useState(false);
-    const {abortController, setAbortController} = useAbort();
 
-    const fetchData = useCallback(async () => {
-        if (abortController) {
-            abortController.abort();
-        }
-        const newAbortController = new AbortController();
-        setAbortController(newAbortController);
-
-        setVisibleConnectionError(false);
-        setVisibleLoadingConnection(true);
-        try {
-            const response = await CategoryService.listCategories(newAbortController.signal);
-            if (response && Array.isArray(response.data)) {
-                setListData(response.data);
-            }
-        } catch (error) {
-            handleApiErrorWithRetry(error, toastRef, logout, setVisibleConnectionError);
-        } finally {
-            setVisibleLoadingConnection(false);
-        }
-    }, [abortController, setAbortController, toastRef, logout]);
+    const {data: listData = [], isLoading: isListLoading, isError, error, refetch} = useQuery({
+        queryKey: ['categories'],
+        queryFn: ({signal}) => CategoryService.listCategories(signal).then(res => res.data || []),
+        retry: false,
+    });
 
     useEffect(() => {
-        fetchData();
-    }, []);
-
-
-    const openModal = useCallback(async (mode: ModalMode, categoryId?: number) => {
-        setErrors({});
-        setFormData(INITIAL_FORM_DATA);
-        setModalMode(mode);
-
-        if ((mode === "edit" || mode === "delete") && categoryId) {
-            setSelectedCategoryId(categoryId);
-        }
-
-        if (mode === "edit" && categoryId) {
-            setIsModalLoading(true);
-            setIsModalVisible(true);
-            try {
-                const categoryData = await CategoryService.getCategory(categoryId, token, toastRef, logout);
-                if (categoryData) {
-                    setFormData(categoryData);
-                }
-            } catch (error) {
-                console.error("Failed to fetch category data:", error);
-                setIsModalVisible(false);
-            } finally {
-                setIsModalLoading(false);
-            }
+        if (isError) {
+            handleApiErrorWithRetry(error, setVisibleConnectionError);
         } else {
-            setIsModalVisible(true);
+            setVisibleConnectionError(false);
         }
-    }, [token, logout, toastRef]);
+    }, [isError, error]);
 
     const closeModal = useCallback(() => {
         setIsModalVisible(false);
@@ -98,53 +51,100 @@ export const useCategory = ({toastRef}: UseCategoryProps) => {
         }, 300);
     }, []);
 
+    const {
+        data: categoryDataForEdit,
+        isLoading: isModalLoading,
+        isError: isGetCategoryError,
+        error: getCategoryError
+    } = useQuery({
+        queryKey: ['category', selectedCategoryId],
+        queryFn: () => CategoryService.getCategory(selectedCategoryId!),
+        enabled: modalMode === 'edit' && !!selectedCategoryId && isModalVisible,
+        retry: false,
+    });
+
+    useEffect(() => {
+        if (isGetCategoryError) {
+            handleApiError(getCategoryError, toastRef);
+            closeModal();
+        }
+    }, [isGetCategoryError, getCategoryError, toastRef, closeModal]);
+
+
+    useEffect(() => {
+        if (categoryDataForEdit) {
+            setFormData(categoryDataForEdit);
+        }
+    }, [categoryDataForEdit]);
+
+    const openModal = useCallback((mode: ModalMode, categoryId?: number) => {
+        setErrors({});
+        setFormData(INITIAL_FORM_DATA);
+        setSelectedCategoryId(categoryId || null);
+        setModalMode(mode);
+        setIsModalVisible(true);
+    }, []);
+
+    const handleMutationSuccess = (message: string) => {
+        showSuccessToast(toastRef, message);
+        queryClient.invalidateQueries({queryKey: ['categories']});
+        closeModal();
+    };
+
+    const handleMutationError = (error: unknown) => {
+        if (error instanceof z.ZodError) {
+            const formErrors = error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {});
+            setErrors(formErrors);
+        } else {
+            handleApiError(error, toastRef);
+        }
+    };
+
+    const createMutation = useMutation({
+        mutationFn: CategoryService.createCategory,
+        onSuccess: () => handleMutationSuccess("Kategori berhasil dibuat"),
+        onError: handleMutationError,
+    });
+
+    const updateMutation = useMutation({
+        mutationFn: (data: CategoryFormData) => CategoryService.updateCategory(selectedCategoryId!, data),
+        onSuccess: () => handleMutationSuccess("Kategori berhasil diperbarui"),
+        onError: handleMutationError,
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: () => CategoryService.deleteCategory(selectedCategoryId!),
+        onSuccess: () => handleMutationSuccess("Kategori berhasil dihapus"),
+        onError: handleMutationError,
+    });
+
     const handleSubmit = useCallback(async (e?: React.FormEvent) => {
         e?.preventDefault();
-        setIsSubmitting(true);
         setErrors({});
 
         try {
+            const validatedData = CategorySchema.parse(formData);
             switch (modalMode) {
-                case "create": {
-                    const validatedData = CategorySchema.parse(formData);
-                    await CategoryService.createCategory(validatedData, token, toastRef, logout);
-                    showSuccessToast(toastRef, "Kategori berhasil dibuat");
+                case "create":
+                    await createMutation.mutateAsync(validatedData);
                     break;
-                }
-                case "edit": {
-                    if (!selectedCategoryId) throw new Error("No category selected for update");
-                    const validatedData = CategorySchema.parse(formData);
-                    await CategoryService.updateCategory(selectedCategoryId, validatedData, token, toastRef, logout);
-                    showSuccessToast(toastRef, "Kategori berhasil diperbarui");
+                case "edit":
+                    if (!selectedCategoryId) return;
+                    await updateMutation.mutateAsync(validatedData);
                     break;
-                }
-                case "delete": {
-                    if (!selectedCategoryId) throw new Error("No category selected for deletion");
-                    await CategoryService.deleteCategory(selectedCategoryId, token, toastRef, logout);
-                    showSuccessToast(toastRef, "Kategori berhasil dihapus");
+                case "delete":
+                    if (!selectedCategoryId) return;
+                    await deleteMutation.mutateAsync();
                     break;
-                }
-                default:
-                    throw new Error("Invalid modal mode");
             }
-            
-            fetchData();
-            closeModal();
-
         } catch (error) {
             if (error instanceof z.ZodError) {
-                const formErrors = error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {});
-                setErrors(formErrors);
-            } else {
-                console.error("An unhandled error occurred:", error);
+                handleMutationError(error);
             }
-        } finally {
-            setIsSubmitting(false);
         }
-    }, [
-        modalMode, formData, selectedCategoryId, token, logout,
-        fetchData, closeModal, toastRef
-    ]);
+    }, [modalMode, formData, selectedCategoryId, createMutation, updateMutation, deleteMutation]);
+    
+    const isSubmitting = createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
 
     return {
         modalState: {
@@ -158,12 +158,12 @@ export const useCategory = ({toastRef}: UseCategoryProps) => {
         errors,
         listData,
         connectionState: {
-            isLoading: visibleLoadingConnection,
+            isLoading: isListLoading,
             isError: visibleConnectionError,
         },
         openModal,
         closeModal,
         handleSubmit,
-        fetchData,
+        refetch,
     };
 };

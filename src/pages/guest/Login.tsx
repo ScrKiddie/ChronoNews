@@ -8,7 +8,9 @@ import {Turnstile, TurnstileInstance} from "@marsidev/react-turnstile";
 import GuestFormContainer from "../../components/GuestFormContainer.tsx";
 import SubmitButton from "../../components/SubmitButton.tsx";
 import InputGroup from "../../components/InputGroup.tsx";
-import {showErrorToast, showSuccessToast} from "../../utils/toastHandler.tsx";
+import {handleApiError, showSuccessToast} from "../../utils/toastHandler.tsx";
+import { useMutation } from "@tanstack/react-query";
+import { z } from "zod";
 
 const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
@@ -21,13 +23,8 @@ const Login: React.FC = () => {
         password: "",
         tokenCaptcha: "",
     });
-    const [errors, setError] = useState({
-        email: "",
-        password: "",
-        tokenCaptcha: "",
-    });
-    const [loading, setLoading] = useState(false);
-    const ref = useRef<TurnstileInstance>(null);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const captchaRef = useRef<TurnstileInstance>(null);
 
     useEffect(() => {
         if (token) {
@@ -35,46 +32,42 @@ const Login: React.FC = () => {
         }
     }, [token, navigate]);
 
+    const loginMutation = useMutation({
+        mutationFn: loginUser,
+        onSuccess: (response) => {
+            login(response.data);
+            showSuccessToast(toastRef, "Berhasil masuk ke sistem");
+            navigate("/admin/beranda");
+        },
+        onError: (error: any) => {
+            handleApiError(error, toastRef);
+
+            if (error?.status === 401 || error?.status === 400) {
+                setErrors({
+                    email: error.message,
+                    password: error.message,
+                });
+            }
+
+            setData(prev => ({ ...prev, tokenCaptcha: "" }));
+            captchaRef.current?.reset();
+        }
+    });
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
-
-        const result = loginSchema.safeParse(data);
-
-        if (!result.success) {
-            const errorMessages = {
-                email: "",
-                password: "",
-                tokenCaptcha: "",
-            };
-            result.error.errors.forEach((err) => {
-                errorMessages[err.path[0]] = err.message;
-            });
-            setError(errorMessages);
-            setLoading(false);
-            return;
-        }
-
-        setError({
-            email: "",
-            password: "",
-            tokenCaptcha: "",
-        });
+        setErrors({});
 
         try {
-            const response = await loginUser(data);
-            login(response.data);
-            showSuccessToast(toastRef,"Berhasil masuk ke sistem")
-            navigate("/admin/beranda");
+            const validatedData = loginSchema.parse(data);
+            await loginMutation.mutateAsync(validatedData);
         } catch (error) {
-            showErrorToast(toastRef, (error as any).message)
-        } finally {
-            setData(prev => ({ ...prev, tokenCaptcha: "" }));
-            ref.current?.reset();
-            setLoading(false);
+            if (error instanceof z.ZodError) {
+                const formErrors = error.errors.reduce((acc, err) => ({ ...acc, [err.path[0]]: err.message }), {});
+                setErrors(formErrors);
+            }
         }
     };
-
 
     return (
         <GuestFormContainer
@@ -86,12 +79,8 @@ const Login: React.FC = () => {
                         label="Email"
                         data={data.email}
                         error={errors.email}
-                        setData={(e) => {
-                            setData(prev => ({...prev, email: e}));
-                        }}
-                        setError={(e) => {
-                            setError(prev => ({...prev, email: e}));
-                        }}
+                        setData={(e) => setData(prev => ({...prev, email: e}))}
+                        setError={(e) => setErrors(prev => ({...prev, email: e}))}
                     />
                 </div>
                 <div className="mb-2">
@@ -100,31 +89,27 @@ const Login: React.FC = () => {
                         label="Password"
                         data={data.password}
                         error={errors.password}
-                        setData={(e) => {
-                            setData(prev => ({...prev, password: e}));
-                        }}
-                        setError={(e) => {
-                            setError(prev => ({...prev, password: e}));
-                        }}
+                        setData={(e) => setData(prev => ({...prev, password: e}))}
+                        setError={(e) => setErrors(prev => ({...prev, password: e}))}
                     />
                 </div>
                 <div className="flex flex-col mb-2">
                     <Turnstile
-                        ref={ref}
+                        ref={captchaRef}
                         options={{language: "id", size: "flexible"}}
                         siteKey={turnstileSiteKey}
                         onSuccess={(token) => setData(prev => ({...prev, tokenCaptcha: token}))}
                         onError={() => {
-                            setData(prev => ({...prev, tokenCaptcha: ""}))
-                            ref.current?.reset();
+                            setData(prev => ({...prev, tokenCaptcha: ""}));
+                            captchaRef.current?.reset();
                         }}
                         onExpire={() => {
-                            setData(prev => ({...prev, tokenCaptcha: ""}))
-                            ref.current?.reset();
+                            setData(prev => ({...prev, tokenCaptcha: ""}));
+                            captchaRef.current?.reset();
                         }}
                     />
                 </div>
-                <SubmitButton loading={loading} captchaMode={true} tokenCaptcha={data.tokenCaptcha}/>
+                <SubmitButton loading={loginMutation.isPending} captchaMode={true} tokenCaptcha={data.tokenCaptcha}/>
             </form>
             <h1 className="m-0 mt-2  text-sm font-normal text-center" style={{color: 'var(--surface-600)'}}>
                 Lupa Password? <span
@@ -135,7 +120,6 @@ const Login: React.FC = () => {
         Permintaan Reset
       </span>
             </h1>
-
         </GuestFormContainer>
     );
 };

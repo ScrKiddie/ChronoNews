@@ -22,7 +22,7 @@ const Journalist = () => {
         size,
         setSize,
         totalItem,
-        fetchData,
+        refetch,
         visibleConnectionError,
         visibleLoadingConnection,
     } = useSearchUser();
@@ -38,7 +38,6 @@ const Journalist = () => {
         cropperProps,
     } = useUserManagement({
         toastRef,
-        fetchData,
         pagination: {page, setPage, totalItem, size},
     });
 
@@ -87,7 +86,7 @@ const Journalist = () => {
             {/* Connection Error/Loading */}
             <LoadingRetry
                 visibleConnectionError={visibleConnectionError}
-                onRetry={fetchData}
+                onRetry={refetch}
                 visibleLoadingConnection={visibleLoadingConnection}
             />
 

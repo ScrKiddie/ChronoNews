@@ -30,6 +30,7 @@ const PostModal = ({
                        isEditMode,
                        role,
                        editorContent,
+                       setEditorContent,
                        setThumbnail,
                        setCroppedImage
                    }) => {
@@ -83,13 +84,6 @@ const PostModal = ({
         }
     }, [uploadImage, imageHandler]);
 
-
-    useEffect(() => {
-        if (data?.content) {
-            editorContent.current = data.content;
-        }
-    }, [data?.content]);
-
     const {sub} = useAuth()
 
     const handleTextChange = useCallback((htmlValue) => {
@@ -98,24 +92,8 @@ const PostModal = ({
         } else {
             if(errors) errors.content = false;
         }
-        editorContent.current = htmlValue;
-    }, [errors]);
-
-    const processContentForSubmit = (htmlContent: string | null | undefined) => {
-        if (!htmlContent) return "";
-
-        const contentToProcess = String(htmlContent);
-
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(contentToProcess, 'text/html');
-        const images = doc.querySelectorAll('img');
-        images.forEach(img => img.removeAttribute('src'));
-        return doc.body.innerHTML;
-    };
-
-    const handleFormSubmit = (e) => {
-        handleSubmit(e, processContentForSubmit(editorContent.current))
-    }
+        setEditorContent(htmlValue);
+    }, [errors, setEditorContent]);
 
     const {
         isMenuVisible,
@@ -178,7 +156,7 @@ const PostModal = ({
             onHide={onClose}
         >
 
-            <form onSubmit={handleFormSubmit} className="w-full">
+            <form onSubmit={handleSubmit} className="w-full">
                 <div className="flex flex-col p-4 gap-4">
                     <div className="w-full">
                         <InputGroup
@@ -305,7 +283,7 @@ const PostModal = ({
                                 onLoad={handleEditorLoad}
                                 id={`content`}
                                 modules={getQuillModules()}
-                                value={editorContent?.current || data?.content || ""}
+                                value={editorContent}
                                 onTextChange={(e) => handleTextChange(e.htmlValue || "")}
 
                                 headerTemplate={

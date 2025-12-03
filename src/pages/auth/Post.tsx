@@ -22,7 +22,7 @@ const Post = () => {
         size,
         setSize,
         totalItem,
-        fetchData,
+        refetch,
         visibleConnectionError,
         visibleLoadingConnection,
     } = useSearchPost();
@@ -36,13 +36,13 @@ const Post = () => {
         closeModal,
         handleSubmit,
         handleDeleteConfirm,
-        editorContentRef,
+        editorContent,
+        setEditorContent,
         cropperProps,
         options,
         role,
     } = usePostManagement({
         toastRef,
-        fetchData,
         pagination: {page, setPage, totalItem, size},
     });
 
@@ -108,7 +108,7 @@ const Post = () => {
             {/* Connection Error/Loading */}
             <LoadingRetry
                 visibleConnectionError={visibleConnectionError}
-                onRetry={fetchData}
+                onRetry={refetch}
                 visibleLoadingConnection={visibleLoadingConnection}
             />
 
@@ -133,8 +133,9 @@ const Post = () => {
                 handleImageChange={cropperProps.handleImageChange}
                 setCroppedImage={cropperProps.setCroppedImage}
                 setThumbnail={cropperProps.setThumbnail}
-
-                editorContent={editorContentRef}
+                // editor
+                editorContent={editorContent}
+                setEditorContent={setEditorContent}
             />
 
             {/* Modal Loading for fetching data */}

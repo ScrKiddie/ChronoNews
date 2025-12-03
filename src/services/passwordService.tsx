@@ -1,20 +1,12 @@
-import {handleApiError} from "../utils/toastHandler.tsx";
 import apiClient from "./apiClient.tsx";
 
 export const PasswordService = {
-    updatePassword: async (data, token, toast, logout) => {
-        try {
-            const response = await apiClient.patch(`/user/current/password`, data, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                }
-            });
-
-            return response.data.data;
-        } catch (error) {
-            handleApiError(error, toast, logout);
-            throw error;
-        }
+    updatePassword: async (data: any) => {
+        const response = await apiClient.patch(`/user/current/password`, data, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        return response.data.data;
     }
 };
