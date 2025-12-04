@@ -1,6 +1,12 @@
 import ChronoNewsLogo from "../../public/chrononews.svg";
+import React from "react";
 
-const GuestFormContainer = ({children, title = ""}) => {
+interface GuestFormContainerProps {
+    children: React.ReactNode;
+    title?: string | React.ReactNode;
+}
+
+const GuestFormContainer: React.FC<GuestFormContainerProps> = ({children, title = ""}) => {
     return (
         <div
             className="flex justify-center flex-col items-center min-h-screen max-h-fit bg-cover bg-center bg-white xl:bg-[#f2f2f2]">

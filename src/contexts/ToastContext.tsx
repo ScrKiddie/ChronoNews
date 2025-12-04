@@ -1,16 +1,20 @@
-import {createContext, useRef, RefObject} from "react";
-import {Toast} from "primereact/toast";
+import { createContext, useRef, ReactNode, FC } from "react";
+import { Toast } from "primereact/toast";
+import { ToastContextType } from "../types/toast.tsx";
 
+export const ToastContext = createContext<ToastContextType>(null);
 
-type ToastRef = RefObject<Toast | null>;
-export const ToastContext = createContext<ToastRef | null>(null);
+interface ToastProviderProps {
+    children: ReactNode;
+}
 
-export const ToastProvider = ({children}) => {
-    const toastRef = useRef<Toast>(null);
+export const ToastProvider: FC<ToastProviderProps> = ({ children }) => {
+    const toastRef = useRef<Toast | null>(null);
+
     return (
         <ToastContext.Provider value={toastRef}>
             {children}
-            <Toast ref={toastRef} position="top-center"/>
+            <Toast ref={toastRef} position="top-center" />
         </ToastContext.Provider>
     );
 };

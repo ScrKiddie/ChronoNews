@@ -1,16 +1,17 @@
-import { RefObject } from "react";
+import { ApiError } from "../types/api.tsx";
+import { ToastRef } from "../types/toast.tsx"; // Import dari types
 
-export const showSuccessToast = (toastRef: RefObject<any>, message: string) => {
-    toastRef?.current?.show({ severity: "success", detail: message, life: 2000 });
+export const showSuccessToast = (toastRef: ToastRef, message: string) => {
+    toastRef.current?.show({ severity: "success", detail: message, life: 2000 });
 };
 
-export const showErrorToast = (toastRef: RefObject<any>, message: string) => {
-    toastRef?.current?.show({ severity: "error", detail: message, life: 3000 });
+export const showErrorToast = (toastRef: ToastRef, message: string) => {
+    toastRef.current?.show({ severity: "error", detail: message, life: 3000 });
 };
 
 export const handleApiError = (
-    error: any,
-    toastRef: RefObject<any>
+    error: ApiError,
+    toastRef: ToastRef
 ) => {
     if (error?.isCancelled) {
         console.log("Request cancelled:", error.message);
@@ -25,7 +26,7 @@ export const handleApiError = (
 };
 
 export const handleApiErrorWithRetry = (
-    error: any,
+    error: ApiError,
     setVisibleConnectionError: (visible: boolean) => void
 ) => {
     if (error?.isCancelled) {

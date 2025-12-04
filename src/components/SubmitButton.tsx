@@ -1,6 +1,13 @@
 import {Button} from "primereact/button";
+import React from "react";
 
-const SubmitButton = ({loading, tokenCaptcha="", captchaMode=false}) => {
+interface SubmitButtonProps {
+    loading: boolean;
+    tokenCaptcha?: string;
+    captchaMode?: boolean;
+}
+
+const SubmitButton: React.FC<SubmitButtonProps> = ({loading, tokenCaptcha="", captchaMode=false}) => {
     return (
         <Button
             className="w-full flex items-center justify-center font-normal"

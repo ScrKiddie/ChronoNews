@@ -11,6 +11,7 @@ import InputGroup from "../../components/InputGroup.tsx";
 import {handleApiError, showSuccessToast} from "../../utils/toastHandler.tsx";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
+import { ApiError } from "../../types/api.tsx";
 
 const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
@@ -39,7 +40,7 @@ const Login: React.FC = () => {
             showSuccessToast(toastRef, "Berhasil masuk ke sistem");
             navigate("/admin/beranda");
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
             handleApiError(error, toastRef);
 
             if (error?.status === 401 || error?.status === 400) {
@@ -71,7 +72,6 @@ const Login: React.FC = () => {
 
     return (
         <GuestFormContainer
-            // @ts-expect-error: custom title
             title={<p>Masuk Ke Sistem</p>}>
             <form onSubmit={handleSubmit} className="w-full">
                 <div className="mb-2 mt-2 w-full">

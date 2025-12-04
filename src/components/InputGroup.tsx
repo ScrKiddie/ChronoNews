@@ -2,13 +2,20 @@ import {InputText} from "primereact/inputtext";
 import {Password} from "primereact/password";
 import {Dropdown} from "primereact/dropdown";
 
-const InputGroup = ({
-                        type = "text", label = "", data = "", setData = (a) => {
-        return a
-    }, error, setError = (a) => {
-        return a
-    }, tip = "", options=  [] as { label: string; value: string }[]
-                    }) => {
+interface InputGroupProps<T extends string | number | readonly string[] | undefined> {
+    type?: 'text' | 'password' | 'dropdown';
+    label?: string;
+    data?: T;
+    setData?: (value: T) => void;
+    error?: string;
+    setError?: (error: string) => void;
+    tip?: string;
+    options?: { label: string; value: T }[];
+}
+
+const InputGroup = <T extends string | number | readonly string[] | undefined>({
+                        type = "text", label = "", data = "" as T, setData = () => {}, error, setError = () => {}, tip = "", options=  []
+                    }: InputGroupProps<T>) => {
     return (
         <>
             <label htmlFor={label.replace(/\s+/g, '').toLowerCase()}
@@ -16,24 +23,24 @@ const InputGroup = ({
             {type == "text" && <InputText
                 id={label.replace(/\s+/g, '').toLowerCase()}
                 className={`w-full`}
-                invalid={error}
-                value={data}
+                invalid={!!error}
+                value={data as string}
                 onChange={(e) => {
-                    setData(e.target.value);
-                    setError("");
+                    if(setData) setData(e.target.value as T);
+                    if(setError) setError("");
                 }}
 
             />}
             {type == "password" && <Password
                 id={label.replace(/\s+/g, '').toLowerCase()}
                 className={`w-full`}
-                invalid={error}
+                invalid={!!error}
                 feedback={false}
                 toggleMask
-                value={data}
+                value={data as string}
                 onChange={(e) => {
-                    setData(e.target.value);
-                    setError("");
+                    if(setData) setData(e.target.value as T);
+                    if(setError) setError("");
                 }}
             />}
             {type == "dropdown" && <Dropdown
@@ -42,11 +49,11 @@ const InputGroup = ({
                 options={options}
                 value={data}
                 onChange={(e) => {
-                    setData(e.target.value);
-                    setError("");
+                    if(setData) setData(e.value as T);
+                    if(setError) setError("");
                 }}
 
-                invalid={error}
+                invalid={!!error}
             />}
             {error && <small className="p-error">{error}</small>}
             {!error && tip != "" && <small className="text-gray-500">{tip}</small>}
