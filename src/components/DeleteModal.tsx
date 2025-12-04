@@ -1,13 +1,20 @@
 import {Button} from "primereact/button";
 import {ConfirmDialog} from "primereact/confirmdialog";
 
-const DeleteModal = ({visibleModal, setVisibleModal, onSubmit, submitLoading}) => {
+interface DeleteModalProps {
+    visibleModal: boolean;
+    setVisibleModal: () => void;
+    onSubmit: () => void;
+    submitLoading: boolean;
+}
+
+const DeleteModal = ({visibleModal, setVisibleModal, onSubmit, submitLoading}: DeleteModalProps) => {
     const footer = (
         <div className="flex justify-end gap-2">
             <Button
                 className="flex items-center justify-center font-normal"
                 onClick={() => {
-                    setVisibleModal(false);
+                    setVisibleModal();
                 }}
                 text
                 disabled={submitLoading}

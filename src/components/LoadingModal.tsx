@@ -1,4 +1,8 @@
-const LoadingModal = ({modalLoading}) => {
+interface LoadingModalProps {
+    modalLoading: boolean;
+}
+
+const LoadingModal = ({modalLoading}: LoadingModalProps) => {
     return (
         <div
             className={`flex items-center justify-center p-dialog-mask p-dialog-center p-component-overlay p-component-overlay-enter ${modalLoading ? "block" : "hidden"}`}

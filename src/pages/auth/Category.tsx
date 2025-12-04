@@ -78,7 +78,7 @@ const Category = () => {
             <DeleteModal
                 submitLoading={modalState.isSubmitting}
                 visibleModal={modalState.isVisible && modalState.mode === "delete"}
-                setVisibleModal={(isVisible) => !isVisible && closeModal()}
+                setVisibleModal={closeModal}
                 onSubmit={handleSubmit}
             />
         </div>

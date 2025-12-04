@@ -1,6 +1,18 @@
 import {Dialog} from "primereact/dialog";
 import InputGroup from "./InputGroup.tsx";
 import SubmitButton from "./SubmitButton.tsx";
+import {Dispatch, SetStateAction} from "react";
+
+interface CategoryModalProps {
+    visible: boolean;
+    onClose: () => void;
+    data: { name: string };
+    setData: Dispatch<SetStateAction<{ name: string }>>;
+    errors: Record<string, string>;
+    submitLoading: boolean;
+    handleSubmit: (e?: React.FormEvent) => Promise<void>;
+    isEditMode: boolean;
+}
 
 const CategoryModal = ({
                            visible,
@@ -11,7 +23,7 @@ const CategoryModal = ({
                            submitLoading,
                            handleSubmit,
                            isEditMode,
-                       }) => {
+                       }: CategoryModalProps) => {
     return (
         <Dialog
             closable={!submitLoading}
@@ -35,7 +47,7 @@ const CategoryModal = ({
                             data={data?.name}
                             error={errors.name}
                             setData={(e) => {
-                                setData(prev => ({...prev, name: e}));
+                                setData((prev: { name: string }) => ({...prev, name: e}));
                             }}
                             setError={(e) => {errors.name = e}}
                         />

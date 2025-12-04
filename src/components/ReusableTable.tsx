@@ -1,13 +1,20 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, ReactNode} from "react";
 import {DataTable} from "primereact/datatable";
 import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
+import {Category} from "../types/category.ts";
+
+interface ReusableTableProps {
+    handleVisibleCreateModal: () => void;
+    data: Category[];
+    children: ReactNode;
+}
 
 const ReusableTable = ({
                            handleVisibleCreateModal,
                            data,
                            children
-                       }) => {
+                       }: ReusableTableProps) => {
     const [inputValue, setInputValue] = useState("");
     const [globalFilter, setGlobalFilter] = useState("");
 

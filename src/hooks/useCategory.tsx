@@ -1,9 +1,11 @@
-import {useState, useCallback, RefObject, useEffect} from "react";
+import {useState, useCallback, useEffect} from "react";
 import {z} from "zod";
 import {CategoryService} from "../services/categoryService.tsx";
 import {CategorySchema} from "../schemas/categorySchema.tsx";
 import {handleApiError, handleApiErrorWithRetry, showSuccessToast} from "../utils/toastHandler.tsx";
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
+import {ApiError} from "../types/api.tsx";
+import {ToastRef} from "../types/toast.tsx";
 
 type ModalMode = "create" | "edit" | "delete" | null;
 
@@ -12,7 +14,7 @@ interface CategoryFormData {
 }
 
 interface UseCategoryProps {
-    toastRef: RefObject<any>;
+    toastRef: ToastRef;
 }
 
 const INITIAL_FORM_DATA: CategoryFormData = {
@@ -37,7 +39,7 @@ export const useCategory = ({toastRef}: UseCategoryProps) => {
 
     useEffect(() => {
         if (isError) {
-            handleApiErrorWithRetry(error, setVisibleConnectionError);
+            handleApiErrorWithRetry(error as ApiError, setVisibleConnectionError);
         } else {
             setVisibleConnectionError(false);
         }
@@ -65,7 +67,7 @@ export const useCategory = ({toastRef}: UseCategoryProps) => {
 
     useEffect(() => {
         if (isGetCategoryError) {
-            handleApiError(getCategoryError, toastRef);
+            handleApiError(getCategoryError as ApiError, toastRef);
             closeModal();
         }
     }, [isGetCategoryError, getCategoryError, toastRef, closeModal]);
@@ -96,7 +98,7 @@ export const useCategory = ({toastRef}: UseCategoryProps) => {
             const formErrors = error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {});
             setErrors(formErrors);
         } else {
-            handleApiError(error, toastRef);
+            handleApiError(error as ApiError, toastRef);
         }
     };
 
@@ -115,32 +117,34 @@ export const useCategory = ({toastRef}: UseCategoryProps) => {
     const deleteMutation = useMutation({
         mutationFn: () => CategoryService.deleteCategory(selectedCategoryId!),
         onSuccess: () => handleMutationSuccess("Kategori berhasil dihapus"),
-        onError: handleMutationError,
+        onError: (error) => handleApiError(error as ApiError, toastRef),
     });
 
     const handleSubmit = useCallback(async (e?: React.FormEvent) => {
         e?.preventDefault();
         setErrors({});
 
-        try {
-            const validatedData = CategorySchema.parse(formData);
-            switch (modalMode) {
-                case "create":
-                    await createMutation.mutateAsync(validatedData);
-                    break;
-                case "edit":
-                    if (!selectedCategoryId) return;
-                    await updateMutation.mutateAsync(validatedData);
-                    break;
-                case "delete":
-                    if (!selectedCategoryId) return;
-                    await deleteMutation.mutateAsync();
-                    break;
-            }
-        } catch (error) {
-            if (error instanceof z.ZodError) {
-                handleMutationError(error);
-            }
+        switch (modalMode) {
+            case "create":
+            case "edit":
+                try {
+                    const validatedData = CategorySchema.parse(formData);
+                    if (modalMode === "create") {
+                        await createMutation.mutateAsync(validatedData);
+                    } else {
+                        if (!selectedCategoryId) return;
+                        await updateMutation.mutateAsync(validatedData);
+                    }
+                } catch (error) {
+                    if (error instanceof z.ZodError) {
+                        handleMutationError(error);
+                    }
+                }
+                break;
+            case "delete":
+                if (!selectedCategoryId) return;
+                await deleteMutation.mutateAsync();
+                break;
         }
     }, [modalMode, formData, selectedCategoryId, createMutation, updateMutation, deleteMutation]);
     
