@@ -1,8 +1,9 @@
 import apiClient from "./apiClient.tsx";
-import {GenericAbortSignal} from "axios";
+import { GenericAbortSignal } from "axios";
+import { UserCreateRequest, UserUpdateRequest } from "../types/user.tsx";
 
 export const UserService = {
-    createUser: async (data: any) => {
+    createUser: async (data: UserCreateRequest) => {
         const formData = new FormData();
         formData.append("name", data.name);
         formData.append("phoneNumber", data.phoneNumber);
@@ -18,7 +19,7 @@ export const UserService = {
         return response.data.data;
     },
 
-    searchUser: async (filters: any = {}, signal?: GenericAbortSignal) => {
+    searchUser: async (filters: Record<string, string> = {}, signal?: GenericAbortSignal) => {
         const queryParams = new URLSearchParams(filters).toString();
         const response = await apiClient.get(`/user?${queryParams}`, { signal });
         return response.data;
@@ -29,12 +30,12 @@ export const UserService = {
         return response.data.data;
     },
 
-    updateUser: async (id: number, data: any) => {
+    updateUser: async (id: number, data: UserUpdateRequest) => {
         const formData = new FormData();
-        formData.append("name", data.name);
-        formData.append("phoneNumber", data.phoneNumber);
-        formData.append("email", data.email);
-        formData.append("role", data.role);
+        if (data.name) formData.append("name", data.name);
+        if (data.phoneNumber) formData.append("phoneNumber", data.phoneNumber);
+        if (data.email) formData.append("email", data.email);
+        if (data.role) formData.append("role", data.role);
         if (data.password) {
             formData.append("password", data.password);
         }

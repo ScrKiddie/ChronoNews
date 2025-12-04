@@ -1,4 +1,5 @@
 import apiClient from "./apiClient.tsx";
+import { UserUpdateRequest } from "../types/user.tsx";
 
 export const ProfileService = {
     getCurrentUser: async () => {
@@ -6,11 +7,11 @@ export const ProfileService = {
         return response.data.data;
     },
     
-    updateCurrentUser: async (data: any) => {
+    updateCurrentUser: async (data: UserUpdateRequest) => {
         const formData = new FormData();
-        formData.append("name", data.name);
-        formData.append("phoneNumber", data.phoneNumber);
-        formData.append("email", data.email);
+        if (data.name) formData.append("name", data.name);
+        if (data.phoneNumber) formData.append("phoneNumber", data.phoneNumber);
+        if (data.email) formData.append("email", data.email);
         if (data.profilePicture) {
             formData.append("profilePicture", data.profilePicture);
         }

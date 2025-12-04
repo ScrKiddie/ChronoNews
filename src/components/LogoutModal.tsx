@@ -1,7 +1,14 @@
 import {Button} from "primereact/button";
 import {ConfirmDialog} from "primereact/confirmdialog";
+import {Dispatch, SetStateAction} from "react";
 
-const LogoutModal = ({visible, setVisible, onLogout}) => {
+interface LogoutModalProps {
+    visible: boolean;
+    setVisible: Dispatch<SetStateAction<boolean>>;
+    onLogout: () => void;
+}
+
+const LogoutModal = ({visible, setVisible, onLogout}: LogoutModalProps) => {
     const footer = (
         <div className="flex justify-end gap-2">
             <Button

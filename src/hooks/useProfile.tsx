@@ -1,30 +1,27 @@
-import {useState, useCallback, RefObject, useEffect} from "react";
+import {useState, useCallback, useEffect} from "react";
 import {z} from "zod";
 import {ProfileService} from "../services/profileService.tsx";
 import {ProfileSchema} from "../schemas/profileSchema.tsx";
 import {useCropper} from "./useCropper";
 import {handleApiError, showSuccessToast} from "../utils/toastHandler.tsx";
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
+import {UserFormData} from "../types/user.tsx";
+import { ToastRef } from "../types/toast.tsx";
+import { ApiError } from "../types/api.tsx";
 
-interface ProfileFormData {
-    name: string;
-    email: string;
-    phoneNumber: string;
-    deleteProfilePicture?: boolean;
-}
-
-const INITIAL_FORM_DATA: ProfileFormData = {
+const INITIAL_FORM_DATA: UserFormData = {
     name: "",
     email: "",
     phoneNumber: "",
     deleteProfilePicture: false,
+    role: "",
 };
 
-export const useProfile = (toastRef: RefObject<any>) => {
+export const useProfile = (toastRef: ToastRef) => {
     const queryClient = useQueryClient();
 
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [formData, setFormData] = useState<ProfileFormData>(INITIAL_FORM_DATA);
+    const [formData, setFormData] = useState<UserFormData>(INITIAL_FORM_DATA);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [profilePicture, setProfilePicture] = useState<File | null>(null);
 
@@ -57,8 +54,8 @@ export const useProfile = (toastRef: RefObject<any>) => {
     }, [profileData, isModalVisible]);
 
     useEffect(() => {
-        if (isError) {
-            handleApiError(error, toastRef);
+        if (isError && error) {
+            handleApiError(error as ApiError, toastRef);
             closeModal();
         }
     }, [isError, error, toastRef, closeModal]);
@@ -72,14 +69,14 @@ export const useProfile = (toastRef: RefObject<any>) => {
         setIsModalVisible(true);
     }, [cropper]);
 
-    const handleMutationError = (error: any) => {
+    const handleMutationError = (error: ApiError | z.ZodError) => {
         if (error instanceof z.ZodError) {
             const formErrors = error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {});
             setErrors(formErrors);
         } else {
             handleApiError(error, toastRef);
 
-            if (error?.status === 409 && error.message) {
+            if ('status' in error && error.status === 409 && error.message) {
                 if (error.message.toLowerCase().includes('email')) {
                     setErrors(prev => ({ ...prev, email: error.message }));
                 } else if (error.message.toLowerCase().includes('telepon') || error.message.toLowerCase().includes('phone')) {

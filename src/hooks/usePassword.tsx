@@ -4,10 +4,12 @@ import {PasswordSchema} from "../schemas/passwordSchema.tsx";
 import {PasswordService} from "../services/passwordService.tsx";
 import {handleApiError, showSuccessToast} from "../utils/toastHandler.tsx";
 import {useMutation} from "@tanstack/react-query";
+import {ToastRef} from "../types/toast.tsx";
+import { ApiError } from "../types/api.tsx";
 
-export const usePassword = (toastRef) => {
+export const usePassword = (toastRef: ToastRef) => {
     const [visibleModal, setVisibleModal] = useState(false);
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const [data, setData] = useState({
         oldPassword: "",
         password: "",
@@ -20,11 +22,11 @@ export const usePassword = (toastRef) => {
             showSuccessToast(toastRef, "Password berhasil diperbarui");
             handleCloseModal();
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
             handleApiError(error, toastRef);
 
             if (error?.status === 401 && error.message) {
-                setErrors({ oldPassword: error.message });
+                setErrors({oldPassword: error.message});
             }
         }
     });
@@ -39,7 +41,7 @@ export const usePassword = (toastRef) => {
         setVisibleModal(false);
     }, []);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setErrors({});
 

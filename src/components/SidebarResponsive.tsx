@@ -1,6 +1,6 @@
 import {Sidebar, Menu} from "react-pro-sidebar";
 import ChronoNewsLogo from "../../public/chrononews.svg";
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, ReactNode} from "react";
 import MenuItemResponsive from "./MenuItemResponsive.tsx";
 import {Button} from "primereact/button";
 import {Menu as PrimeMenu} from "primereact/menu";
@@ -17,14 +17,17 @@ import {useAuth} from "../hooks/useAuth.tsx";
 import {useLocation} from "react-router-dom";
 import {useProfile} from "../hooks/useProfile.tsx";
 
-const SidebarResponsive = ({children}) => {
+interface SidebarResponsiveProps {
+    children: ReactNode;
+}
+
+const SidebarResponsive = ({children}: SidebarResponsiveProps) => {
     const {role} = useAuth();
     const toastRef = useToast();
     const {
         collapsed,
         toggled,
         isMenuVisible,
-        buttonRef,
         menuContainerRef,
         handleSidebarToggle,
         toggleMenuVisibility,
@@ -60,12 +63,12 @@ const SidebarResponsive = ({children}) => {
         visibleModal: visiblePasswordModal
     } = usePassword(toastRef);
 
-    const scrollRef = useRef(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
 
     const {pathname} = useLocation();
     useEffect(() => {
-        if (scrollRef.current as any) {
-            (scrollRef.current as any).scrollTop = 0;
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = 0;
         }
     }, [pathname]);
 
@@ -141,7 +144,7 @@ const SidebarResponsive = ({children}) => {
                         </div>
 
 
-                        <Button ref={buttonRef} severity="secondary" onClick={toggleMenuVisibility} text rounded
+                        <Button severity="secondary" onClick={toggleMenuVisibility} text rounded
                                 className={`size-8`} icon={<i className={`pi pi-bars text-xl`}/>}/>
                         <div ref={menuContainerRef} className={`absolute top-0 right-0`}>
                             <PrimeMenu
@@ -213,10 +216,10 @@ const SidebarResponsive = ({children}) => {
 
             {/*modal cropper*/}
             <CropImageModal
-                id={"user-cropper"}
+                id="user-cropper"
                 visible={profileCropperProps.visibleCropImageModal}
                 onClose={profileCropperProps.handleCloseCropImageModal}
-                selectedImage={profileCropperProps.selectedImage}
+                selectedImage={profileCropperProps.selectedImage as string | null}
                 onCrop={profileCropperProps.handleCrop}
                 cropperRef={profileCropperProps.cropperRef}
                 imageRef={profileCropperProps.imageRef}

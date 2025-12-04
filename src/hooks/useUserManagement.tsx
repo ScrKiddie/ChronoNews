@@ -7,17 +7,9 @@ import {handleApiError, showSuccessToast} from "../utils/toastHandler.tsx";
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
 import {ToastRef} from "../types/toast.tsx";
 import {ApiError} from "../types/api.tsx";
+import {UserFormData, UserUpdateRequest} from "../types/user.tsx"
 
 type ModalMode = "create" | "edit" | "delete" | null;
-
-interface UserFormData {
-    name: string;
-    phoneNumber: string;
-    email: string;
-    password?: string;
-    role: string;
-    deleteProfilePicture?: boolean;
-}
 
 interface UseUserManagementProps {
     toastRef: ToastRef;
@@ -136,7 +128,10 @@ export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps
     });
 
     const updateUserMutation = useMutation({
-        mutationFn: ({id, request}: { id: number, request: Partial<UserFormData> & { profilePicture?: File, deleteProfilePicture?: boolean } }) => UserService.updateUser(id, request),
+        mutationFn: ({id, request}: {
+            id: number,
+            request: UserUpdateRequest
+        }) => UserService.updateUser(id, request),
         onSuccess: (_, variables) => {
             showSuccessToast(toastRef, "Pengguna berhasil diperbarui");
             queryClient.invalidateQueries({queryKey: ['users']});
@@ -180,7 +175,7 @@ export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps
                 case "edit": {
                     if (!selectedUserId) throw new Error("No user selected for update");
                     const validatedData = UserUpdateSchema.parse(formData);
-                    const request = {
+                    const request: UserUpdateRequest = {
                         ...validatedData,
                         ...(formData.deleteProfilePicture === true ? {deleteProfilePicture: true} : {}),
                         ...(profilePicture instanceof File ? {profilePicture} : {}),

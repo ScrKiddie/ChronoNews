@@ -1,6 +1,23 @@
 import {Dialog} from "primereact/dialog";
 import InputGroup from "./InputGroup.tsx";
 import SubmitButton from "./SubmitButton.tsx";
+import {Dispatch, SetStateAction} from "react";
+
+interface PasswordData {
+    oldPassword: string;
+    password: string;
+    confirmPassword: string;
+}
+
+interface PasswordModalProps {
+    visible: boolean;
+    onClose: () => void;
+    data: PasswordData;
+    errors: Record<string, string>;
+    submitLoading: boolean;
+    handleSubmit: (e: React.FormEvent) => Promise<void>;
+    setData: Dispatch<SetStateAction<PasswordData>>;
+}
 
 const PasswordModal = ({
                            visible,
@@ -10,7 +27,7 @@ const PasswordModal = ({
                            submitLoading,
                            handleSubmit,
                            setData,
-                       }) => {
+                       }: PasswordModalProps) => {
     return (
         <Dialog
             closable={!submitLoading}
@@ -28,8 +45,12 @@ const PasswordModal = ({
                             label="Password Lama"
                             data={data?.oldPassword}
                             error={errors.oldPassword}
-                            setData={(e)=>{ setData(prev => ({ ...prev, oldPassword: e }));}}
-                            setError={(e)=>{ errors.oldPassword = e }}
+                            setData={(e: string) => {
+                                setData((prev: PasswordData) => ({...prev, oldPassword: e}));
+                            }}
+                            setError={(e: string) => {
+                                errors.oldPassword = e
+                            }}
                         />
                     </div>
                     <div className="w-full">
@@ -38,8 +59,12 @@ const PasswordModal = ({
                             label="Password Baru"
                             data={data?.password}
                             error={errors.password}
-                            setData={(e)=>{ setData(prev => ({ ...prev, password: e }));}}
-                            setError={(e)=>{ errors.password = e }}
+                            setData={(e: string) => {
+                                setData((prev: PasswordData) => ({...prev, password: e}));
+                            }}
+                            setError={(e: string) => {
+                                errors.password = e
+                            }}
                         />
                     </div>
                     <div className="w-full">
@@ -48,8 +73,12 @@ const PasswordModal = ({
                             label="Konfirmasi Password Baru"
                             data={data?.confirmPassword}
                             error={errors.confirmPassword}
-                            setData={(e)=>{ setData(prev => ({ ...prev, confirmPassword: e }));}}
-                            setError={(e)=>{ errors.confirmPassword = e }}
+                            setData={(e: string) => {
+                                setData((prev: PasswordData) => ({...prev, confirmPassword: e}));
+                            }}
+                            setError={(e: string) => {
+                                errors.confirmPassword = e
+                            }}
                         />
                     </div>
                     <SubmitButton loading={submitLoading}/>

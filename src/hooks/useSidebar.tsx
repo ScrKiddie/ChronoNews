@@ -2,6 +2,7 @@ import {useEffect, useRef, useState} from "react";
 import {useAuth} from "./useAuth.tsx";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useToast} from "./useToast.tsx";
+import {Button} from "primereact/button";
 
 export const useSidebar = () => {
     const toastRef = useToast();
@@ -11,8 +12,8 @@ export const useSidebar = () => {
     const [key, setKey] = useState(0);
     const [isModalLogoutVisible, setIsModalLogoutVisible] = useState(false)
     const {logout} = useAuth();
-    const buttonRef = useRef(null);
-    const menuContainerRef = useRef(null);
+    const buttonRef = useRef<Button>(null);
+    const menuContainerRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
     const [lastPath, setLastPath] = useState('');
     const location = useLocation();
@@ -33,12 +34,12 @@ export const useSidebar = () => {
 
     useEffect(() => {
         document.querySelectorAll('.ps-menu-label').forEach((menuLabel) => {
-            (menuLabel as any).style.display = collapsed ? "none" : "block";
+            (menuLabel as HTMLElement).style.display = collapsed ? "none" : "block";
         });
     }, [collapsed]);
 
     useEffect(() => {
-        const checkViewportWidth = () => {
+        const handleResize = () => {
             if (window.innerWidth <= 768) {
                 setCollapsed(false);
             } else {
@@ -46,17 +47,17 @@ export const useSidebar = () => {
             }
         };
 
-        checkViewportWidth();
-        window.addEventListener("resize", checkViewportWidth);
+        handleResize();
+        window.addEventListener("resize", handleResize);
 
         return () => {
-            window.removeEventListener("resize", checkViewportWidth);
+            window.removeEventListener("resize", handleResize);
         };
     }, []);
 
     const handleSidebarToggle = () => setToggled(!toggled);
 
-    const toggleMenuVisibility = (event) => {
+    const toggleMenuVisibility = (event: React.MouseEvent) => {
         event.stopPropagation();
         setIsMenuVisible((prev) => {
             if (!prev) setKey((prevKey) => prevKey + 1);
@@ -65,12 +66,10 @@ export const useSidebar = () => {
     };
 
     useEffect(() => {
-        const handleClickOutside = (event) => {
+        const handleClickOutside = (event: MouseEvent) => {
             if (
                 menuContainerRef.current &&
-                !(menuContainerRef.current as any).contains(event.target) &&
-                buttonRef.current &&
-                !(buttonRef.current as any).contains(event.target)
+                !menuContainerRef.current.contains(event.target as Node)
             ) {
                 setIsMenuVisible(false);
             }
@@ -81,6 +80,7 @@ export const useSidebar = () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
 
     return {
         collapsed,

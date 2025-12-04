@@ -7,23 +7,14 @@ import SubmitButton from "./SubmitButton.tsx";
 import {useSidebar} from "../hooks/useSidebar.tsx";
 import {Menu} from "primereact/menu";
 import {MenuItem} from "primereact/menuitem";
+import { UserFormData } from '../types/user.tsx';
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
-
-interface UserFormData {
-    name: string;
-    phoneNumber: string;
-    email: string;
-    password?: string;
-    role: string;
-    profilePicture?: string;
-    deleteProfilePicture?: boolean;
-}
 
 interface UserModalProps {
     visible: boolean;
     onClose: () => void;
-    data: UserFormData;
+    data: Partial<UserFormData>;
     setData: Dispatch<SetStateAction<UserFormData>>;
     croppedImage: string | null;
     fileInputRef: React.RefObject<HTMLInputElement>;
