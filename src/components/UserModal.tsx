@@ -1,13 +1,43 @@
 import {Dialog} from "primereact/dialog";
 import {Button} from "primereact/button";
 import defaultProfilePicture from "../assets/profilepicture.svg";
-import {useEffect, useState} from "react";
+import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import InputGroup from "./InputGroup.tsx";
 import SubmitButton from "./SubmitButton.tsx";
 import {useSidebar} from "../hooks/useSidebar.tsx";
 import {Menu} from "primereact/menu";
+import {MenuItem} from "primereact/menuitem";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
+
+interface UserFormData {
+    name: string;
+    phoneNumber: string;
+    email: string;
+    password?: string;
+    role: string;
+    profilePicture?: string;
+    deleteProfilePicture?: boolean;
+}
+
+interface UserModalProps {
+    visible: boolean;
+    onClose: () => void;
+    data: UserFormData;
+    setData: Dispatch<SetStateAction<UserFormData>>;
+    croppedImage: string | null;
+    fileInputRef: React.RefObject<HTMLInputElement>;
+    errors: Record<string, string>;
+    submitLoading: boolean;
+    handleSubmit: (e?: React.FormEvent) => Promise<void>;
+    handleClickUploadButton: () => void;
+    handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    isUserCreateMode?: boolean;
+    isUserEditMode?: boolean;
+    setProfilePicture: Dispatch<SetStateAction<File | null>>;
+    setCroppedImage: Dispatch<SetStateAction<string | null>>;
+}
+
 const UserModal = ({
                        visible,
                        onClose,
@@ -20,11 +50,11 @@ const UserModal = ({
                        handleSubmit,
                        handleClickUploadButton,
                        handleImageChange,
-                       isUserCreateMode=false,
-                       isUserEditMode=false,
+                       isUserCreateMode = false,
+                       isUserEditMode = false,
                        setProfilePicture,
                        setCroppedImage
-                   }) => {
+                   }: UserModalProps) => {
     const roleOptions = [
         {label: "Admin", value: "admin"},
         {label: "Journalist", value: "journalist"},
@@ -39,10 +69,10 @@ const UserModal = ({
         menuContainerRef,
     } = useSidebar();
 
-    const [menuItems, setMenuItems] = useState([]);
+    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
     useEffect(() => {
-        const items: any = [];
+        const items: MenuItem[] = [];
         items.push({
             label: "Ganti",
             icon: <i className="pi pi-image pr-3" />,
@@ -52,29 +82,21 @@ const UserModal = ({
             },
         });
 
-        if ((typeof data?.profilePicture === 'string' && data.profilePicture.trim() !== '') || croppedImage)
-        {
+        if ((typeof data?.profilePicture === 'string' && data.profilePicture.trim() !== '') || croppedImage) {
             items.push({
                 label: "Hapus",
                 icon: <i className="pi pi-trash pr-3" />,
                 command() {
                     setIsMenuVisible(false);
-                    if(setData){
-                        setData(prev => ({...prev, profilePicture: ""}))
-                        setData(prev => ({...prev, deleteProfilePicture: true}))
-                    }
-                    if(setProfilePicture){
-                        setProfilePicture("")
-                    }
-                    if(setCroppedImage){
-                        setCroppedImage("")
-                    }
+                    setData((prev: UserFormData) => ({...prev, profilePicture: "", deleteProfilePicture: true}));
+                    setProfilePicture(null);
+                    setCroppedImage(null);
                 },
             });
         }
 
         setMenuItems(items);
-    }, [data?.profilePicture, croppedImage, handleClickUploadButton]);
+    }, [data?.profilePicture, croppedImage, handleClickUploadButton, setData, setProfilePicture, setCroppedImage, setIsMenuVisible]);
 
     return (
         <Dialog
@@ -103,14 +125,12 @@ const UserModal = ({
                                     ? `${apiUri}/profile_picture/${data?.profilePicture}`
                                     : `${defaultProfilePicture}`)
                             }
-
-                            className="size-[14rem] rounded-full "
+                            className="size-[14rem] rounded-full"
                             style={{border: "1px solid #d1d5db"}}
+                            alt="Profile"
                         />
                         <Button
-                            onClick={
-                                toggleMenuVisibility
-                            }
+                            onClick={toggleMenuVisibility}
                             ref={buttonRef}
                             type="button"
                             className="absolute inset-0 w-full h-full bg-transparent flex items-center justify-center hover:bg-black/20 transition rounded-full"
@@ -134,64 +154,64 @@ const UserModal = ({
                     />
 
                     <div className="w-full">
-                        <div className="w-full">
-                            <InputGroup
-                                label="Nama"
-                                data={data?.name}
-                                error={errors.name}
-                                setData={(e) => {setData(prev => ({...prev, name: e}))}}
-                                setError={(e) => {errors.name = e}}
-                            />
-                        </div>
+                        <InputGroup
+                            label="Nama"
+                            data={data.name}
+                            error={errors.name}
+                            setData={(e: string) => setData((prev: UserFormData) => ({...prev, name: e}))}
+                            setError={(e: string) => { errors.name = e; }}
+                        />
                     </div>
 
                     {(isUserCreateMode || isUserEditMode) && (
                         <div className="w-full">
                             <InputGroup
-                                type={"dropdown"}
+                                type="dropdown"
                                 options={roleOptions}
                                 label="Role"
-                                data={data?.role}
+                                data={data.role}
                                 error={errors.role}
-                                setData={(e)=>{ setData(prev => ({ ...prev, role: e }));}}
-                                setError={(e)=>{ errors.role=e;}}
+                                setData={(e: string) => setData((prev: UserFormData) => ({ ...prev, role: e }))}
+                                setError={(e: string) => { errors.role = e; }}
                             />
                         </div>
                     )}
+
                     <div className="w-full">
                         <InputGroup
                             label="Email"
-                            data={data?.email}
+                            data={data.email}
                             error={errors.email}
-                            setData={(e)=>{ setData(prev => ({ ...prev, email: e }));}}
-                            setError={(e)=>{ errors.email = e}}
+                            setData={(e: string) => setData((prev: UserFormData) => ({ ...prev, email: e }))}
+                            setError={(e: string) => { errors.email = e; }}
                         />
                     </div>
 
                     <div className="w-full">
                         <InputGroup
                             label="Telepon"
-                            data={data?.phoneNumber}
+                            data={data.phoneNumber}
                             error={errors.phoneNumber}
-                            setData={(e)=>{ setData(prev => ({ ...prev, phoneNumber: e }));}}
-                            setError={(e)=>{ errors.phoneNumber = e }}
+                            setData={(e: string) => setData((prev: UserFormData) => ({ ...prev, phoneNumber: e }))}
+                            setError={(e: string) => { errors.phoneNumber = e; }}
                         />
                     </div>
 
-                    {(isUserEditMode) && (
+                    {isUserEditMode && (
                         <div className="w-full">
                             <InputGroup
                                 type="password"
                                 label="Password"
-                                data={data?.password}
+                                data={data.password || ""}
                                 error={errors.password}
-                                setData={(e)=>{ setData(prev => ({ ...prev, password: e }));}}
-                                setError={(e)=>{ errors.password = e }}
-                                tip={(isUserEditMode && !errors.password) ? "Kosongkan jika tidak ingin mengubah password" : ""}
+                                setData={(e: string) => setData((prev: UserFormData) => ({ ...prev, password: e }))}
+                                setError={(e: string) => { errors.password = e; }}
+                                tip={!errors.password ? "Kosongkan jika tidak ingin mengubah password" : ""}
                             />
                         </div>
                     )}
-                   <SubmitButton loading={submitLoading}/>
+
+                    <SubmitButton loading={submitLoading} />
                 </div>
             </form>
         </Dialog>

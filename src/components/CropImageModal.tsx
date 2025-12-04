@@ -2,18 +2,29 @@ import Cropper from "cropperjs";
 import "cropperjs/dist/cropper.css";
 import {Dialog} from "primereact/dialog";
 import {Button} from "primereact/button";
-import {JSX} from "react";
+import {JSX, RefObject} from "react";
+
+interface CropImageModalProps {
+    id?: string;
+    aspectRatio?: number;
+    visible: boolean;
+    onClose: () => void;
+    selectedImage: string | null;
+    onCrop: () => void;
+    imageRef: RefObject<HTMLImageElement>;
+    cropperRef: RefObject<Cropper | null>;
+}
 
 const CropImageModal = ({
-                            id = "",
-                            aspectRatio = 1,
-                            visible,
-                            onClose,
-                            selectedImage,
-                            onCrop,
-                            imageRef,
-                            cropperRef
-                        }) => {
+    id = "",
+    aspectRatio = 1,
+    visible,
+    onClose,
+    selectedImage,
+    onCrop,
+    imageRef,
+    cropperRef
+}: CropImageModalProps) => {
     const header: JSX.Element = <h1 className="font-medium m-0 text-xl">Crop Gambar</h1>;
     return (
         <Dialog

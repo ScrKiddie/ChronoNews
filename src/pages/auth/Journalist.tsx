@@ -36,6 +36,7 @@ const Journalist = () => {
         closeModal,
         handleSubmit,
         cropperProps,
+        setProfilePicture,
     } = useUserManagement({
         toastRef,
         pagination: {page, setPage, totalItem, size},
@@ -67,7 +68,7 @@ const Journalist = () => {
                     totalItem={totalItem}
                     page={page}
                     size={size}
-                    onPageChange={(newPage, newSize) => {
+                    onPageChange={(newPage: number, newSize: number) => {
                         setPage(newPage);
                         setSize(newSize);
                     }}
@@ -106,7 +107,7 @@ const Journalist = () => {
                 handleImageChange={cropperProps.handleImageChange}
                 setData={setFormData}
                 setCroppedImage={cropperProps.setCroppedImage}
-                setProfilePicture={cropperProps.setProfilePicture}
+                setProfilePicture={setProfilePicture}
             />
 
             {/* Loading Modal for Edit */}
@@ -117,7 +118,7 @@ const Journalist = () => {
                 id="user-cropper"
                 visible={cropperProps.visibleCropImageModal}
                 onClose={cropperProps.handleCloseCropImageModal}
-                selectedImage={cropperProps.selectedImage}
+                selectedImage={cropperProps.selectedImage as string | null}
                 onCrop={cropperProps.handleCrop}
                 cropperRef={cropperProps.cropperRef}
                 imageRef={cropperProps.imageRef}
@@ -127,7 +128,7 @@ const Journalist = () => {
             <DeleteModal
                 submitLoading={modalState.isSubmitting}
                 visibleModal={modalState.isVisible && modalState.mode === "delete"}
-                setVisibleModal={(isVisible) => !isVisible && closeModal()}
+                setVisibleModal={closeModal}
                 onSubmit={handleSubmit}
             />
         </div>

@@ -1,30 +1,50 @@
-import {useState, useRef} from "react";
+import {useState, useRef, RefObject} from "react";
+import Cropper from "cropperjs";
 import {showErrorToast} from "../utils/toastHandler.tsx";
+import {ToastRef} from "../types/toast.tsx";
 
-type UseCropperParams = {
+export interface UseCropperParams {
     setVisibleModal?: (visible: boolean) => void;
     setProfilePicture?: (file: File | null) => void;
-    toastRef?: any;
+    toastRef?: ToastRef;
     width?: number;
     height?: number;
-};
+}
+
+interface UseCropperReturn {
+    fileInputRef: RefObject<HTMLInputElement>;
+    imageRef: RefObject<HTMLImageElement>;
+    cropperRef: RefObject<Cropper | null>;
+    selectedImage: string | null | ArrayBuffer;
+    visibleCropImageModal: boolean;
+    croppedImage: string | null;
+    handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleCloseCropImageModal: () => void;
+    handleClickUploadButton: () => void;
+    handleCrop: () => void;
+    resetCropper: () => void;
+    destroyCropper: () => void;
+    setCroppedImage: React.Dispatch<React.SetStateAction<string | null>>;
+}
 
 export const useCropper = ({
                                setVisibleModal,
                                setProfilePicture,
                                toastRef,
                                width = 800,
-                               height = 800
-                           }: UseCropperParams = {}) => {
-    const fileInputRef = useRef(null);
-    const [selectedImage, setSelectedImage] = useState<null | string | ArrayBuffer>(null);
+                               height = 800,
+                           }: UseCropperParams): UseCropperReturn => {
+    const fileInputRef = useRef<HTMLInputElement>(null!);
+    const imageRef = useRef<HTMLImageElement>(null!);
+    const cropperRef = useRef<Cropper | null>(null);
+
+    const [selectedImage, setSelectedImage] = useState<string | null | ArrayBuffer>(null);
     const [visibleCropImageModal, setVisibleCropImageModal] = useState(false);
-    const [croppedImage, setCroppedImage] = useState<string|null>(null);
-    const imageRef = useRef(null);
-    const cropperRef = useRef(null);
+    const [croppedImage, setCroppedImage] = useState<string | null>(null);
     const [imageFormat, setImageFormat] = useState("image/jpeg");
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
         if (!file) return;
 
         const validFormats = ["image/png", "image/jpeg", "image/jpg"];
@@ -43,7 +63,7 @@ export const useCropper = ({
         const reader = new FileReader();
         reader.onload = () => {
             if (setVisibleModal) {
-                setVisibleModal(false)
+                setVisibleModal(false);
             }
             setVisibleCropImageModal(true);
             setSelectedImage(reader.result);
@@ -54,23 +74,27 @@ export const useCropper = ({
 
     const handleCloseCropImageModal = () => {
         if (setVisibleModal) {
-            setVisibleModal(true)
+            setVisibleModal(true);
         }
         setVisibleCropImageModal(false);
         setSelectedImage(null);
         destroyCropper();
         if (fileInputRef.current) {
-            (fileInputRef.current as any).value = null;
+            fileInputRef.current.value = "";
         }
     };
 
-    const handleClickUploadButton = () => (fileInputRef.current as any).click();
+    const handleClickUploadButton = () => {
+        fileInputRef.current?.click();
+    };
 
     const handleCrop = () => {
         if (cropperRef.current) {
-            const canvas = (cropperRef.current as any).getCroppedCanvas({
-                width: width, height: height, imageSmoothingEnabled: true,
-                imageSmoothingQuality: "high"
+            const canvas = cropperRef.current.getCroppedCanvas({
+                width,
+                height,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: "high",
             });
 
             canvas.toBlob((blob) => {
@@ -95,21 +119,19 @@ export const useCropper = ({
                         });
                         setProfilePicture(file);
                     }
-
                 }
             }, imageFormat);
-
         }
 
         setVisibleCropImageModal(false);
         if (setVisibleModal) {
-            setVisibleModal(true)
+            setVisibleModal(true);
         }
     };
 
     const destroyCropper = () => {
         if (cropperRef.current) {
-            (cropperRef.current as any).destroy();
+            cropperRef.current.destroy();
             cropperRef.current = null;
         }
     };
@@ -122,11 +144,11 @@ export const useCropper = ({
 
     return {
         fileInputRef,
+        imageRef,
+        cropperRef,
         selectedImage,
         visibleCropImageModal,
         croppedImage,
-        cropperRef,
-        imageRef,
         handleImageChange,
         handleCloseCropImageModal,
         handleClickUploadButton,
@@ -134,6 +156,5 @@ export const useCropper = ({
         resetCropper,
         destroyCropper,
         setCroppedImage,
-        setProfilePicture
     };
 };

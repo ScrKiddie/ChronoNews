@@ -1,24 +1,46 @@
-import {useCallback, useEffect, useRef, useState} from "react";
-import {DataTable} from "primereact/datatable";
+import {useCallback, useEffect, useRef, useState, ReactNode, Dispatch, SetStateAction} from "react";
+import {DataTable, DataTablePageEvent} from "primereact/datatable";
 import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
 
-const ReusableLazyTable = ({
-                               handleVisibleCreateModal,
-                               data,
-                               totalItem,
-                               page,
-                               size,
-                               onPageChange,
-                               searchParams,
-                               setSearchParams,
-                               children
+interface SearchParams {
+    name?: string;
+    email?: string;
+    phoneNumber?: string;
+    title?: string;
+    categoryName?: string;
+    userName?: string;
+    summary?: string;
+    role?: string;
+}
 
-                           }) => {
+interface ReusableLazyTableProps<T> {
+    handleVisibleCreateModal: () => void;
+    data: T[];
+    totalItem: number;
+    page: number;
+    size: number;
+    onPageChange: (newPage: number, newSize: number) => void;
+    searchParams: SearchParams;
+    setSearchParams: Dispatch<SetStateAction<SearchParams>>;
+    children: ReactNode;
+}
+
+const ReusableLazyTable = <T extends object>({
+    handleVisibleCreateModal,
+    data,
+    totalItem,
+    page,
+    size,
+    onPageChange,
+    searchParams,
+    setSearchParams,
+    children
+}: ReusableLazyTableProps<T>) => {
 
     const [searchValue, setSearchValue] = useState(searchParams.name || "");
     const timerRef = useRef<number | null>(null);
-    
+
     useEffect(() => {
         return () => {
             if (timerRef.current) {
@@ -27,13 +49,13 @@ const ReusableLazyTable = ({
         };
     }, []);
 
-    const debouncedSearch = useCallback((value) => {
+    const debouncedSearch = useCallback((value: string) => {
         if (timerRef.current) {
             clearTimeout(timerRef.current);
         }
-        
-        timerRef.current = setTimeout(() => {
-            setSearchParams((prev) => ({
+
+        timerRef.current = window.setTimeout(() => {
+            setSearchParams((prev: SearchParams) => ({
                 ...prev,
                 email: value,
                 name: value,
@@ -47,7 +69,7 @@ const ReusableLazyTable = ({
         }, 300);
     }, [setSearchParams]);
 
-    const handleSearchChange = (e) => {
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearchValue(value);
         debouncedSearch(value);
@@ -82,7 +104,7 @@ const ReusableLazyTable = ({
                 totalRecords={totalItem}
                 lazy
                 first={(page - 1) * size}
-                onPage={(e) => onPageChange((e.page ?? 0) + 1, e.rows ?? 10)}
+                onPage={(e: DataTablePageEvent) => onPageChange((e.page ?? 0) + 1, e.rows ?? 10)}
                 showGridlines
                 size={"small"}
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"

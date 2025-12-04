@@ -1,10 +1,12 @@
-import {useState, useCallback, RefObject, useEffect} from "react";
+import {useState, useCallback, useEffect} from "react";
 import {z} from "zod";
 import {UserService} from "../services/userService.tsx";
 import {UserCreateSchema, UserUpdateSchema} from "../schemas/userSchema.tsx";
 import {useCropper} from "./useCropper";
 import {handleApiError, showSuccessToast} from "../utils/toastHandler.tsx";
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
+import {ToastRef} from "../types/toast.tsx";
+import {ApiError} from "../types/api.tsx";
 
 type ModalMode = "create" | "edit" | "delete" | null;
 
@@ -18,7 +20,7 @@ interface UserFormData {
 }
 
 interface UseUserManagementProps {
-    toastRef: RefObject<any>;
+    toastRef: ToastRef;
     pagination: {
         page: number;
         setPage: (page: number | ((prev: number) => number)) => void;
@@ -76,8 +78,11 @@ export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps
     });
 
     useEffect(() => {
-        if (isError) {
-            handleApiError(error, toastRef);
+        if (isError && error) {
+            const apiError: ApiError = {
+                message: (error as Error).message || "An unexpected error occurred.",
+            };
+            handleApiError(apiError, toastRef);
             closeModal();
         }
     }, [isError, error, toastRef, closeModal]);
@@ -98,18 +103,24 @@ export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps
         setIsModalVisible(true);
     }, [cropper]);
 
-    const handleMutationError = (error: any) => {
+    const handleMutationError = (error: unknown) => {
         if (error instanceof z.ZodError) {
             const formErrors = error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {});
             setErrors(formErrors);
         } else {
-            handleApiError(error, toastRef);
-            if (error?.status === 409 && error.message) {
-                if (error.message.toLowerCase().includes('email')) {
-                    setErrors({ email: error.message });
-                } else if (error.message.toLowerCase().includes('telepon') || error.message.toLowerCase().includes('phone')) {
-                    setErrors({ phoneNumber: error.message });
+            const apiError = error as ApiError;
+            if (apiError && typeof apiError.message === 'string') {
+                handleApiError(apiError, toastRef);
+                if (apiError.status === 409) {
+                    if (apiError.message.toLowerCase().includes('email')) {
+                        setErrors({ email: apiError.message });
+                    } else if (apiError.message.toLowerCase().includes('telepon') || apiError.message.toLowerCase().includes('phone')) {
+                        setErrors({ phoneNumber: apiError.message });
+                    }
                 }
+            } else {
+                const fallbackError: ApiError = { message: "Terjadi kesalahan yang tidak diketahui." };
+                handleApiError(fallbackError, toastRef);
             }
         }
     };
@@ -125,7 +136,7 @@ export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps
     });
 
     const updateUserMutation = useMutation({
-        mutationFn: ({id, request}: { id: number, request: any }) => UserService.updateUser(id, request),
+        mutationFn: ({id, request}: { id: number, request: Partial<UserFormData> & { profilePicture?: File, deleteProfilePicture?: boolean } }) => UserService.updateUser(id, request),
         onSuccess: (_, variables) => {
             showSuccessToast(toastRef, "Pengguna berhasil diperbarui");
             queryClient.invalidateQueries({queryKey: ['users']});
@@ -187,12 +198,13 @@ export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps
             }
         } catch (error) {
             if (error instanceof z.ZodError) {
-                handleMutationError(error)
+                handleMutationError(error);
             }
         }
     }, [
         modalMode, formData, profilePicture, selectedUserId,
-        createUserMutation, updateUserMutation, deleteUserMutation
+        createUserMutation, updateUserMutation, deleteUserMutation,
+        toastRef, closeModal
     ]);
 
     const isSubmitting = createUserMutation.isPending || updateUserMutation.isPending || deleteUserMutation.isPending;
@@ -210,9 +222,7 @@ export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps
         openModal,
         closeModal,
         handleSubmit,
-        cropperProps: {
-            ...cropper,
-            setProfilePicture,
-        },
+        cropperProps: cropper,
+        setProfilePicture,
     };
 };
