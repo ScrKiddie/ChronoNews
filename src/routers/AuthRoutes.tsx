@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.tsx";
-import Beranda from "../pages/auth/Beranda";
+import Home from "../pages/auth/Home.tsx";
 import Journalist from "../pages/auth/Journalist.tsx";
 import NotFound from "../pages/guest/NotFound";
 import Loading from "../pages/guest/Loading.tsx";
@@ -28,7 +28,7 @@ const GuestRoutes = () => {
     }
     return (
         <Routes>
-            <Route path="/beranda" element={<SidebarResponsive><Beranda /></SidebarResponsive>} />
+            <Route path="/beranda" element={<SidebarResponsive><Home /></SidebarResponsive>} />
             {role === "admin" ? (
                 <>
                     <Route path="/jurnalis" element={<SidebarResponsive><Journalist /></SidebarResponsive>} />

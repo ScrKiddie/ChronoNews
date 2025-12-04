@@ -1,6 +1,6 @@
 export const getDateRangeInUnix = (range: string): { start: number | null, end: number | null } => {
     const now = new Date();
-    let start: Date | null = null;
+    let start: Date | null;
     let end: Date | null = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
     switch (range) {

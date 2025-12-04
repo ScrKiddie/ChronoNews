@@ -14,7 +14,7 @@ export const PostService = {
         if (data.thumbnail) {
             formData.append("thumbnail", data.thumbnail);
         }
-        
+
         const response = await apiClient.post(`/post`, formData, {
             headers: { "Content-Type": "multipart/form-data" }
         });

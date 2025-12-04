@@ -1,17 +1,37 @@
-import {useState} from "react";
+import {ReactNode, useState} from "react";
 import { Chart } from 'primereact/chart';
 import { Card } from "primereact/card";
 import { Ripple } from "primereact/ripple";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth.tsx";
 import useSearchPost from "../../hooks/useSearchPost.tsx";
-import { Paginator } from 'primereact/paginator';
+import {Paginator, PaginatorPageChangeEvent} from 'primereact/paginator';
 import LoadingRetry from "../../components/LoadingRetry.tsx";
-import { Dropdown } from "primereact/dropdown";
+import {Dropdown, DropdownChangeEvent} from "primereact/dropdown";
 import { truncateText } from "../../utils/truncateText.tsx";
 import { getDateRangeInUnix } from "../../utils/dateUtils.tsx";
+import {TooltipItem} from "chart.js";
 
-const Beranda = () => {
+interface PostData {
+    id: string;
+    category: string;
+    user: string;
+    title: string;
+    summary: string;
+    createdAt: string;
+    updatedAt: string;
+    thumbnail: string;
+    viewCount: number;
+}
+
+interface ListItem {
+    icon: ReactNode;
+    title: string;
+    desc: string;
+    route: string;
+}
+
+const Home = () => {
     const navigate = useNavigate();
     const { role } = useAuth();
 
@@ -29,12 +49,12 @@ const Beranda = () => {
         setStartDate
     } = useSearchPost({ countMode: true});
 
-    const handlePageChange = (e) => {
+    const handlePageChange = (e: PaginatorPageChangeEvent) => {
         setPage(e.page + 1);
         setSize(e.rows);
     };
 
-    const list = [
+    const list: ListItem[] = [
         {
             icon: <i className="pi pi-users text-[#f59e0b]" style={{ fontSize: '2rem' }}></i>,
             title: "Jurnalis",
@@ -56,11 +76,11 @@ const Beranda = () => {
     ];
 
     const barData = {
-        labels: data.map(item => (item as any).title.length > 15 ? truncateText((item as any).title,15) : (item as any).title),
+        labels: data.map((item: PostData) => item.title.length > 15 ? truncateText(item.title,15) : item.title),
         datasets: [
             {
                 label: "Jumlah Pengunjung",
-                data: data.map(item => (item as any).viewCount || 0),
+                data: data.map((item: PostData) => item.viewCount || 0),
                 backgroundColor: "rgba(245, 158, 11,0.2)",
                 borderColor: "#f59e0b",
                 borderWidth: 1,
@@ -127,9 +147,9 @@ const Beranda = () => {
                                             plugins: {
                                                 tooltip: {
                                                     callbacks: {
-                                                        title: (tooltipItems) => {
+                                                        title: (tooltipItems: TooltipItem<'bar'>[]) => {
                                                             const index = tooltipItems[0].dataIndex;
-                                                            return truncateText((data[index] as any)?.title,30) || "Tanpa Judul";
+                                                            return truncateText((data[index] as PostData)?.title,30) || "Tanpa Judul";
                                                         }
                                                     },
                                                     titleFont: { family: "Poppins" },
@@ -155,7 +175,7 @@ const Beranda = () => {
                                         rightContent={<Dropdown
                                             value={range}
                                             options={waktuOptions}
-                                            onChange={(e) => {
+                                            onChange={(e: DropdownChangeEvent) => {
                                                 const value = e.value;
                                                 const { start, end } = getDateRangeInUnix(value);
                                                 setRange(value);
@@ -178,4 +198,4 @@ const Beranda = () => {
     );
 };
 
-export default Beranda;
+export default Home;

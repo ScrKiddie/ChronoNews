@@ -3,6 +3,7 @@ import {PostService} from "../services/postService.tsx";
 import {useAuth} from "./useAuth.tsx";
 import {useQuery, keepPreviousData} from "@tanstack/react-query";
 import {handleApiErrorWithRetry} from "../utils/toastHandler.tsx";
+import {Post, SearchFilters} from "../types/post.ts";
 
 const useSearchPost = (params: { countMode?: boolean } = {}) => {
     const { countMode = false } = params;
@@ -28,7 +29,7 @@ const useSearchPost = (params: { countMode?: boolean } = {}) => {
     const { data: searchResult, isLoading, isError, isFetching, error, refetch } = useQuery({
         queryKey,
         queryFn: ({ signal }) => {
-            const filters: any = {
+            const filters: SearchFilters = {
                 ...searchParams,
                 page: page,
                 size: size,
@@ -50,7 +51,7 @@ const useSearchPost = (params: { countMode?: boolean } = {}) => {
             if (!response || !response.data) {
                 return { posts: [], pagination: { totalItem: 0, totalPage: 0 } };
             }
-            const formattedData = response.data.map((post: any) => ({
+            const formattedData = response.data.map((post: Post) => ({
                 id: post.id,
                 category: post.category?.name || "Tidak Ada Kategori",
                 user: post.user?.name || "Tidak Ada User",

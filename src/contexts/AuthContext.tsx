@@ -1,4 +1,4 @@
-import {createContext, useState, useEffect} from "react";
+import {createContext, ReactNode, useState, useEffect} from "react";
 import Cookies from "js-cookie";
 import {jwtDecode} from "jwt-decode";
 import apiClient, {setOnUnauthorized} from "../services/apiClient.tsx";
@@ -20,7 +20,7 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({children}) => {
+export const AuthProvider = ({children}: { children: ReactNode }) => {
     const [token, setToken] = useState<string | null>(() => Cookies.get("token") || null);
     const [sub, setSub] = useState<number | null>(null);
     const [role, setRole] = useState<string | null>(null);
@@ -83,5 +83,3 @@ export const AuthProvider = ({children}) => {
         </AuthContext.Provider>
     );
 };
-
-
