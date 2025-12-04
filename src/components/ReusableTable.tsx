@@ -1,20 +1,19 @@
-import {useState, useEffect, ReactNode} from "react";
-import {DataTable} from "primereact/datatable";
-import {InputText} from "primereact/inputtext";
-import {Button} from "primereact/button";
-import {Category} from "../types/category.ts";
+import { useState, useEffect, ReactNode } from "react";
+import { DataTable } from "primereact/datatable";
+import { InputText } from "primereact/inputtext";
+import { Button } from "primereact/button";
 
-interface ReusableTableProps {
+interface ReusableTableProps<T> {
     handleVisibleCreateModal: () => void;
-    data: Category[];
+    data: T[];
     children: ReactNode;
 }
 
-const ReusableTable = ({
-                           handleVisibleCreateModal,
-                           data,
-                           children
-                       }: ReusableTableProps) => {
+const ReusableTable = <T extends object>({
+    handleVisibleCreateModal,
+    data,
+    children
+}: ReusableTableProps<T>) => {
     const [inputValue, setInputValue] = useState("");
     const [globalFilter, setGlobalFilter] = useState("");
 
@@ -38,10 +37,9 @@ const ReusableTable = ({
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                         />
-
                     </div>
                     <Button
-                        icon={<i className="pi pi-plus-circle" style={{fontSize: '1.45rem'}}></i>}
+                        icon={<i className="pi pi-plus-circle" style={{ fontSize: '1.45rem' }}></i>}
                         className="w-11 h-11 min-w-[44px] min-h-[44px]"
                         onClick={handleVisibleCreateModal}
                     />

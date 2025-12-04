@@ -1,17 +1,14 @@
-import {useState, useCallback, useEffect} from "react";
-import {z} from "zod";
-import {CategoryService} from "../services/categoryService.tsx";
-import {CategorySchema} from "../schemas/categorySchema.tsx";
-import {handleApiError, handleApiErrorWithRetry, showSuccessToast} from "../utils/toastHandler.tsx";
-import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
-import {ApiError} from "../types/api.tsx";
-import {ToastRef} from "../types/toast.tsx";
+import { useState, useCallback, useEffect } from "react";
+import { z } from "zod";
+import { CategoryService } from "../services/categoryService.tsx";
+import { CategorySchema } from "../schemas/categorySchema.tsx";
+import { handleApiError, handleApiErrorWithRetry, showSuccessToast } from "../utils/toastHandler.tsx";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ApiError } from "../types/api.tsx";
+import { ToastRef } from "../types/toast.tsx";
 
 type ModalMode = "create" | "edit" | "delete" | null;
-
-interface CategoryFormData {
-    name: string;
-}
+type CategoryFormData = z.infer<typeof CategorySchema>;
 
 interface UseCategoryProps {
     toastRef: ToastRef;
@@ -21,7 +18,7 @@ const INITIAL_FORM_DATA: CategoryFormData = {
     name: "",
 };
 
-export const useCategory = ({toastRef}: UseCategoryProps) => {
+export const useCategory = ({ toastRef }: UseCategoryProps) => {
     const queryClient = useQueryClient();
 
     const [modalMode, setModalMode] = useState<ModalMode>(null);
@@ -31,9 +28,9 @@ export const useCategory = ({toastRef}: UseCategoryProps) => {
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
 
-    const {data: listData = [], isLoading: isListLoading, isError, error, refetch} = useQuery({
+    const { data: listData = [], isLoading: isListLoading, isError, error, refetch } = useQuery({
         queryKey: ['categories'],
-        queryFn: ({signal}) => CategoryService.listCategories(signal).then(res => res.data || []),
+        queryFn: ({ signal }) => CategoryService.listCategories(signal).then(res => res.data || []),
         retry: false,
     });
 
@@ -89,13 +86,13 @@ export const useCategory = ({toastRef}: UseCategoryProps) => {
 
     const handleMutationSuccess = (message: string) => {
         showSuccessToast(toastRef, message);
-        queryClient.invalidateQueries({queryKey: ['categories']});
+        queryClient.invalidateQueries({ queryKey: ['categories'] });
         closeModal();
     };
 
     const handleMutationError = (error: unknown) => {
         if (error instanceof z.ZodError) {
-            const formErrors = error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {});
+            const formErrors = error.errors.reduce((acc, err) => ({ ...acc, [err.path[0]]: err.message }), {});
             setErrors(formErrors);
         } else {
             handleApiError(error as ApiError, toastRef);
@@ -147,7 +144,7 @@ export const useCategory = ({toastRef}: UseCategoryProps) => {
                 break;
         }
     }, [modalMode, formData, selectedCategoryId, createMutation, updateMutation, deleteMutation]);
-    
+
     const isSubmitting = createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
 
     return {

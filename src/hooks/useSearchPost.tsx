@@ -3,7 +3,7 @@ import {PostService} from "../services/postService.tsx";
 import {useAuth} from "./useAuth.tsx";
 import {useQuery, keepPreviousData} from "@tanstack/react-query";
 import {handleApiErrorWithRetry} from "../utils/toastHandler.tsx";
-import {Post, SearchFilters} from "../types/post.ts";
+import {Post, SearchFilters} from "../types/post.tsx";
 
 const useSearchPost = (params: { countMode?: boolean } = {}) => {
     const { countMode = false } = params;

@@ -1,13 +1,11 @@
-import {Dialog} from "primereact/dialog";
+import { Dialog } from "primereact/dialog";
 import InputGroup from "./InputGroup.tsx";
 import SubmitButton from "./SubmitButton.tsx";
-import {Dispatch, SetStateAction} from "react";
+import { Dispatch, SetStateAction } from "react";
+import { z } from "zod";
+import { PasswordSchema } from "../schemas/passwordSchema.tsx";
 
-interface PasswordData {
-    oldPassword: string;
-    password: string;
-    confirmPassword: string;
-}
+type PasswordData = z.infer<typeof PasswordSchema>;
 
 interface PasswordModalProps {
     visible: boolean;
@@ -20,14 +18,14 @@ interface PasswordModalProps {
 }
 
 const PasswordModal = ({
-                           visible,
-                           onClose,
-                           data,
-                           errors,
-                           submitLoading,
-                           handleSubmit,
-                           setData,
-                       }: PasswordModalProps) => {
+    visible,
+    onClose,
+    data,
+    errors,
+    submitLoading,
+    handleSubmit,
+    setData,
+}: PasswordModalProps) => {
     return (
         <Dialog
             closable={!submitLoading}
@@ -46,7 +44,7 @@ const PasswordModal = ({
                             data={data?.oldPassword}
                             error={errors.oldPassword}
                             setData={(e: string) => {
-                                setData((prev: PasswordData) => ({...prev, oldPassword: e}));
+                                setData((prev) => ({ ...prev, oldPassword: e }));
                             }}
                             setError={(e: string) => {
                                 errors.oldPassword = e
@@ -60,7 +58,7 @@ const PasswordModal = ({
                             data={data?.password}
                             error={errors.password}
                             setData={(e: string) => {
-                                setData((prev: PasswordData) => ({...prev, password: e}));
+                                setData((prev) => ({ ...prev, password: e }));
                             }}
                             setError={(e: string) => {
                                 errors.password = e
@@ -74,14 +72,14 @@ const PasswordModal = ({
                             data={data?.confirmPassword}
                             error={errors.confirmPassword}
                             setData={(e: string) => {
-                                setData((prev: PasswordData) => ({...prev, confirmPassword: e}));
+                                setData((prev) => ({ ...prev, confirmPassword: e }));
                             }}
                             setError={(e: string) => {
                                 errors.confirmPassword = e
                             }}
                         />
                     </div>
-                    <SubmitButton loading={submitLoading}/>
+                    <SubmitButton loading={submitLoading} />
                 </div>
             </form>
         </Dialog>

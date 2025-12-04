@@ -1,9 +1,11 @@
 import apiClient from "./apiClient.tsx";
-import {GenericAbortSignal} from "axios";
+import { GenericAbortSignal } from "axios";
+import { z } from "zod";
+import { CategorySchema } from "../schemas/categorySchema.tsx";
 
 export const CategoryService = {
-    createCategory: async (data: { name: string }) => {
-        const response = await apiClient.post(`/category`, { name: data.name }, {
+    createCategory: async (data: z.infer<typeof CategorySchema>) => {
+        const response = await apiClient.post(`/category`, data, {
             headers: { "Content-Type": "application/json" }
         });
         return response.data.data;
@@ -19,8 +21,8 @@ export const CategoryService = {
         return response.data.data;
     },
 
-    updateCategory: async (id: number, data: { name: string }) => {
-        const response = await apiClient.put(`/category/${id}`, { name: data.name }, {
+    updateCategory: async (id: number, data: z.infer<typeof CategorySchema>) => {
+        const response = await apiClient.put(`/category/${id}`, data, {
             headers: { "Content-Type": "application/json" }
         });
         return response.data.data;

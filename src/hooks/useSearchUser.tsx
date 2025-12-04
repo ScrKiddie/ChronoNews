@@ -1,12 +1,13 @@
-import {useState, useEffect} from "react";
-import {UserService} from "../services/userService.tsx";
-import {useAuth} from "./useAuth.tsx";
-import {useQuery, keepPreviousData} from "@tanstack/react-query";
-import {handleApiErrorWithRetry} from "../utils/toastHandler.tsx";
+import { useState, useEffect } from "react";
+import { UserService } from "../services/userService.tsx";
+import { useAuth } from "./useAuth.tsx";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { handleApiErrorWithRetry } from "../utils/toastHandler.tsx";
+import { UserSearchFilters } from "../types/user.tsx";
 
 const useSearchUser = () => {
-    const {token} = useAuth();
-    const [searchParams, setSearchParams] = useState({name: "", phoneNumber: "", email: "", role: ""});
+    const { token } = useAuth();
+    const [searchParams, setSearchParams] = useState<UserSearchFilters>({});
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(5);
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
@@ -15,7 +16,7 @@ const useSearchUser = () => {
         setPage(1);
     }, [searchParams, size]);
 
-    const queryKey = ['users', 'search', {searchParams, page, size}];
+    const queryKey = ['users', 'search', { searchParams, page, size }];
 
     const {
         data: searchResult,
@@ -26,15 +27,20 @@ const useSearchUser = () => {
         refetch,
     } = useQuery({
         queryKey,
-        queryFn: ({signal}) => {
-            const filters = { ...searchParams, page, size };
+        queryFn: ({ signal }) => {
+            const filters: Record<string, string> = { page: String(page), size: String(size) };
+            Object.entries(searchParams).forEach(([key, value]) => {
+                if (value) {
+                    filters[key] = value;
+                }
+            });
             return UserService.searchUser(filters, signal);
         },
         select: (response) => {
             if (!response || !response.data) {
-                return {users: [], pagination: {totalItem: 0}};
+                return { users: [], pagination: { totalItem: 0 } };
             }
-            return {users: response.data, pagination: response.pagination};
+            return { users: response.data, pagination: response.pagination };
         },
         placeholderData: keepPreviousData,
         enabled: !!token,

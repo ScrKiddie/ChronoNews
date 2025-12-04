@@ -2,7 +2,14 @@ import {useLocation, useNavigate} from "react-router-dom";
 import {MenuItem} from "react-pro-sidebar";
 import {Button} from "primereact/button";
 
-const MenuItemResponsive = ({collapsed, icon, link, label}) => {
+interface MenuItemResponsiveProps {
+    collapsed: boolean;
+    icon: string;
+    link: string;
+    label: string;
+}
+
+const MenuItemResponsive = ({collapsed, icon, link, label}: MenuItemResponsiveProps) => {
     const location = useLocation();
     const navigate = useNavigate();
 

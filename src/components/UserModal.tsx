@@ -7,15 +7,15 @@ import SubmitButton from "./SubmitButton.tsx";
 import {useSidebar} from "../hooks/useSidebar.tsx";
 import {Menu} from "primereact/menu";
 import {MenuItem} from "primereact/menuitem";
-import { UserFormData } from '../types/user.tsx';
+import {ProfileFormData, UserManagementFormData} from '../types/user.tsx';
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
-interface UserModalProps {
+interface UserModalProps<T extends ProfileFormData | UserManagementFormData> {
     visible: boolean;
     onClose: () => void;
-    data: Partial<UserFormData>;
-    setData: Dispatch<SetStateAction<UserFormData>>;
+    data: Partial<T>;
+    setData: Dispatch<SetStateAction<Partial<T>>>;
     croppedImage: string | null;
     fileInputRef: React.RefObject<HTMLInputElement>;
     errors: Record<string, string>;
@@ -29,23 +29,23 @@ interface UserModalProps {
     setCroppedImage: Dispatch<SetStateAction<string | null>>;
 }
 
-const UserModal = ({
-                       visible,
-                       onClose,
-                       data,
-                       setData,
-                       croppedImage,
-                       fileInputRef,
-                       errors,
-                       submitLoading,
-                       handleSubmit,
-                       handleClickUploadButton,
-                       handleImageChange,
-                       isUserCreateMode = false,
-                       isUserEditMode = false,
-                       setProfilePicture,
-                       setCroppedImage
-                   }: UserModalProps) => {
+const UserModal = <T extends ProfileFormData | UserManagementFormData>({
+   visible,
+   onClose,
+   data,
+   setData,
+   croppedImage,
+   fileInputRef,
+   errors,
+   submitLoading,
+   handleSubmit,
+   handleClickUploadButton,
+   handleImageChange,
+   isUserCreateMode = false,
+   isUserEditMode = false,
+   setProfilePicture,
+   setCroppedImage
+}: UserModalProps<T>) => {
     const roleOptions = [
         {label: "Admin", value: "admin"},
         {label: "Journalist", value: "journalist"},
@@ -66,20 +66,24 @@ const UserModal = ({
         const items: MenuItem[] = [];
         items.push({
             label: "Ganti",
-            icon: <i className="pi pi-image pr-3" />,
+            icon: <i className="pi pi-image pr-3"/>,
             command() {
                 setIsMenuVisible(false);
                 handleClickUploadButton();
             },
         });
 
-        if ((typeof data?.profilePicture === 'string' && data.profilePicture.trim() !== '') || croppedImage) {
+        if ((typeof data?.profilePicture === "string" && data.profilePicture.trim() !== "") || croppedImage) {
             items.push({
                 label: "Hapus",
-                icon: <i className="pi pi-trash pr-3" />,
+                icon: <i className="pi pi-trash pr-3"/>,
                 command() {
                     setIsMenuVisible(false);
-                    setData((prev: UserFormData) => ({...prev, profilePicture: "", deleteProfilePicture: true}));
+                    setData((prev) => ({
+                        ...prev,
+                        profilePicture: "",
+                        deleteProfilePicture: true,
+                    }));
                     setProfilePicture(null);
                     setCroppedImage(null);
                 },
@@ -87,7 +91,17 @@ const UserModal = ({
         }
 
         setMenuItems(items);
-    }, [data?.profilePicture, croppedImage, handleClickUploadButton, setData, setProfilePicture, setCroppedImage, setIsMenuVisible]);
+    }, [
+        data?.profilePicture,
+        croppedImage,
+        handleClickUploadButton,
+        setData,
+        setProfilePicture,
+        setCroppedImage,
+        setIsMenuVisible,
+        isUserCreateMode,
+        isUserEditMode
+    ]);
 
     return (
         <Dialog
@@ -112,7 +126,7 @@ const UserModal = ({
                         <img
                             src={
                                 croppedImage ||
-                                (typeof data?.profilePicture === 'string' && data.profilePicture.trim() !== ''
+                                (typeof data?.profilePicture === "string" && data.profilePicture.trim() !== ""
                                     ? `${apiUri}/profile_picture/${data?.profilePicture}`
                                     : `${defaultProfilePicture}`)
                             }
@@ -129,7 +143,9 @@ const UserModal = ({
                         <div ref={menuContainerRef}>
                             <Menu
                                 key={key}
-                                className={`${isMenuVisible ? "visible" : "hidden"} normal text-md w-fit shadow-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 menu-news`}
+                                className={`${
+                                    isMenuVisible ? "visible" : "hidden"
+                                } normal text-md w-fit shadow-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 menu-news`}
                                 model={menuItems}
                             />
                         </div>
@@ -147,10 +163,17 @@ const UserModal = ({
                     <div className="w-full">
                         <InputGroup
                             label="Nama"
-                            data={data.name}
+                            data={data.name || ""}
                             error={errors.name}
-                            setData={(e: string) => setData((prev: UserFormData) => ({...prev, name: e}))}
-                            setError={(e: string) => { errors.name = e; }}
+                            setData={(e: string) =>
+                                setData((prev) => ({
+                                    ...prev,
+                                    name: e,
+                                }))
+                            }
+                            setError={(e: string) => {
+                                errors.name = e;
+                            }}
                         />
                     </div>
 
@@ -160,10 +183,17 @@ const UserModal = ({
                                 type="dropdown"
                                 options={roleOptions}
                                 label="Role"
-                                data={data.role}
+                                data={(data as Partial<UserManagementFormData>).role || ""}
                                 error={errors.role}
-                                setData={(e: string) => setData((prev: UserFormData) => ({ ...prev, role: e }))}
-                                setError={(e: string) => { errors.role = e; }}
+                                setData={(e: string) =>
+                                    setData((prev) => ({
+                                        ...prev,
+                                        role: e,
+                                    }))
+                                }
+                                setError={(e: string) => {
+                                    errors.role = e;
+                                }}
                             />
                         </div>
                     )}
@@ -171,20 +201,34 @@ const UserModal = ({
                     <div className="w-full">
                         <InputGroup
                             label="Email"
-                            data={data.email}
+                            data={data.email || ""}
                             error={errors.email}
-                            setData={(e: string) => setData((prev: UserFormData) => ({ ...prev, email: e }))}
-                            setError={(e: string) => { errors.email = e; }}
+                            setData={(e: string) =>
+                                setData((prev) => ({
+                                    ...prev,
+                                    email: e,
+                                }))
+                            }
+                            setError={(e: string) => {
+                                errors.email = e;
+                            }}
                         />
                     </div>
 
                     <div className="w-full">
                         <InputGroup
                             label="Telepon"
-                            data={data.phoneNumber}
+                            data={data.phoneNumber || ""}
                             error={errors.phoneNumber}
-                            setData={(e: string) => setData((prev: UserFormData) => ({ ...prev, phoneNumber: e }))}
-                            setError={(e: string) => { errors.phoneNumber = e; }}
+                            setData={(e: string) =>
+                                setData((prev) => ({
+                                    ...prev,
+                                    phoneNumber: e,
+                                }))
+                            }
+                            setError={(e: string) => {
+                                errors.phoneNumber = e;
+                            }}
                         />
                     </div>
 
@@ -193,16 +237,23 @@ const UserModal = ({
                             <InputGroup
                                 type="password"
                                 label="Password"
-                                data={data.password || ""}
+                                data={(data as Partial<UserManagementFormData>).password || ""}
                                 error={errors.password}
-                                setData={(e: string) => setData((prev: UserFormData) => ({ ...prev, password: e }))}
-                                setError={(e: string) => { errors.password = e; }}
+                                setData={(e: string) =>
+                                    setData((prev) => ({
+                                        ...prev,
+                                        password: e,
+                                    }))
+                                }
+                                setError={(e: string) => {
+                                    errors.password = e;
+                                }}
                                 tip={!errors.password ? "Kosongkan jika tidak ingin mengubah password" : ""}
                             />
                         </div>
                     )}
 
-                    <SubmitButton loading={submitLoading} />
+                    <SubmitButton loading={submitLoading}/>
                 </div>
             </form>
         </Dialog>

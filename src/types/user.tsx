@@ -1,26 +1,41 @@
 import { z } from "zod";
-import { UserCreateSchema } from "../schemas/userSchema";
+import { UserCreateSchema, UserUpdateSchema } from "../schemas/userSchema.tsx";
+import { ProfileSchema } from "../schemas/profileSchema.tsx";
+
+export type UserSearchFilters = {
+    name?: string;
+    phoneNumber?: string;
+    email?: string;
+    role?: string;
+};
+
+export type User = z.infer<typeof UserCreateSchema> & {
+    id: number;
+    profilePicture?: string;
+    createdAt: string;
+    updatedAt: string;
+};
 
 export type UserCreateRequest = z.infer<typeof UserCreateSchema> & {
     profilePicture?: File;
 };
 
-export interface UserFormData {
-    name: string;
-    phoneNumber: string;
-    email: string;
-    password?: string;
-    role: string;
+export type UserUpdateRequest = z.infer<typeof UserUpdateSchema> & {
+    profilePicture?: File;
+    deleteProfilePicture?: boolean;
+};
+
+export type ProfileUpdateServiceRequest = z.infer<typeof ProfileSchema> & {
+    profilePicture?: File;
+    deleteProfilePicture?: boolean;
+};
+
+export type UserManagementFormData = z.infer<typeof UserCreateSchema> & z.infer<typeof UserUpdateSchema> & {
     deleteProfilePicture?: boolean;
     profilePicture?: string;
-}
+};
 
-export interface UserUpdateRequest {
-    name?: string;
-    phoneNumber?: string;
-    email?: string;
-    password?: string;
-    role?: string;
+export type ProfileFormData = z.infer<typeof ProfileSchema> & {
     deleteProfilePicture?: boolean;
-    profilePicture?: File;
-}
+    profilePicture?: string;
+};

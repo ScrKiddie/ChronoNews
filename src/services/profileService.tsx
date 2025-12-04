@@ -1,5 +1,5 @@
 import apiClient from "./apiClient.tsx";
-import { UserUpdateRequest } from "../types/user.tsx";
+import { ProfileUpdateServiceRequest } from "../types/user.tsx";
 
 export const ProfileService = {
     getCurrentUser: async () => {
@@ -7,7 +7,7 @@ export const ProfileService = {
         return response.data.data;
     },
     
-    updateCurrentUser: async (data: UserUpdateRequest) => {
+    updateCurrentUser: async (data: ProfileUpdateServiceRequest) => {
         const formData = new FormData();
         if (data.name) formData.append("name", data.name);
         if (data.phoneNumber) formData.append("phoneNumber", data.phoneNumber);

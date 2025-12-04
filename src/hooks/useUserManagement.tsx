@@ -1,13 +1,13 @@
-import {useState, useCallback, useEffect} from "react";
-import {z} from "zod";
-import {UserService} from "../services/userService.tsx";
-import {UserCreateSchema, UserUpdateSchema} from "../schemas/userSchema.tsx";
-import {useCropper} from "./useCropper";
-import {handleApiError, showSuccessToast} from "../utils/toastHandler.tsx";
-import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
-import {ToastRef} from "../types/toast.tsx";
-import {ApiError} from "../types/api.tsx";
-import {UserFormData, UserUpdateRequest} from "../types/user.tsx"
+import { useState, useCallback, useEffect } from "react";
+import { z } from "zod";
+import { UserService } from "../services/userService.tsx";
+import { UserCreateSchema, UserUpdateSchema } from "../schemas/userSchema.tsx";
+import { useCropper } from "./useCropper";
+import { handleApiError, showSuccessToast } from "../utils/toastHandler.tsx";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ToastRef } from "../types/toast.tsx";
+import { ApiError } from "../types/api.tsx";
+import { User, UserUpdateRequest, UserManagementFormData } from "../types/user.tsx";
 
 type ModalMode = "create" | "edit" | "delete" | null;
 
@@ -21,22 +21,22 @@ interface UseUserManagementProps {
     };
 }
 
-const INITIAL_FORM_DATA: UserFormData = {
+const INITIAL_FORM_DATA: UserManagementFormData = {
     name: "",
     phoneNumber: "",
     email: "",
-    password: "",
     role: "",
     deleteProfilePicture: false,
+    profilePicture: "",
 };
 
-export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps) => {
-    const {page, setPage, totalItem, size} = pagination;
+export const useUserManagement = ({ toastRef, pagination }: UseUserManagementProps) => {
+    const { page, setPage, totalItem, size } = pagination;
     const queryClient = useQueryClient();
 
     const [modalMode, setModalMode] = useState<ModalMode>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [formData, setFormData] = useState<UserFormData>(INITIAL_FORM_DATA);
+    const [formData, setFormData] = useState<Partial<UserManagementFormData>>(INITIAL_FORM_DATA);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
     const [profilePicture, setProfilePicture] = useState<File | null>(null);
@@ -62,7 +62,7 @@ export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps
         isLoading: isModalLoading,
         isError,
         error
-    } = useQuery({
+    } = useQuery<User>({
         queryKey: ['user', selectedUserId],
         queryFn: () => UserService.getUser(selectedUserId!),
         enabled: modalMode === 'edit' && !!selectedUserId && isModalVisible,
@@ -81,7 +81,14 @@ export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps
 
     useEffect(() => {
         if (userDataForEdit) {
-            setFormData(userDataForEdit);
+            setFormData({
+                name: userDataForEdit.name,
+                phoneNumber: userDataForEdit.phoneNumber,
+                email: userDataForEdit.email,
+                role: userDataForEdit.role,
+                profilePicture: userDataForEdit.profilePicture,
+                deleteProfilePicture: false,
+            });
         }
     }, [userDataForEdit]);
 
@@ -97,7 +104,7 @@ export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps
 
     const handleMutationError = (error: unknown) => {
         if (error instanceof z.ZodError) {
-            const formErrors = error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {});
+            const formErrors = error.errors.reduce((acc, err) => ({ ...acc, [err.path[0]]: err.message }), {});
             setErrors(formErrors);
         } else {
             const apiError = error as ApiError;
@@ -121,21 +128,21 @@ export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps
         mutationFn: UserService.createUser,
         onSuccess: () => {
             showSuccessToast(toastRef, "Pengguna berhasil dibuat");
-            queryClient.invalidateQueries({queryKey: ['users']});
+            queryClient.invalidateQueries({ queryKey: ['users'] });
             closeModal();
         },
         onError: handleMutationError,
     });
 
     const updateUserMutation = useMutation({
-        mutationFn: ({id, request}: {
+        mutationFn: ({ id, request }: {
             id: number,
             request: UserUpdateRequest
         }) => UserService.updateUser(id, request),
         onSuccess: (_, variables) => {
             showSuccessToast(toastRef, "Pengguna berhasil diperbarui");
-            queryClient.invalidateQueries({queryKey: ['users']});
-            queryClient.invalidateQueries({queryKey: ['user', variables.id]});
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+            queryClient.invalidateQueries({ queryKey: ['user', variables.id] });
             closeModal();
         },
         onError: handleMutationError,
@@ -150,7 +157,7 @@ export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps
             if (remainingItems > 0 && page > remainingPages) {
                 setPage(remainingPages);
             } else {
-                queryClient.invalidateQueries({queryKey: ['users']});
+                queryClient.invalidateQueries({ queryKey: ['users'] });
             }
             closeModal();
         },
@@ -167,7 +174,7 @@ export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps
                     const validatedData = UserCreateSchema.parse(formData);
                     const request = {
                         ...validatedData,
-                        ...(profilePicture instanceof File ? {profilePicture} : {}),
+                        ...(profilePicture instanceof File ? { profilePicture } : {}),
                     };
                     await createUserMutation.mutateAsync(request);
                     break;
@@ -177,10 +184,10 @@ export const useUserManagement = ({toastRef, pagination}: UseUserManagementProps
                     const validatedData = UserUpdateSchema.parse(formData);
                     const request: UserUpdateRequest = {
                         ...validatedData,
-                        ...(formData.deleteProfilePicture === true ? {deleteProfilePicture: true} : {}),
-                        ...(profilePicture instanceof File ? {profilePicture} : {}),
+                        ...(formData.deleteProfilePicture === true ? { deleteProfilePicture: true } : {}),
+                        ...(profilePicture instanceof File ? { profilePicture } : {}),
                     };
-                    await updateUserMutation.mutateAsync({id: selectedUserId, request});
+                    await updateUserMutation.mutateAsync({ id: selectedUserId, request });
                     break;
                 }
                 case "delete": {

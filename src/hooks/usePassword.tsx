@@ -1,20 +1,24 @@
-import {useState, useCallback} from "react";
-import {z} from "zod";
-import {PasswordSchema} from "../schemas/passwordSchema.tsx";
-import {PasswordService} from "../services/passwordService.tsx";
-import {handleApiError, showSuccessToast} from "../utils/toastHandler.tsx";
-import {useMutation} from "@tanstack/react-query";
-import {ToastRef} from "../types/toast.tsx";
+import { useState, useCallback } from "react";
+import { z } from "zod";
+import { PasswordSchema } from "../schemas/passwordSchema.tsx";
+import { PasswordService } from "../services/passwordService.tsx";
+import { handleApiError, showSuccessToast } from "../utils/toastHandler.tsx";
+import { useMutation } from "@tanstack/react-query";
+import { ToastRef } from "../types/toast.tsx";
 import { ApiError } from "../types/api.tsx";
+
+type PasswordData = z.infer<typeof PasswordSchema>;
+
+const INITIAL_DATA: PasswordData = {
+    oldPassword: "",
+    password: "",
+    confirmPassword: "",
+};
 
 export const usePassword = (toastRef: ToastRef) => {
     const [visibleModal, setVisibleModal] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const [data, setData] = useState({
-        oldPassword: "",
-        password: "",
-        confirmPassword: "",
-    });
+    const [data, setData] = useState<PasswordData>(INITIAL_DATA);
 
     const updatePasswordMutation = useMutation({
         mutationFn: PasswordService.updatePassword,
@@ -26,14 +30,14 @@ export const usePassword = (toastRef: ToastRef) => {
             handleApiError(error, toastRef);
 
             if (error?.status === 401 && error.message) {
-                setErrors({oldPassword: error.message});
+                setErrors({ oldPassword: error.message });
             }
         }
     });
 
     const handleVisibleModal = useCallback(() => {
         setErrors({});
-        setData({oldPassword: "", password: "", confirmPassword: ""});
+        setData(INITIAL_DATA);
         setVisibleModal(true);
     }, []);
 
@@ -50,7 +54,7 @@ export const usePassword = (toastRef: ToastRef) => {
             await updatePasswordMutation.mutateAsync(validatedData);
         } catch (error) {
             if (error instanceof z.ZodError) {
-                setErrors(error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {}));
+                setErrors(error.errors.reduce((acc, err) => ({ ...acc, [err.path[0]]: err.message }), {}));
             } else {
                 console.error("Caught unexpected error in handleSubmit:", error);
             }
