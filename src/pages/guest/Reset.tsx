@@ -10,6 +10,7 @@ import SubmitButton from "../../components/SubmitButton.tsx";
 import {handleApiError, showSuccessToast} from "../../utils/toastHandler.tsx";
 import {useMutation} from "@tanstack/react-query";
 import {z} from "zod";
+import {ApiError} from "../../types/api.tsx";
 
 const Reset: React.FC = () => {
     const toastRef = useToast();
@@ -35,7 +36,7 @@ const Reset: React.FC = () => {
             showSuccessToast(toastRef, "Berhasil melakukan reset");
             navigate("/login");
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
             handleApiError(error, toastRef);
 
             if (error?.status === 400 && error.message) {

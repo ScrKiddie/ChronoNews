@@ -11,6 +11,7 @@ import {ResetService} from "../../services/resetService.tsx";
 import {handleApiError, showSuccessToast} from "../../utils/toastHandler.tsx";
 import {useMutation} from "@tanstack/react-query";
 import {z} from "zod";
+import {ApiError} from "../../types/api.tsx";
 
 const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
@@ -34,7 +35,7 @@ const ResetRequest: React.FC = () => {
             showSuccessToast(toastRef, "Cek inbox atau spam pada email anda");
             navigate("/reset");
         },
-        onError: (error: any) => {
+        onError: (error: ApiError) => {
             handleApiError(error, toastRef);
             setData(prev => ({...prev, tokenCaptcha: ""}));
             captchaRef.current?.reset();
