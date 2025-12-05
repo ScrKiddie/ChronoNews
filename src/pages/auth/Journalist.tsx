@@ -9,6 +9,7 @@ import LoadingRetry from "../../components/LoadingRetry.tsx";
 import {useToast} from "../../hooks/useToast.tsx";
 import LoadingModal from "../../components/LoadingModal.tsx";
 import DeleteModal from "../../components/DeleteModal.tsx";
+import {Dispatch, SetStateAction} from "react";
 
 const Journalist = () => {
     const toastRef = useToast();
@@ -39,7 +40,12 @@ const Journalist = () => {
         setProfilePicture,
     } = useUserManagement({
         toastRef,
-        pagination: {page, setPage, totalItem, size},
+        pagination: {
+            page: page || 1,
+            setPage: setPage as Dispatch<SetStateAction<number>>,
+            totalItem: totalItem || 0,
+            size: size || 10
+        },
     });
 
     const actionTemplate = (rowData: { id: number }) => {
@@ -65,9 +71,9 @@ const Journalist = () => {
             <div className={`${(visibleLoadingConnection || visibleConnectionError) ? "hidden" : "block"}`}>
                 <ReusableLazyTable
                     data={data}
-                    totalItem={totalItem}
-                    page={page}
-                    size={size}
+                    totalItem={totalItem || 0}
+                    page={page || 1}
+                    size={size || 10}
                     onPageChange={(newPage: number, newSize: number) => {
                         setPage(newPage);
                         setSize(newSize);

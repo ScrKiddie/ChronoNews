@@ -82,11 +82,11 @@ const RegularPost: React.FC<RegularPostProps> = ({
                 )}
             />
 
-            {postPagination && postPagination.totalItem > 0 && (
+            {postPagination && (postPagination.totalItem || 0) > 0 && (
                  <Paginator
                     first={(postPage - 1) * postSize}
                     rows={postSize}
-                    totalRecords={postPagination.totalItem}
+                    totalRecords={postPagination.totalItem || 0}
                     onPageChange={(e: PaginatorPageChangeEvent) => setPostPage(e.page + 1)}
                     template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                     className="mt-4"

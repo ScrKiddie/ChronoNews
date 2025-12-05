@@ -66,7 +66,7 @@ const TopPost: FC<TopPostProps> = ({
                                 <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white p-1 px-2 rounded-md flex items-center text-xs">
                                     <i className="pi pi-eye mr-1"></i>
                                     <span>{post.viewCount}</span>
-                                </div>
+                                 </div>
                             </div>
                             <div className="p-4">
                                 <h3
@@ -96,11 +96,11 @@ const TopPost: FC<TopPostProps> = ({
                 )}
             />
 
-            {topPostPagination && topPostPagination.totalItem > 0 && (
+            {topPostPagination && (topPostPagination.totalItem || 0) > 0 && (
                 <Paginator
                     first={(topPostPage - 1) * topPostSize}
                     rows={topPostSize}
-                    totalRecords={topPostPagination.totalItem}
+                    totalRecords={topPostPagination.totalItem || 0}
                     onPageChange={(e: PaginatorPageChangeEvent) => setTopPostPage(e.page + 1)}
                     template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                     className="mt-4"

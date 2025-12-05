@@ -167,9 +167,9 @@ const Home = () => {
                                         style={{ height: "30%" }}
                                     />
                                     <Paginator
-                                        first={(page - 1) * size}
-                                        rows={size}
-                                        totalRecords={totalItem}
+                                        first={((page || 1) - 1) * (size || 10)}
+                                        rows={size || 10}
+                                        totalRecords={totalItem || 0}
                                         onPageChange={handlePageChange}
                                         rowsPerPageOptions={[5, 10, 20, 50]}
                                         rightContent={<Dropdown

@@ -9,6 +9,7 @@ import PostModal from "../../components/PostModal.tsx";
 import CropImageModal from "../../components/CropImageModal.tsx";
 import LoadingModal from "../../components/LoadingModal.tsx";
 import DeleteModal from "../../components/DeleteModal.tsx";
+import {Dispatch, SetStateAction} from "react";
 
 const Post = () => {
     const toastRef = useToast();
@@ -42,7 +43,12 @@ const Post = () => {
         editorContentRef,
     } = usePostManagement({
         toastRef,
-        pagination: { page, setPage, totalItem, size },
+        pagination: {
+            page: page || 1,
+            setPage: setPage as Dispatch<SetStateAction<number>>,
+            totalItem: totalItem || 0,
+            size: size || 10
+        },
     });
 
     const actionTemplate = (rowData: { id: number }) => (
@@ -66,9 +72,9 @@ const Post = () => {
             <div className={`${(visibleConnectionError || visibleLoadingConnection) ? "hidden" : "block"}`}>
                 <ReusableLazyTable
                     data={data}
-                    totalItem={totalItem}
-                    page={page}
-                    size={size}
+                    totalItem={totalItem || 0}
+                    page={page || 1}
+                    size={size || 10}
                     onPageChange={(newPage, newSize) => {
                         setPage(newPage);
                         setSize(newSize);

@@ -81,12 +81,12 @@ const HeadlinePost: React.FC<HeadlinePostProps> = ({
                     </div>
                 )}
             />
-            {headlinePostPagination && headlinePostPagination.totalItem > 0 && (
+            {headlinePostPagination && (headlinePostPagination.totalItem || 0) > 0 && (
                 <Paginator
                     pageLinkSize={1}
                     first={(headlinePostPage - 1) * headlineSize}
                     rows={headlineSize}
-                    totalRecords={headlinePostPagination.totalItem}
+                    totalRecords={headlinePostPagination.totalItem || 0}
                     onPageChange={(e: PaginatorPageChangeEvent) => setHeadlinePostPage(e.page + 1)}
                     template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                     className="mt-4"
