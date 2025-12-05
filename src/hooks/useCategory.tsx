@@ -2,7 +2,7 @@ import {useState, useCallback, useEffect, FormEvent} from "react";
 import { z } from "zod";
 import { CategoryService } from "../services/categoryService.tsx";
 import { CategorySchema } from "../schemas/categorySchema.tsx";
-import { handleApiError, handleApiErrorWithRetry, showSuccessToast } from "../utils/toastHandler.tsx";
+import { handleApiError, showSuccessToast } from "../utils/toastHandler.tsx";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApiError } from "../types/api.tsx";
 import { ToastRef } from "../types/toast.tsx";
@@ -29,19 +29,21 @@ export const useCategory = ({ toastRef }: UseCategoryProps) => {
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
 
-    const { data: listData = [], isLoading: isListLoading, isError, error, refetch } = useQuery({
+    const { data: listData = [], isLoading: isListLoading, isError, error, refetch, isFetching } = useQuery({
         queryKey: ['categories'],
         queryFn: ({ signal }) => CategoryService.listCategories(signal).then(res => res.data || []),
         retry: false,
     });
 
     useEffect(() => {
-        if (isError) {
-            handleApiErrorWithRetry(error as ApiError, setVisibleConnectionError);
+        if (isListLoading || isFetching) {
+            setVisibleConnectionError(false);
+        } else if (isError && (error as ApiError)?.isNetworkError) {
+            setVisibleConnectionError(true);
         } else {
             setVisibleConnectionError(false);
         }
-    }, [isError, error]);
+    }, [isError, error, isListLoading, isFetching]);
 
     const closeModal = useCallback(() => {
         setIsModalVisible(false);
@@ -162,7 +164,7 @@ export const useCategory = ({ toastRef }: UseCategoryProps) => {
         errors,
         listData,
         connectionState: {
-            isLoading: isListLoading,
+            isLoading: isListLoading || isFetching,
             isError: visibleConnectionError,
         },
         openModal,

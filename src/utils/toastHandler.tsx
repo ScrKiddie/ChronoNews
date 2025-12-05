@@ -24,20 +24,3 @@ export const handleApiError = (
         showErrorToast(toastRef, "Terjadi kesalahan yang tidak diketahui.");
     }
 };
-
-export const handleApiErrorWithRetry = (
-    error: ApiError,
-    setVisibleConnectionError: (visible: boolean) => void
-) => {
-    if (error?.isCancelled) {
-        console.log("Request cancelled:", error.message);
-        return;
-    }
-
-    if (error?.isNetworkError || error?.isSetupError) {
-        setVisibleConnectionError(true);
-    } else {
-        console.error("API Error (Retry Handler):", error?.message || error);
-        setVisibleConnectionError(true);
-    }
-};

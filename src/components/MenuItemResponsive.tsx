@@ -14,7 +14,9 @@ const MenuItemResponsive = ({collapsed, icon, link, label}: MenuItemResponsivePr
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate(link);
+        if (location.pathname !== link) {
+            navigate(link);
+        }
     };
 
     return (

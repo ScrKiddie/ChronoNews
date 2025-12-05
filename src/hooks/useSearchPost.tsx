@@ -2,9 +2,9 @@ import {useState, useEffect} from "react";
 import {PostService} from "../services/postService.tsx";
 import {useAuth} from "./useAuth.tsx";
 import {useQuery, keepPreviousData} from "@tanstack/react-query";
-import {handleApiErrorWithRetry} from "../utils/toastHandler.tsx";
 import {Post} from "../types/post.tsx";
 import {PostSearchParams} from "../types/search.tsx";
+import { ApiError } from "../types/api.tsx";
 
 const useSearchPost = (params: { countMode?: boolean } = {}) => {
     const { countMode = false } = params;
@@ -76,12 +76,14 @@ const useSearchPost = (params: { countMode?: boolean } = {}) => {
     });
 
     useEffect(() => {
-        if (isError) {
-            handleApiErrorWithRetry(error, setVisibleConnectionError);
+        if (isLoading || isFetching) {
+            setVisibleConnectionError(false);
+        } else if (isError && (error as ApiError)?.isNetworkError) {
+            setVisibleConnectionError(true);
         } else {
             setVisibleConnectionError(false);
         }
-    }, [isError, error]);
+    }, [isError, error, isLoading, isFetching]);
 
     const setPage = (page: number) => setSearchParams(prev => ({ ...prev, page }));
     const setSize = (size: number) => setSearchParams(prev => ({ ...prev, size }));

@@ -3,7 +3,6 @@ import { useAuth } from "../hooks/useAuth.tsx";
 import Home from "../pages/auth/Home.tsx";
 import Journalist from "../pages/auth/Journalist.tsx";
 import NotFound from "../pages/guest/NotFound";
-import Loading from "../pages/guest/Loading.tsx";
 import SidebarResponsive from "../components/SidebarResponsive";
 import Category from "../pages/auth/Category.tsx";
 import Post from "../pages/auth/Post.tsx";
@@ -12,7 +11,7 @@ const GuestRoutes = () => {
     const { token, isAuthChecked, role } = useAuth();
 
     if (!isAuthChecked) {
-        return <Loading />;
+        return <div style={{ backgroundColor: '#f2f2f2', height: '100vh', width: '100vw' }}></div>;
     }
 
     if (!token) {

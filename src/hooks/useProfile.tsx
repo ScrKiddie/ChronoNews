@@ -37,9 +37,10 @@ export const useProfile = (toastRef: ToastRef) => {
 
     const {
         data: profileData,
-        isLoading: isModalLoading,
+        isLoading: isProfileLoading,
         isError,
-        error
+        error,
+        isSuccess
     } = useQuery({
         queryKey: ['profile', 'me'],
         queryFn: ProfileService.getCurrentUser,
@@ -48,10 +49,10 @@ export const useProfile = (toastRef: ToastRef) => {
     });
 
     useEffect(() => {
-        if (isModalVisible && profileData) {
+        if (isModalVisible && isSuccess && profileData) {
             setFormData(profileData);
         }
-    }, [profileData, isModalVisible]);
+    }, [profileData, isModalVisible, isSuccess]);
 
     useEffect(() => {
         if (isError && error) {
@@ -60,14 +61,14 @@ export const useProfile = (toastRef: ToastRef) => {
         }
     }, [isError, error, toastRef, closeModal]);
 
-
     const openModal = useCallback(() => {
         cropper.resetCropper();
         setErrors({});
         setFormData(INITIAL_FORM_DATA);
         setProfilePicture(null);
+        queryClient.removeQueries({ queryKey: ['profile', 'me'] });
         setIsModalVisible(true);
-    }, [cropper]);
+    }, [cropper, queryClient]);
 
     const handleMutationError = (error: ApiError | z.ZodError) => {
         if (error instanceof z.ZodError) {
@@ -118,8 +119,8 @@ export const useProfile = (toastRef: ToastRef) => {
 
     return {
         modalState: {
-            isVisible: isModalVisible,
-            isLoading: isModalLoading,
+            isVisible: isModalVisible && isSuccess,
+            isLoading: isModalVisible && isProfileLoading,
             isSubmitting: updateProfileMutation.isPending,
         },
         formData,

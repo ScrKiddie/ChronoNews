@@ -1,4 +1,4 @@
-import { z } from "zod"
+import {z} from "zod"
 
 export const validateTitle = z.string().superRefine((value, ctx) => {
     if (value.trim().length === 0) {
@@ -23,13 +23,6 @@ export const validateSummary = z.string().superRefine((value, ctx) => {
     }
 })
 
-export const validateContent = z.string().superRefine((value, ctx) => {
-    if (value.trim().length === 0) {
-        ctx.addIssue({ code: "custom", message: "Konten tidak boleh kosong" })
-        return
-    }
-})
-
 export const validateCategoryID = z.number().superRefine((value, ctx) => {
     if (value === undefined || value === null || value === 0) {
         ctx.addIssue({ code: "custom", message: "Kategori tidak boleh kosong" })
@@ -49,7 +42,7 @@ export const validateOptionalUserID = z.number().optional().superRefine((value, 
 export const PostCreateSchema = z.object({
     title: validateTitle,
     summary: validateSummary,
-    content: validateContent,
+    content: z.any().optional(),
     categoryID: validateCategoryID,
     userID: validateOptionalUserID,
 })
@@ -57,7 +50,7 @@ export const PostCreateSchema = z.object({
 export const PostUpdateSchema = z.object({
     title: validateTitle,
     summary: validateSummary,
-    content: validateContent,
+    content: z.any().optional(),
     categoryID: validateCategoryID,
     userID: validateOptionalUserID,
 })

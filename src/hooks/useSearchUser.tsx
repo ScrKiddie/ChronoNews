@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { UserService } from "../services/userService.tsx";
 import { useAuth } from "./useAuth.tsx";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { handleApiErrorWithRetry } from "../utils/toastHandler.tsx";
 import { UserSearchParams } from '../types/search';
+import { ApiError } from "../types/api.tsx";
 
 const useSearchUser = () => {
     const { token } = useAuth();
@@ -43,12 +43,14 @@ const useSearchUser = () => {
     });
 
     useEffect(() => {
-        if (isError) {
-            handleApiErrorWithRetry(error, setVisibleConnectionError);
+        if (isLoading || isFetching) {
+            setVisibleConnectionError(false);
+        } else if (isError && (error as ApiError)?.isNetworkError) {
+            setVisibleConnectionError(true);
         } else {
             setVisibleConnectionError(false);
         }
-    }, [isError, error]);
+    }, [isError, error, isLoading, isFetching]);
 
     const setPage = (page: number) => setSearchParams(prev => ({ ...prev, page }));
     const setSize = (size: number) => setSearchParams(prev => ({ ...prev, size }));
