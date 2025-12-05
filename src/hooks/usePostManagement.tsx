@@ -51,6 +51,7 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
     const [thumbnail, setThumbnail] = useState<File | null>(null);
+    const errorHandledRef = useRef(false);
 
     const cropper = useCropper({
         setVisibleModal: setIsModalVisible,
@@ -62,8 +63,8 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
 
     const {
         data: postDataForEdit,
-        isLoading: isModalLoading,
-        isFetching: isModalFetching,
+        isLoading: isPostDataLoading,
+        isFetching: isPostDataFetching,
         isSuccess: isPostSuccess,
         isError: isPostError,
         error: postError
@@ -80,37 +81,50 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
                 deleteThumbnail: false,
             };
         },
-        enabled: modalMode === 'edit' && !!selectedPostId && isModalVisible,
+        enabled: modalMode === 'edit' && !!selectedPostId,
         gcTime: 0,
         staleTime: 0,
     });
 
     const closeModal = useCallback(() => {
         setIsModalVisible(false);
+        setModalMode(null);
+        setIsDataSynced(false);
         setTimeout(() => {
             if (selectedPostId) {
                 queryClient.removeQueries({ queryKey: ['post', selectedPostId] });
             }
 
-            setModalMode(null);
             setSelectedPostId(null);
             setFormData(INITIAL_FORM_DATA);
-
             editorContentRef.current = "";
-
-            setIsDataSynced(false);
+            setThumbnail(null);
+            setErrors({});
+            errorHandledRef.current = false;
         }, 300);
     }, [selectedPostId, queryClient]);
 
-    const {data: categoryOptions = []} = useQuery({
+    const {
+        data: categoryOptions = [],
+        isLoading: areCategoriesLoading,
+        isFetching: areCategoriesFetching,
+        isError: areCategoriesError,
+        error: categoriesError
+    } = useQuery({
         queryKey: ['categories'],
         queryFn: () => CategoryService.listCategories().then(res =>
             res.data.map((c: Category) => ({ label: c.name, value: c.id }))
         ),
-        enabled: isModalVisible,
+        enabled: modalMode === 'create' || modalMode === 'edit',
     });
 
-    const {data: userOptions = []} = useQuery<DropdownOption[]>({
+    const {
+        data: userOptions = [],
+        isLoading: areUsersLoading,
+        isFetching: areUsersFetching,
+        isError: areUsersError,
+        error: usersError
+    } = useQuery<DropdownOption[]>({
         queryKey: ['users', 'all'],
         queryFn: () => UserService.searchUser().then(res => [
             {label: "Posting Sebagai Diri Sendiri", value: 0},
@@ -119,53 +133,75 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
                 value: u.id
             }))
         ]),
-        enabled: isModalVisible && role === 'admin',
+        enabled: (modalMode === 'create' || modalMode === 'edit') && role === 'admin',
     });
 
     useEffect(() => {
-        if (isPostError) {
-            handleApiError(postError as ApiError, toastRef);
-            closeModal();
+        if (modalMode === 'edit') {
+            if (isPostError) {
+                handleApiError(postError as ApiError, toastRef);
+                closeModal();
+            } else if (postDataForEdit && isPostSuccess && !isPostDataFetching && !isDataSynced) {
+                setFormData({
+                    title: postDataForEdit.title,
+                    summary: postDataForEdit.summary,
+                    content: postDataForEdit.content,
+                    userID: postDataForEdit.userID,
+                    categoryID: postDataForEdit.categoryID,
+                    deleteThumbnail: false,
+                    thumbnail: postDataForEdit.thumbnail
+                });
+                editorContentRef.current = postDataForEdit.content;
+                setIsDataSynced(true);
+                setIsModalVisible(true);
+            } else if (isPostDataLoading || isPostDataFetching) {
+                setIsModalVisible(false);
+            }
+        } else if (modalMode === 'create') {
+            const categoriesReady = !areCategoriesLoading && !areCategoriesFetching && !areCategoriesError;
+            const usersReady = role !== 'admin' || (!areUsersLoading && !areUsersFetching && !areUsersError);
+
+            if (areCategoriesError || (role === 'admin' && areUsersError)) {
+                if (!errorHandledRef.current) {
+                    const errorsToShow: ApiError[] = [];
+                    if (areCategoriesError) errorsToShow.push(categoriesError as ApiError);
+                    if (role === 'admin' && areUsersError) errorsToShow.push(usersError as ApiError);
+                    if (errorsToShow.length > 0) {
+                        handleApiError(errorsToShow[0], toastRef);
+                        errorHandledRef.current = true;
+                    }
+                }
+                closeModal();
+            } else if (categoriesReady && usersReady) {
+                setIsModalVisible(true);
+            } else if (areCategoriesLoading || areCategoriesFetching || areUsersLoading || areUsersFetching) {
+                setIsModalVisible(false);
+            }
+        } else if (modalMode === null) {
+            setIsModalVisible(false);
         }
-    }, [isPostError, postError, toastRef, closeModal]);
+    }, [
+        modalMode,
+        postDataForEdit, isPostSuccess, isPostError, isPostDataLoading, isPostDataFetching, isDataSynced, postError,
+        areCategoriesLoading, areCategoriesFetching, areCategoriesError, categoriesError,
+        areUsersLoading, areUsersFetching, areUsersError, usersError,
+        role, toastRef, closeModal
+    ]);
 
-    useEffect(() => {
-        if (
-            modalMode === 'edit' &&
-            isModalVisible &&
-            postDataForEdit &&
-            isPostSuccess &&
-            !isModalFetching &&
-            !isDataSynced
-        ) {
-            setFormData({
-                title: postDataForEdit.title,
-                summary: postDataForEdit.summary,
-                content: postDataForEdit.content,
-                userID: postDataForEdit.userID,
-                categoryID: postDataForEdit.categoryID,
-                deleteThumbnail: false,
-                thumbnail: postDataForEdit.thumbnail
-            });
-
-            editorContentRef.current = postDataForEdit.content;
-
-            setIsDataSynced(true);
-        }
-    }, [postDataForEdit, isPostSuccess, modalMode, isModalVisible, isModalFetching, isDataSynced]);
 
     const openModal = useCallback((mode: ModalMode, postId?: number) => {
         cropper.resetCropper();
         setErrors({});
         setFormData(INITIAL_FORM_DATA);
-
         editorContentRef.current = "";
-
         setThumbnail(null);
         setSelectedPostId(postId || null);
         setIsDataSynced(false);
+        errorHandledRef.current = false;
         setModalMode(mode);
-        setIsModalVisible(true);
+        if (mode === 'delete') {
+            setIsModalVisible(true);
+        }
     }, [cropper]);
 
     const handleMutationSuccess = (message: string) => {
@@ -261,13 +297,15 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
     };
 
     const isSubmitting = createPostMutation.isPending || updatePostMutation.isPending || deletePostMutation.isPending;
-    const isLoadingCombined = isModalLoading || isModalFetching;
+
+    const isModalLoadingCombined = isPostDataLoading || isPostDataFetching ||
+        (modalMode === 'create' && (areCategoriesLoading || areCategoriesFetching || (role === 'admin' && (areUsersLoading || areUsersFetching))));
 
     return {
         modalState: {
             isVisible: isModalVisible,
             mode: modalMode,
-            isLoading: isLoadingCombined,
+            isLoading: isModalLoadingCombined,
             isSubmitting,
         },
         formData,
