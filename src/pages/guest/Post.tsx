@@ -139,21 +139,25 @@ const Post: React.FC = () => {
                 {isSearchPage ? (
                     <>
                         {searchPosts.length > 0 ? (
-                            <RegularPost
-                                post={searchPosts}
-                                postPage={searchPostPage}
-                                setPostPage={setSearchPostPage}
-                                postSize={sizes.search}
-                                postPagination={searchPostPagination}
-                                handleCategoryChange={handleCategoryChange}
-                            />
+                            <>
+                                <h3 className="text-[#4b5569] text-xl mb-4">Berita Lainnya</h3>
+                                <RegularPost
+                                    post={searchPosts}
+                                    postPage={searchPostPage}
+                                    setPostPage={setSearchPostPage}
+                                    postSize={sizes.search}
+                                    postPagination={searchPostPagination}
+                                    handleCategoryChange={handleCategoryChange}
+                                />
+                            </>
+
                         ) : (
                             !loading && <EmptyData />
                         )}
                     </>
                 ) : isPostPage ? (
                     <>
-                        <MainPost mainPost={mainPost} setIsModalVisible={setIsModalVisible} isModalVisible={isModalVisible} handleCategoryChange={handleCategoryChange} />
+                        <MainPost mainPost={mainPost || null} setIsModalVisible={setIsModalVisible} isModalVisible={isModalVisible} handleCategoryChange={handleCategoryChange} />
                         <h3 className="text-[#4b5569] text-xl mt-4">Berita Lainnya</h3>
                         <RegularPost
                             post={posts}
@@ -198,7 +202,7 @@ const Post: React.FC = () => {
                                     handleCategoryChange={handleCategoryChange}
                                 />
 
-                                <h3 className="text-[#4b5569] text-xl mt-4">Berita Lainnya</h3>
+                                <h3 className="text-[#4b5569] text-xl my-4">Berita Lainnya</h3>
                                 <RegularPost
                                     post={posts}
                                     postPage={regularPostPage}
@@ -214,7 +218,7 @@ const Post: React.FC = () => {
                     </>
                 )}
             </div>
-            <GuestFooter quickLinks={categories} />
+            <GuestFooter quickLinks={categories.map(cat => ({ ...cat, id: String(cat.id) }))} />
         </div>
     );
 };

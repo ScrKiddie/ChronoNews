@@ -1,13 +1,24 @@
 import {DataView} from "primereact/dataview";
-import {Paginator} from "primereact/paginator";
+import {Paginator, PaginatorPageChangeEvent} from "primereact/paginator";
 import {useNavigate} from "react-router-dom";
 import thumbnail from "../assets/thumbnail.svg";
 import {truncateText} from "../utils/truncateText.tsx";
 import {slugify} from "../utils/slugify.tsx";
+import {Post, Pagination} from "../types/post.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
-const RegularPost = ({
+interface RegularPostProps {
+    post: Post[];
+    postPage: number;
+    setPostPage: (page: number) => void;
+    postSize: number;
+    postPagination: Pagination | undefined;
+    classKu?: string;
+    handleCategoryChange: (category: string) => void;
+}
+
+const RegularPost: React.FC<RegularPostProps> = ({
                          post,
                          postPage,
                          setPostPage,
@@ -18,7 +29,7 @@ const RegularPost = ({
                      }) => {
     const navigate = useNavigate();
 
-    const handleNavigate = (item) => {
+    const handleNavigate = (item: Post) => {
         const slug = slugify(item.title);
         navigate(`/post/${item.id}/${slug}`);
     }
@@ -28,7 +39,7 @@ const RegularPost = ({
             <DataView
                 value={post}
                 layout="list"
-                itemTemplate={(item) => (
+                itemTemplate={(item: Post) => (
                     <div key={item.id}
                          className={`flex mb-3 break-all justify-between h-40 shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg overflow-hidden`}>
                         <div className="relative flex-shrink-0 w-48 sm:w-56 md:w-64 lg:w-72">
@@ -53,7 +64,11 @@ const RegularPost = ({
                             <p className="text-gray-600 text-xs sm:text-sm mb-1">
                                 <span
                                     className="no-underline text-gray-600 hover:text-gray-600 cursor-pointer"
-                                    onClick={() => handleCategoryChange(item.category?.name.toLowerCase())}
+                                    onClick={() => {
+                                        if (item.category?.name) {
+                                            handleCategoryChange(item.category.name.toLowerCase())
+                                        }
+                                    }}
                                 >
                                     {truncateText(item.category?.name, 13)}
                                 </span> - {item.createdAt}
@@ -71,7 +86,7 @@ const RegularPost = ({
                     first={(postPage - 1) * postSize}
                     rows={postSize}
                     totalRecords={postPagination.totalItem}
-                    onPageChange={(e) => setPostPage(e.page + 1)}
+                    onPageChange={(e: PaginatorPageChangeEvent) => setPostPage(e.page + 1)}
                     template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                     className="mt-4"
                 />

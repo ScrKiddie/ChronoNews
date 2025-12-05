@@ -8,18 +8,19 @@ export interface User {
     name: string;
     email: string;
     phoneNumber: string;
-    role: string
+    role: string;
+    profilePicture?: string;
 }
 
 export interface Post {
-    id: string;
+    id: number | null;
     title: string;
     summary: string;
     content: string;
     thumbnail: string;
     viewCount: number;
-    createdAt: number;
-    updatedAt: number;
+    createdAt: string | number;
+    updatedAt?: string | number;
     category: Category;
     user: User;
 }
@@ -29,11 +30,6 @@ export interface Pagination {
     totalPage: number;
     currentPage: number;
     size: number;
-}
-
-export interface SearchPostResponse {
-    data: Post[];
-    pagination: Pagination;
 }
 
 export interface SearchFilters {
@@ -47,6 +43,7 @@ export interface SearchFilters {
     startDate?: number;
     endDate?: number;
     userID?: number | string;
+    excludeIds?: string;
 }
 
 export interface PostFormData {

@@ -1,26 +1,37 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Editor} from "primereact/editor";
 import {Button} from "primereact/button";
-import {BreadCrumb} from "primereact/breadcrumb";
+import {BreadCrumb, BreadCrumbProps} from "primereact/breadcrumb";
 import defaultProfilePicture from "../assets/profilepicture.svg";
 import thumbnail from "../assets/thumbnail.svg";
 import {Dialog} from "primereact/dialog";
 import {truncateText} from "../utils/truncateText.tsx";
+import {Post} from "../types/post.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
-const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVisible}) => {
+interface MainPostProps {
+    mainPost: Post | null;
+    handleCategoryChange: (category: string) => void;
+    isModalVisible: boolean;
+    setIsModalVisible: (visible: boolean) => void;
+}
+
+const MainPost: React.FC<MainPostProps> = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVisible}) => {
     const [showUpdatedAt, setShowUpdatedAt] = useState(false);
 
     useEffect(() => {
-        if (!mainPost || !mainPost.id) return;
+        if (!mainPost?.id) return;
 
-        if ((window as any).DISQUS) {
-            (window as any).DISQUS.reset({ reload: true,
+        if (window.DISQUS) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (window.DISQUS as any).reset({
+                reload: true,
                 config: function () {
-                    this.page.identifier = mainPost.id;
+                    this.page.identifier = mainPost.id!.toString();
                     this.page.url = window.location.href;
-                }});
+                }
+            });
         } else {
             const script = document.createElement("script");
             script.src = `https://${import.meta.env.VITE_DISQUS_SHORTNAME}.disqus.com/embed.js`;
@@ -29,6 +40,7 @@ const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVis
             document.body.appendChild(script);
         }
     }, [mainPost?.id]);
+
 
     const toggleUpdatedAt = () => {
         setShowUpdatedAt(!showUpdatedAt);
@@ -53,26 +65,30 @@ const MainPost = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVis
     if (!mainPost || !mainPost.id) {
         return null;
     }
+    
+    const breadcrumbItems: BreadCrumbProps['model'] = [
+        {
+            label: "Home", template: () => <span
+                className="text-[#475569]  cursor-pointer font-[600]" onClick={() => {
+                handleCategoryChange("")
+            }}
+            > Home</span>
+        },
+        {
+            label: mainPost.category?.name || "Kategori", template: () => <span
+                className="text-[#f59e0b] cursor-pointer font-[600]" onClick={() => {
+                if (mainPost.category?.name) {
+                    handleCategoryChange(mainPost.category.name.toLowerCase())
+                }
+            }}
+            >{truncateText(mainPost.category?.name || "", 13)} </span>
+        }
+    ];
 
     return (
         <>
             <main className={`break-all`}>
-                <BreadCrumb model={[
-                    {
-                        label: "Home", template: () => <span
-                            className="text-[#475569]  cursor-pointer font-[600]" onClick={() => {
-                            handleCategoryChange("")
-                        }}
-                        > Home</span>
-                    },
-                    {
-                        label: mainPost.category?.name || "Kategori", template: () => <span
-                            className="text-[#f59e0b] cursor-pointer font-[600]" onClick={() => {
-                            handleCategoryChange(mainPost.category?.name.toLowerCase())
-                        }}
-                        >{truncateText(mainPost.category?.name || "", 13)} </span>
-                    }
-                ]}/>
+                <BreadCrumb model={breadcrumbItems}/>
 
                 <h1 className="text-[#475569] font-semibold text-3xl">{mainPost.title}</h1>
                 <small className="text-[#475569] mb-2 mt-2">{mainPost.summary}</small>

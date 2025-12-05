@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import {useState, useCallback, FormEvent} from "react";
 import { z } from "zod";
 import { PasswordSchema } from "../schemas/passwordSchema.tsx";
 import { PasswordService } from "../services/passwordService.tsx";
@@ -45,7 +45,7 @@ export const usePassword = (toastRef: ToastRef) => {
         setVisibleModal(false);
     }, []);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setErrors({});
 

@@ -1,14 +1,25 @@
 import {DataView} from "primereact/dataview";
-import {Paginator} from "primereact/paginator";
+import {Paginator, PaginatorPageChangeEvent} from "primereact/paginator";
 import {useNavigate} from "react-router-dom";
 import thumbnail from "../assets/thumbnail.svg";
 import emptyData from "../assets/emptydata.webp";
 import {truncateText} from "../utils/truncateText.tsx";
 import {slugify} from "../utils/slugify.tsx";
+import {Post, Pagination} from "../types/post.tsx";
+import {FC} from "react";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
-const TopPost = ({
+interface TopPostProps {
+    topPost: Post[];
+    topPostPage: number;
+    setTopPostPage: (page: number) => void;
+    topPostSize: number;
+    topPostPagination: Pagination | undefined;
+    handleCategoryChange: (category: string) => void;
+}
+
+const TopPost: FC<TopPostProps> = ({
                      topPost,
                      topPostPage,
                      setTopPostPage,
@@ -18,7 +29,7 @@ const TopPost = ({
                  }) => {
     const navigate = useNavigate();
 
-    const handleNavigate = (item) => {
+    const handleNavigate = (item: Post) => {
         const slug = slugify(item.title);
         navigate(`/post/${item.id}/${slug}`);
     }
@@ -41,7 +52,7 @@ const TopPost = ({
                 value={topPost}
                 layout="grid"
                 className="grid-custom"
-                itemTemplate={(post) => (
+                itemTemplate={(post: Post) => (
                     <div key={post.id} className="w-full lg:w-1/3 break-all">
                         <div className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg sm:min-h-[350px] flex flex-col">
                             <div className="relative">
@@ -66,7 +77,11 @@ const TopPost = ({
                                 <p>
                                     <span
                                         className="text-base no-underline text-gray-600 hover:text-gray-600 cursor-pointer"
-                                        onClick={() => handleCategoryChange(post.category?.name.toLowerCase())}
+                                        onClick={() => {
+                                            if (post.category?.name) {
+                                                handleCategoryChange(post.category.name.toLowerCase())
+                                            }
+                                        }}
                                     >
                                         {truncateText(post.category?.name, 13)}
                                     </span> - {post.createdAt}
@@ -85,7 +100,7 @@ const TopPost = ({
                     first={(topPostPage - 1) * topPostSize}
                     rows={topPostSize}
                     totalRecords={topPostPagination.totalItem}
-                    onPageChange={(e) => setTopPostPage(e.page + 1)}
+                    onPageChange={(e: PaginatorPageChangeEvent) => setTopPostPage(e.page + 1)}
                     template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                     className="mt-4"
                 />

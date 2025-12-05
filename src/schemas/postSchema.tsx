@@ -39,30 +39,6 @@ export const validateOptionalUserID = z.number().optional().superRefine((value, 
     }
 })
 
-export const validateOptionalStringMax = (label: string, max: number) =>
-    z.string().optional().superRefine((value, ctx) => {
-        if (value !== undefined && value.length > max) {
-            ctx.addIssue({ code: "custom", message: `${label} maksimal ${max} karakter` })
-        }
-    })
-
-export const validateOptionalPositiveInt = (label: string) =>
-    z.number().optional().superRefine((value, ctx) => {
-        if (value !== undefined && (!Number.isInteger(value) || value <= 0)) {
-            ctx.addIssue({ code: "custom", message: `${label} harus berupa angka positif` })
-        }
-    })
-
-export const validatePostID = z.number().superRefine((value, ctx) => {
-    if (value === undefined || value === null || value === 0) {
-        ctx.addIssue({ code: "custom", message: "ID RegularPost tidak boleh kosong" })
-        return
-    }
-    if (!Number.isInteger(value) || value <= 0) {
-        ctx.addIssue({ code: "custom", message: "ID RegularPost harus berupa angka positif" })
-    }
-})
-
 export const PostCreateSchema = z.object({
     title: validateTitle,
     summary: validateSummary,

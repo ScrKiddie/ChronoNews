@@ -58,10 +58,16 @@ const useSearchPost = (params: { countMode?: boolean } = {}) => {
                 user: post.user?.name || "Tidak Ada User",
                 title: post.title,
                 summary: post.summary,
-                createdAt: new Date(post.createdAt * 1000).toLocaleString(),
+                createdAt: typeof post.createdAt === 'number'
+                    ? new Date(post.createdAt * 1000).toLocaleString()
+                    : new Date(post.createdAt).toLocaleString(),
+
                 updatedAt: post.updatedAt
-                    ? new Date(post.updatedAt * 1000).toLocaleString()
+                    ? (typeof post.updatedAt === 'number'
+                        ? new Date(post.updatedAt * 1000).toLocaleString()
+                        : new Date(post.updatedAt).toLocaleString())
                     : "Belum diperbarui",
+
                 thumbnail: post.thumbnail || "Tidak Ada Gambar",
                 viewCount: post.viewCount
             }));

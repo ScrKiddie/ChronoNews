@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import {useState, useCallback, useEffect, FormEvent} from "react";
 import { z } from "zod";
 import { CategoryService } from "../services/categoryService.tsx";
 import { CategorySchema } from "../schemas/categorySchema.tsx";
@@ -117,7 +117,7 @@ export const useCategory = ({ toastRef }: UseCategoryProps) => {
         onError: (error) => handleApiError(error as ApiError, toastRef),
     });
 
-    const handleSubmit = useCallback(async (e?: React.FormEvent) => {
+    const handleSubmit = useCallback(async (e?: FormEvent) => {
         e?.preventDefault();
         setErrors({});
 

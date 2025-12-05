@@ -1,13 +1,24 @@
 import {DataView} from "primereact/dataview";
-import {Paginator} from "primereact/paginator";
+import {Paginator, PaginatorPageChangeEvent} from "primereact/paginator";
 import {useNavigate} from "react-router-dom";
 import thumbnail from "../assets/thumbnail.svg";
 import {truncateText} from "../utils/truncateText.tsx";
 import {slugify} from "../utils/slugify.tsx";
+import {Post, Pagination} from "../types/post.tsx";
+import React from "react";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
-const HeadlinePost = ({
+interface HeadlinePostProps {
+    headlinePost: Post | null;
+    headlinePostPage: number;
+    setHeadlinePostPage: (page: number) => void;
+    headlinePostPagination: Pagination | undefined;
+    headlineSize: number;
+    handleCategoryChange: (category: string) => void;
+}
+
+const HeadlinePost: React.FC<HeadlinePostProps> = ({
                           headlinePost,
                           headlinePostPage,
                           setHeadlinePostPage,
@@ -18,7 +29,7 @@ const HeadlinePost = ({
 
     const navigate = useNavigate();
 
-    const handleNavigate = (item) => {
+    const handleNavigate = (item: Post) => {
         if (!item) return;
         const slug = slugify(item.title);
         navigate(`/post/${item.id}/${slug}`);
@@ -30,7 +41,7 @@ const HeadlinePost = ({
                 value={headlinePost ? [headlinePost] : []}
                 layout="grid"
                 className="grid-custom "
-                itemTemplate={(post) => (
+                itemTemplate={(post: Post) => (
                     <div key={post.id} className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg w-full break-all">
                         <div className="relative">
                             <img
@@ -55,7 +66,9 @@ const HeadlinePost = ({
                             <p className=""><span
                                 className="text-base no-underline text-gray-600 hover:text-gray-600 cursor-pointer"
                                 onClick={() => {
-                                    handleCategoryChange(headlinePost.category?.name.toLowerCase())
+                                    if (headlinePost?.category?.name) {
+                                        handleCategoryChange(headlinePost.category.name.toLowerCase());
+                                    }
                                 }}
                             >
                             {truncateText(post.category?.name, 13)}
@@ -73,7 +86,7 @@ const HeadlinePost = ({
                     first={(headlinePostPage - 1) * headlineSize}
                     rows={headlineSize}
                     totalRecords={headlinePostPagination.totalItem}
-                    onPageChange={(e) => setHeadlinePostPage(e.page + 1)}
+                    onPageChange={(e: PaginatorPageChangeEvent) => setHeadlinePostPage(e.page + 1)}
                     template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                     className="mt-4"
                 />

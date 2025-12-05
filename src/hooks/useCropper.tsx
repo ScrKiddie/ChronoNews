@@ -1,4 +1,4 @@
-import {useState, useRef, RefObject} from "react";
+import {useState, useRef, RefObject, ChangeEvent, SetStateAction, Dispatch} from "react";
 import Cropper from "cropperjs";
 import {showErrorToast} from "../utils/toastHandler.tsx";
 import {ToastRef} from "../types/toast.tsx";
@@ -18,13 +18,13 @@ interface UseCropperReturn {
     selectedImage: string | null;
     visibleCropImageModal: boolean;
     croppedImage: string | null;
-    handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleImageChange: (e: ChangeEvent<HTMLInputElement>) => void;
     handleCloseCropImageModal: () => void;
     handleClickUploadButton: () => void;
     handleCrop: () => void;
     resetCropper: () => void;
     destroyCropper: () => void;
-    setCroppedImage: React.Dispatch<React.SetStateAction<string | null>>;
+    setCroppedImage: Dispatch<SetStateAction<string | null>>;
 }
 
 export const useCropper = ({
@@ -43,7 +43,7 @@ export const useCropper = ({
     const [croppedImage, setCroppedImage] = useState<string | null>(null);
     const [imageFormat, setImageFormat] = useState("image/jpeg");
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 

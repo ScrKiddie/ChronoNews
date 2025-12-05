@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import {useState, useCallback, useEffect, FormEvent} from "react";
 import { z } from "zod";
 import { UserService } from "../services/userService.tsx";
 import { UserCreateSchema, UserUpdateSchema } from "../schemas/userSchema.tsx";
@@ -108,7 +108,7 @@ export const useUserManagement = ({ toastRef, pagination }: UseUserManagementPro
             setErrors(formErrors);
         } else {
             const apiError = error as ApiError;
-            if (apiError && typeof apiError.message === 'string') {
+            if (apiError && apiError.message === 'string') {
                 handleApiError(apiError, toastRef);
                 if (apiError.status === 409) {
                     if (apiError.message.toLowerCase().includes('email')) {
@@ -164,7 +164,7 @@ export const useUserManagement = ({ toastRef, pagination }: UseUserManagementPro
         onError: handleMutationError,
     });
 
-    const handleSubmit = useCallback(async (e?: React.FormEvent) => {
+    const handleSubmit = useCallback(async (e?: FormEvent) => {
         e?.preventDefault();
         setErrors({});
 
