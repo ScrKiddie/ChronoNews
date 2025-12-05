@@ -65,32 +65,31 @@ export const useUserManagement = ({ toastRef, pagination }: UseUserManagementPro
     } = useQuery<User>({
         queryKey: ['user', selectedUserId],
         queryFn: () => UserService.getUser(selectedUserId!),
-        enabled: modalMode === 'edit' && !!selectedUserId && isModalVisible,
+        enabled: modalMode === 'edit' && !!selectedUserId,
         retry: false,
     });
 
     useEffect(() => {
-        if (isError && error) {
-            const apiError: ApiError = {
-                message: (error as Error).message || "An unexpected error occurred.",
-            };
-            handleApiError(apiError, toastRef);
-            closeModal();
+        if (modalMode === 'edit') {
+            if (isError && error) {
+                const apiError: ApiError = {
+                    message: (error as Error).message || "An unexpected error occurred.",
+                };
+                handleApiError(apiError, toastRef);
+                closeModal();
+            } else if (userDataForEdit && !isModalLoading) {
+                setFormData({
+                    name: userDataForEdit.name,
+                    phoneNumber: userDataForEdit.phoneNumber,
+                    email: userDataForEdit.email,
+                    role: userDataForEdit.role,
+                    profilePicture: userDataForEdit.profilePicture,
+                    deleteProfilePicture: false,
+                });
+                setIsModalVisible(true);
+            }
         }
-    }, [isError, error, toastRef, closeModal]);
-
-    useEffect(() => {
-        if (userDataForEdit) {
-            setFormData({
-                name: userDataForEdit.name,
-                phoneNumber: userDataForEdit.phoneNumber,
-                email: userDataForEdit.email,
-                role: userDataForEdit.role,
-                profilePicture: userDataForEdit.profilePicture,
-                deleteProfilePicture: false,
-            });
-        }
-    }, [userDataForEdit]);
+    }, [userDataForEdit, modalMode, isModalLoading, isError, error, toastRef, closeModal]);
 
     const openModal = useCallback((mode: ModalMode, userId?: number) => {
         cropper.resetCropper();
@@ -99,7 +98,9 @@ export const useUserManagement = ({ toastRef, pagination }: UseUserManagementPro
         setProfilePicture(null);
         setSelectedUserId(userId || null);
         setModalMode(mode);
-        setIsModalVisible(true);
+        if (mode !== 'edit') {
+            setIsModalVisible(true);
+        }
     }, [cropper]);
 
     const handleMutationError = (error: unknown) => {

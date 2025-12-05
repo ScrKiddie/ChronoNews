@@ -48,6 +48,8 @@ export const useCategory = ({ toastRef }: UseCategoryProps) => {
         setTimeout(() => {
             setModalMode(null);
             setSelectedCategoryId(null);
+            setFormData(INITIAL_FORM_DATA);
+            setErrors({});
         }, 300);
     }, []);
 
@@ -59,30 +61,30 @@ export const useCategory = ({ toastRef }: UseCategoryProps) => {
     } = useQuery({
         queryKey: ['category', selectedCategoryId],
         queryFn: () => CategoryService.getCategory(selectedCategoryId!),
-        enabled: modalMode === 'edit' && !!selectedCategoryId && isModalVisible,
+        enabled: modalMode === 'edit' && !!selectedCategoryId,
         retry: false,
     });
 
     useEffect(() => {
-        if (isGetCategoryError) {
-            handleApiError(getCategoryError as ApiError, toastRef);
-            closeModal();
+        if (modalMode === 'edit') {
+            if (isGetCategoryError) {
+                handleApiError(getCategoryError as ApiError, toastRef);
+                closeModal();
+            } else if (categoryDataForEdit && !isModalLoading) {
+                setFormData(categoryDataForEdit);
+                setIsModalVisible(true);
+            }
         }
-    }, [isGetCategoryError, getCategoryError, toastRef, closeModal]);
-
-
-    useEffect(() => {
-        if (categoryDataForEdit) {
-            setFormData(categoryDataForEdit);
-        }
-    }, [categoryDataForEdit]);
+    }, [categoryDataForEdit, modalMode, isModalLoading, isGetCategoryError, getCategoryError, toastRef, closeModal]);
 
     const openModal = useCallback((mode: ModalMode, categoryId?: number) => {
         setErrors({});
         setFormData(INITIAL_FORM_DATA);
         setSelectedCategoryId(categoryId || null);
         setModalMode(mode);
-        setIsModalVisible(true);
+        if (mode !== 'edit') {
+            setIsModalVisible(true);
+        }
     }, []);
 
     const handleMutationSuccess = (message: string) => {
