@@ -1,6 +1,7 @@
 import apiClient from "./apiClient.tsx";
 import { GenericAbortSignal } from "axios";
 import { UserCreateRequest, UserUpdateRequest } from "../types/user.tsx";
+import { UserSearchParams } from "../types/search.tsx";
 
 export const UserService = {
     createUser: async (data: UserCreateRequest) => {
@@ -19,8 +20,8 @@ export const UserService = {
         return response.data.data;
     },
 
-    searchUser: async (filters: Record<string, string> = {}, signal?: GenericAbortSignal) => {
-        const queryParams = new URLSearchParams(filters).toString();
+    searchUser: async (filters: Partial<UserSearchParams> = {}, signal?: GenericAbortSignal) => {
+        const queryParams = new URLSearchParams(filters as Record<string, string>).toString();
         const response = await apiClient.get(`/user?${queryParams}`, { signal });
         return response.data;
     },

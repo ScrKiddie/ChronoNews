@@ -10,9 +10,8 @@ import {handleApiError, showSuccessToast} from "../utils/toastHandler.tsx";
 import {processContentForEditor, reverseProcessContentForServer} from "../utils/contentProcessor.tsx";
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
 import {ToastRef} from "../types/toast.tsx";
-import {ApiPostRequest, Category, DropdownOption, User} from "../types/post.tsx";
+import {ApiPostRequest, Category, DropdownOption, PostFormData, User} from "../types/post.tsx";
 import {ApiError} from "../types/api.tsx";
-import {PostFormData} from "../types/post.tsx";
 
 type ModalMode = "create" | "edit" | "delete" | null;
 
@@ -140,9 +139,9 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
             setFormData({
                 title: postDataForEdit.title,
                 summary: postDataForEdit.summary,
+                content: postDataForEdit.content,
                 userID: postDataForEdit.userID,
                 categoryID: postDataForEdit.categoryID,
-                content: "",
                 deleteThumbnail: false,
                 thumbnail: postDataForEdit.thumbnail
             });
@@ -201,8 +200,11 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
             showSuccessToast(toastRef, "Postingan berhasil dihapus");
             const remainingItems = totalItem - 1;
             const totalPages = Math.ceil(remainingItems / size);
-            if (page > totalPages && totalPages > 0) setPage(totalPages);
-            else queryClient.invalidateQueries({queryKey: ['posts', 'search']});
+            if (page > totalPages && totalPages > 0) {
+                setPage(totalPages);
+            } else {
+                queryClient.invalidateQueries({queryKey: ['posts', 'search']});
+            }
             closeModal();
         },
         onError: handleMutationError,
@@ -231,7 +233,6 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
             if (modalMode === "create") {
                 const request: ApiPostRequest = {
                     ...validatedData,
-                    content: contentToSubmit,
                     userID: validatedData.userID ?? 0,
                     ...(thumbnail && { thumbnail }),
                 };
@@ -240,11 +241,9 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
             else if (modalMode === "edit" && selectedPostId) {
                 const cleanedContent = reverseProcessContentForServer(contentToSubmit);
                 const request: PostFormData = {
-                    title: validatedData.title,
-                    summary: validatedData.summary,
+                    ...validatedData,
                     content: cleanedContent || "",
                     userID: validatedData.userID ?? formData.userID ?? 0,
-                    categoryID: validatedData.categoryID,
                     ...(formData.deleteThumbnail && { deleteThumbnail: true }),
                     ...(thumbnail && { thumbnail: thumbnail }),
                 };

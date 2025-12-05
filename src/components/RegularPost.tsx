@@ -4,7 +4,8 @@ import {useNavigate} from "react-router-dom";
 import thumbnail from "../assets/thumbnail.svg";
 import {truncateText} from "../utils/truncateText.tsx";
 import {slugify} from "../utils/slugify.tsx";
-import {Post, Pagination} from "../types/post.tsx";
+import {Post} from "../types/post.tsx";
+import {Pagination} from "../types/pagination.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 

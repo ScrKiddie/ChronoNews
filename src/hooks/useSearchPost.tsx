@@ -3,37 +3,35 @@ import {PostService} from "../services/postService.tsx";
 import {useAuth} from "./useAuth.tsx";
 import {useQuery, keepPreviousData} from "@tanstack/react-query";
 import {handleApiErrorWithRetry} from "../utils/toastHandler.tsx";
-import {Post, SearchFilters} from "../types/post.tsx";
-import {SearchParams} from "../types/search.tsx";
+import {Post} from "../types/post.tsx";
+import {PostSearchParams} from "../types/search.tsx";
 
 const useSearchPost = (params: { countMode?: boolean } = {}) => {
     const { countMode = false } = params;
     const [startDate, setStartDate] = useState(0);
     const [endDate, setEndDate] = useState(0);
     const {sub, role} = useAuth();
-    const [searchParams, setSearchParams] = useState<SearchParams>({
+    const [searchParams, setSearchParams] = useState<PostSearchParams>({
         title: "",
         categoryName: "",
         userName: "",
-        summary: ""
+        summary: "",
+        page: 1,
+        size: 5,
     });
-    const [page, setPage] = useState(1);
-    const [size, setSize] = useState(5);
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
 
     useEffect(() => {
-        setPage(1);
-    }, [searchParams, size, startDate, endDate]);
+        setSearchParams(prev => ({ ...prev, page: 1 }));
+    }, [searchParams.title, searchParams.categoryName, searchParams.userName, searchParams.summary, searchParams.size, startDate, endDate]);
 
-    const queryKey = ['posts', 'search', { searchParams, page, size, startDate, endDate, countMode, role, sub }];
+    const queryKey = ['posts', 'search', { searchParams, startDate, endDate, countMode, role, sub }];
 
     const { data: searchResult, isLoading, isError, isFetching, error, refetch } = useQuery({
         queryKey,
         queryFn: ({ signal }) => {
-            const filters: SearchFilters = {
+            const filters: PostSearchParams = {
                 ...searchParams,
-                page: page,
-                size: size,
             };
 
             if (countMode) {
@@ -85,13 +83,16 @@ const useSearchPost = (params: { countMode?: boolean } = {}) => {
         }
     }, [isError, error]);
 
+    const setPage = (page: number) => setSearchParams(prev => ({ ...prev, page }));
+    const setSize = (size: number) => setSearchParams(prev => ({ ...prev, size }));
+
     return {
         data: searchResult?.posts ?? [],
         searchParams,
         setSearchParams,
-        page,
+        page: searchParams.page,
         setPage,
-        size,
+        size: searchParams.size,
         setSize,
         totalItem: searchResult?.pagination?.totalItem ?? 0,
         totalPage: searchResult?.pagination?.totalPage ?? 0,

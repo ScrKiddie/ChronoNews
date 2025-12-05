@@ -1,16 +1,9 @@
-export interface Category {
-    id: number;
-    name: string;
-}
+import { z } from "zod";
+import { PostCreateSchema, PostUpdateSchema } from "../schemas/postSchema.tsx";
+import { User } from "./user.tsx";
+import { Category } from "./category.tsx";
 
-export interface User {
-    id: number;
-    name: string;
-    email: string;
-    phoneNumber: string;
-    role: string;
-    profilePicture?: string;
-}
+export type { User, Category };
 
 export interface Post {
     id: number | null;
@@ -25,46 +18,15 @@ export interface Post {
     user: User;
 }
 
-export interface Pagination {
-    totalItem: number;
-    totalPage: number;
-    currentPage: number;
-    size: number;
-}
-
-export interface SearchFilters {
-    title?: string;
-    categoryName?: string;
-    userName?: string;
-    summary?: string;
-    page?: number;
-    size?: number;
-    sort?: string;
-    startDate?: number;
-    endDate?: number;
-    userID?: number | string;
-    excludeIds?: string;
-}
-
-export interface PostFormData {
-    title: string;
-    summary: string;
-    content: string;
-    userID?: number;
-    categoryID: number;
+export type PostFormData = z.infer<typeof PostCreateSchema> & z.infer<typeof PostUpdateSchema> & {
     thumbnail?: string | File;
     deleteThumbnail?: boolean;
-}
+};
 
-export interface ApiPostRequest {
-    title: string;
-    summary: string;
-    content: string;
-    userID: number;
-    categoryID: number;
+export type ApiPostRequest = z.infer<typeof PostCreateSchema> & {
     thumbnail?: File;
     deleteThumbnail?: boolean;
-}
+};
 
 export interface PostFormErrors {
     [key: string]: string | undefined;

@@ -1,6 +1,7 @@
 import apiClient from "./apiClient.tsx";
 import {GenericAbortSignal} from "axios";
-import {PostFormData, SearchFilters} from "../types/post.tsx";
+import {PostFormData} from "../types/post.tsx";
+import {PostSearchParams} from "../types/search.tsx";
 
 export const PostService = {
     createPost: async (data: PostFormData) => {
@@ -16,7 +17,7 @@ export const PostService = {
         return response.data.data;
     },
 
-    searchPost: async (filters: Partial<SearchFilters>, signal?: GenericAbortSignal) => {
+    searchPost: async (filters: Partial<PostSearchParams>, signal?: GenericAbortSignal) => {
         const queryParams = new URLSearchParams(filters as Record<string, string>).toString();
         const response = await apiClient.get(`/post?${queryParams}`, { signal });
 

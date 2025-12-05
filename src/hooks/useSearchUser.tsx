@@ -3,20 +3,21 @@ import { UserService } from "../services/userService.tsx";
 import { useAuth } from "./useAuth.tsx";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { handleApiErrorWithRetry } from "../utils/toastHandler.tsx";
-import { SearchParams } from '../types/search';
+import { UserSearchParams } from '../types/search';
 
 const useSearchUser = () => {
     const { token } = useAuth();
-    const [searchParams, setSearchParams] = useState<SearchParams>({});
-    const [page, setPage] = useState(1);
-    const [size, setSize] = useState(5);
+    const [searchParams, setSearchParams] = useState<UserSearchParams>({
+        page: 1,
+        size: 5,
+    });
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
 
     useEffect(() => {
-        setPage(1);
-    }, [searchParams, size]);
+        setSearchParams(prev => ({ ...prev, page: 1 }));
+    }, [searchParams.name, searchParams.email, searchParams.phoneNumber, searchParams.role, searchParams.size]);
 
-    const queryKey = ['users', 'search', { searchParams, page, size }];
+    const queryKey = ['users', 'search', { searchParams }];
 
     const {
         data: searchResult,
@@ -28,13 +29,7 @@ const useSearchUser = () => {
     } = useQuery({
         queryKey,
         queryFn: ({ signal }) => {
-            const filters: Record<string, string> = { page: String(page), size: String(size) };
-            Object.entries(searchParams).forEach(([key, value]) => {
-                if (value) {
-                    filters[key] = value;
-                }
-            });
-            return UserService.searchUser(filters, signal);
+            return UserService.searchUser(searchParams, signal);
         },
         select: (response) => {
             if (!response || !response.data) {
@@ -55,13 +50,16 @@ const useSearchUser = () => {
         }
     }, [isError, error]);
 
+    const setPage = (page: number) => setSearchParams(prev => ({ ...prev, page }));
+    const setSize = (size: number) => setSearchParams(prev => ({ ...prev, size }));
+
     return {
         data: searchResult?.users ?? [],
         searchParams,
         setSearchParams,
-        page,
+        page: searchParams.page,
         setPage,
-        size,
+        size: searchParams.size,
         setSize,
         totalItem: searchResult?.pagination?.totalItem ?? 0,
         refetch,
