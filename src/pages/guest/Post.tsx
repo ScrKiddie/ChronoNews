@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {TabMenu} from "primereact/tabmenu";
 import {InputText} from "primereact/inputtext";
 import {Menu} from "primereact/menu";
@@ -15,7 +15,9 @@ import TopPost from "../../components/TopPost.tsx";
 import RegularPost from "../../components/RegularPost.tsx";
 import LoadingRetry from "../../components/LoadingRetry.tsx";
 import EmptyData from "../../components/EmptyData.tsx";
+import MiniEmptyData from "../../components/MiniEmptyData.tsx";
 import {Dropdown} from "primereact/dropdown";
+import { Skeleton } from "primereact/skeleton";
 
 const Post: React.FC = () => {
     const {
@@ -49,8 +51,6 @@ const Post: React.FC = () => {
     } = usePost();
 
     const navigate = useNavigate();
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [navZIndex, setNavZIndex] = useState("z-[2001]");
 
     const handleSearch = () => {
         if (searchQuery.trim() !== "") {
@@ -58,46 +58,123 @@ const Post: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        if (loading || error || isModalVisible) {
-            document.body.style.overflow = "hidden";
-            document.documentElement.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "auto";
-            document.documentElement.style.overflow = "auto";
-        }
-        return () => {
-            document.body.style.overflow = "auto";
-            document.documentElement.style.overflow = "auto";
-        };
-    }, [loading, error, isModalVisible]);
-
-    useEffect(() => {
-        let timer: number;
-        if (isModalVisible) {
-            setNavZIndex("z-[1000]");
-        } else {
-            timer = setTimeout(() => {
-                setNavZIndex("z-[2001]");
-            }, 300);
-        }
-        return () => clearTimeout(timer);
-    }, [isModalVisible]);
-
-
     if (notFound) {
         return <NotFound />;
     }
 
+    const isCategoryPage = !isSearchPage && !isPostPage;
+    const hasNoHeadline = !headlinePost;
+    const hasNoTopPosts = !topPosts || topPosts.length === 0;
+    const hasNoRegularPosts = !posts || posts.length === 0;
+
+    const isCompletelyEmpty = isCategoryPage && hasNoHeadline && hasNoTopPosts && hasNoRegularPosts;
+
+    const renderContent = () => {
+        if (isSearchPage) {
+            return (
+                <div className="relative min-h-[80vh]">
+                    {!loading && searchPosts && searchPosts.length > 0 && (
+                        <h3 className="text-[#4b5569] text-xl mb-4">Hasil Pencarian</h3>
+                    )}
+                    {loading ? (
+                        <RegularPost loading={true} post={null} postPage={searchPostPage} setPostPage={setSearchPostPage} postSize={sizes.search} postPagination={searchPostPagination} handleCategoryChange={handleCategoryChange} />
+                    ) : (!searchPosts || searchPosts.length === 0) ? (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <EmptyData message="Tidak ada hasil yang ditemukan untuk kata kunci Anda. Coba cari dengan kata kunci lain." />
+                        </div>
+                    ) : (
+                        <RegularPost loading={false} post={searchPosts} postPage={searchPostPage} setPostPage={setSearchPostPage} postSize={sizes.search} postPagination={searchPostPagination} handleCategoryChange={handleCategoryChange} />
+                    )}
+                </div>
+            );
+        }
+
+        if (isPostPage) {
+            return (
+                <>
+                    <MainPost mainPost={mainPost || null} handleCategoryChange={handleCategoryChange} />
+                    <h3 className="text-[#4b5569] text-xl mt-4">Berita Lainnya</h3>
+                    {loading ? (
+                        <RegularPost loading={true} post={null} postPage={regularPostPage} setPostPage={setRegularPostPage} postSize={sizes.regular} postPagination={regularPostPagination} handleCategoryChange={handleCategoryChange} classKu="mt-4" />
+                    ) : hasNoRegularPosts ? (
+                        <MiniEmptyData message="Belum ada berita lainnya di kategori ini." />
+                    ) : (
+                        <RegularPost loading={false} post={posts} postPage={regularPostPage} setPostPage={setRegularPostPage} postSize={sizes.regular} postPagination={regularPostPagination} handleCategoryChange={handleCategoryChange} classKu="mt-4" />
+                    )}
+                </>
+            );
+        }
+
+        if (!loading && isCompletelyEmpty) {
+            return (
+                <div className="relative min-h-[80vh] flex items-center justify-center">
+                    <EmptyData message="Belum ada berita untuk ditampilkan." />
+                </div>
+            );
+        }
+
+        return (
+            <>
+                {/* Berita Terkini */}
+                <h3 className="text-[#4b5563] mb-3 text-xl">
+                    {loading ? <Skeleton width="10rem" /> : "Berita Terkini"}
+                </h3>
+                {loading ? (
+                    <HeadlinePost loading={true} headlinePost={null} headlinePostPage={headlinePostPage} setHeadlinePostPage={setHeadlinePostPage} headlinePostPagination={headlinePostPagination} headlineSize={sizes.headline} handleCategoryChange={handleCategoryChange} />
+                ) : hasNoHeadline ? (
+                    <MiniEmptyData message="Tidak ada berita terkini untuk ditampilkan." />
+                ) : (
+                    <HeadlinePost loading={false} headlinePost={headlinePost} headlinePostPage={headlinePostPage} setHeadlinePostPage={setHeadlinePostPage} headlinePostPagination={headlinePostPagination} headlineSize={sizes.headline} handleCategoryChange={handleCategoryChange} />
+                )}
+
+                {/* Berita Populer */}
+                <div className="w-full flex md:items-center justify-between mt-4 md:flex-row flex-col text-start">
+                    <h3 className="text-[#4b5569] mb-2 md:mb-0 text-xl">
+                        {loading ? <Skeleton width="10rem" /> : "Berita Populer"}
+                    </h3>
+                    {loading ? <Skeleton width="200px" height="2.5rem" /> : (
+                        <Dropdown
+                            ref={dropdownRef}
+                            value={topPostRange}
+                            options={[{ label: 'Hari Ini', value: '1' }, { label: '7 Hari Terakhir', value: '7' }, { label: '30 Hari Terakhir', value: '30' }, { label: 'Semua Waktu', value: 'all' }]}
+                            onChange={(e) => setTopPostRange(e.value)}
+                            placeholder="Pilih Waktu"
+                            className="md:w-[200px] w-full guest"
+                        />
+                    )}
+                </div>
+                {loading ? (
+                    <TopPost loading={true} topPost={null} topPostPage={topPostPage} setTopPostPage={setTopPostPage} topPostSize={sizes.top} topPostPagination={topPostPagination} handleCategoryChange={handleCategoryChange} />
+                ) : hasNoTopPosts ? (
+                    <MiniEmptyData message="Tidak ada berita populer untuk ditampilkan." />
+                ) : (
+                    <TopPost loading={false} topPost={topPosts} topPostPage={topPostPage} setTopPostPage={setTopPostPage} topPostSize={sizes.top} topPostPagination={topPostPagination} handleCategoryChange={handleCategoryChange} />
+                )}
+
+                {/* Berita Lainnya */}
+                <h3 className="text-[#4b5569] text-xl my-4">
+                    {loading ? <Skeleton width="10rem" /> : "Berita Lainnya"}
+                </h3>
+                {loading ? (
+                    <RegularPost loading={true} post={null} postPage={regularPostPage} setPostPage={setRegularPostPage} postSize={sizes.regular} postPagination={regularPostPagination} handleCategoryChange={handleCategoryChange} />
+                ) : hasNoRegularPosts ? (
+                    <MiniEmptyData message="Tidak ada berita lainnya untuk ditampilkan." />
+                ) : (
+                    <RegularPost loading={false} post={posts} postPage={regularPostPage} setPostPage={setRegularPostPage} postSize={sizes.regular} postPagination={regularPostPagination} handleCategoryChange={handleCategoryChange} />
+                )}
+            </>
+        );
+    };
+
     return (
         <div className="min-h-screen bg-white">
-            <ScrollTop className={`bg-[#f59e0b] color-[#465569] ${loading && "hidden"} ${error && "hidden"} ${isModalVisible && "hidden"}`} />
-            
-            <div className={`flex flex-col fixed top-0 w-full ${navZIndex}`}>
+            <ScrollTop className={`bg-[#f59e0b] color-[#465569] ${loading && "hidden"} ${error && "hidden"}`} />
+
+            <div className={`flex flex-col fixed top-0 w-full z-[2001]`}>
                 <nav className="flex justify-between items-center xl:flex-row flex-col bg-white w-full xl:fixed h-[56px]">
                     <div className="flex xl:block justify-between items-center w-full xl:w-fit mt-2 xl:mt-0">
                         <div className="flex items-center h-full ml-3">
-                            <img src={ChronoNewsLogo as string} className="xl:w-8 w-11" alt="ChronoNewsLogo" />
+                            <img src={String(ChronoNewsLogo)} className="xl:w-8 w-11" alt="ChronoNewsLogo" />
                             <h1 style={{color: 'var(--surface-600)'}} className="ml-1 text-[#475569] font-bold text-2xl xl:block hidden">
                                 CHRONO<span style={{color: 'var(--primary-500)'}}>NEWS</span>
                             </h1>
@@ -117,110 +194,27 @@ const Post: React.FC = () => {
                         </div>
                     </div>
                 </nav>
-                <TabMenu 
-                    model={allCategories} 
-                    activeIndex={activeIndex} 
+                <TabMenu
+                    model={allCategories}
+                    activeIndex={activeIndex}
                     onTabChange={(e) => {
                         if (e.index !== 4) {
                             setActiveIndex(e.index);
                             menuRef.current?.hide(e.originalEvent);
                         }
-                    }} 
-                    className="lg:h-full overflow-y-hidden h-[58px] w-full" 
+                    }}
+                    className="lg:h-full overflow-y-hidden h-[58px] w-full"
                 />
             </div>
 
-            <div className="min-h-screen p-4 mx-auto max-w-4xl bg-white xl:pt-[4.6rem] pt-32 rounded-md">
-                {(loading && posts.length === 0 && searchPosts.length === 0 && !mainPost?.id) || error ? (
-                    <div className="fixed inset-0 flex items-center justify-center bg-white z-[1999]">
-                        <LoadingRetry visibleConnectionError={error} visibleLoadingConnection={loading} onRetry={() => window.location.reload()} />
-                    </div>
-                ) : null}
-
-                {isSearchPage ? (
-                    <>
-                        {searchPosts.length > 0 ? (
-                            <>
-                                <h3 className="text-[#4b5569] text-xl mb-4">Berita Lainnya</h3>
-                                <RegularPost
-                                    post={searchPosts}
-                                    postPage={searchPostPage}
-                                    setPostPage={setSearchPostPage}
-                                    postSize={sizes.search}
-                                    postPagination={searchPostPagination}
-                                    handleCategoryChange={handleCategoryChange}
-                                />
-                            </>
-
-                        ) : (
-                            !loading && <EmptyData />
-                        )}
-                    </>
-                ) : isPostPage ? (
-                    <>
-                        <MainPost mainPost={mainPost || null} setIsModalVisible={setIsModalVisible} isModalVisible={isModalVisible} handleCategoryChange={handleCategoryChange} />
-                        <h3 className="text-[#4b5569] text-xl mt-4">Berita Lainnya</h3>
-                        <RegularPost
-                            post={posts}
-                            postPage={regularPostPage}
-                            setPostPage={setRegularPostPage}
-                            postSize={sizes.regular}
-                            postPagination={regularPostPagination}
-                            handleCategoryChange={handleCategoryChange}
-                            classKu="mt-4"
-                        />
-                    </>
+            <div className="relative min-h-screen p-4 mx-auto max-w-4xl bg-white xl:pt-[4.6rem] pt-32 rounded-md">
+                {error ? (
+                    <LoadingRetry visibleConnectionError={true} onRetry={() => window.location.reload()} />
                 ) : (
-                    <>
-                        {posts.length > 0 ? (
-                            <>
-                                <h3 className="text-[#4b5563] mb-3 text-xl">Berita Terkini</h3>
-                                <HeadlinePost
-                                    headlinePost={headlinePost}
-                                    headlinePostPage={headlinePostPage}
-                                    setHeadlinePostPage={setHeadlinePostPage}
-                                    headlinePostPagination={headlinePostPagination}
-                                    headlineSize={sizes.headline}
-                                    handleCategoryChange={handleCategoryChange}
-                                />
-                                
-                                <div className="w-full flex md:items-center justify-between mt-4 md:flex-row flex-col text-start">
-                                    <h3 className="text-[#4b5569] mb-2 md:mb-0 text-xl">Berita Populer</h3>
-                                    <Dropdown
-                                        ref={dropdownRef}
-                                        value={topPostRange}
-                                        options={[{ label: 'Hari Ini', value: '1' }, { label: '7 Hari Terakhir', value: '7' }, { label: '30 Hari Terakhir', value: '30' }, { label: 'Semua Waktu', value: 'all' }]}
-                                        onChange={(e) => setTopPostRange(e.value)}
-                                        placeholder="Pilih Waktu"
-                                        className="md:w-[200px] w-full guest"
-                                    />
-                                </div>
-                                <TopPost
-                                    topPost={topPosts}
-                                    topPostPage={topPostPage}
-                                    setTopPostPage={setTopPostPage}
-                                    topPostSize={sizes.top}
-                                    topPostPagination={topPostPagination}
-                                    handleCategoryChange={handleCategoryChange}
-                                />
-
-                                <h3 className="text-[#4b5569] text-xl my-4">Berita Lainnya</h3>
-                                <RegularPost
-                                    post={posts}
-                                    postPage={regularPostPage}
-                                    setPostPage={setRegularPostPage}
-                                    postSize={sizes.regular}
-                                    postPagination={regularPostPagination}
-                                    handleCategoryChange={handleCategoryChange}
-                                />
-                            </>
-                        ) : (
-                            !loading && <EmptyData />
-                        )}
-                    </>
+                    renderContent()
                 )}
             </div>
-            <GuestFooter quickLinks={categories.map(cat => ({ ...cat, id: String(cat.id) }))} />
+            <GuestFooter quickLinks={(categories || []).map(cat => ({ ...cat, id: String(cat.id) }))} />
         </div>
     );
 };

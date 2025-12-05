@@ -6,15 +6,16 @@ import { handleApiError, handleApiErrorWithRetry, showSuccessToast } from "../ut
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ApiError } from "../types/api.tsx";
 import { ToastRef } from "../types/toast.tsx";
+import {Category} from "../types/category.tsx";
 
 type ModalMode = "create" | "edit" | "delete" | null;
-type CategoryFormData = z.infer<typeof CategorySchema>;
+
 
 interface UseCategoryProps {
     toastRef: ToastRef;
 }
 
-const INITIAL_FORM_DATA: CategoryFormData = {
+const INITIAL_FORM_DATA: Category = {
     name: "",
 };
 
@@ -23,7 +24,7 @@ export const useCategory = ({ toastRef }: UseCategoryProps) => {
 
     const [modalMode, setModalMode] = useState<ModalMode>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [formData, setFormData] = useState<CategoryFormData>(INITIAL_FORM_DATA);
+    const [formData, setFormData] = useState<Category>(INITIAL_FORM_DATA);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
@@ -106,7 +107,7 @@ export const useCategory = ({ toastRef }: UseCategoryProps) => {
     });
 
     const updateMutation = useMutation({
-        mutationFn: (data: CategoryFormData) => CategoryService.updateCategory(selectedCategoryId!, data),
+        mutationFn: (data: Category) => CategoryService.updateCategory(selectedCategoryId!, data),
         onSuccess: () => handleMutationSuccess("Kategori berhasil diperbarui"),
         onError: handleMutationError,
     });

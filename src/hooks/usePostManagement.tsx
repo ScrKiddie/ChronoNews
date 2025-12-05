@@ -10,8 +10,10 @@ import {handleApiError, showSuccessToast} from "../utils/toastHandler.tsx";
 import {processContentForEditor, reverseProcessContentForServer} from "../utils/contentProcessor.tsx";
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
 import {ToastRef} from "../types/toast.tsx";
-import {ApiPostRequest, Category, DropdownOption, PostFormData, User} from "../types/post.tsx";
+import {ApiPostRequest, DropdownOption, PostFormData} from "../types/post.tsx";
+import { User } from "../types/user.tsx";
 import {ApiError} from "../types/api.tsx";
+import {Category} from "../types/category.tsx";
 
 type ModalMode = "create" | "edit" | "delete" | null;
 

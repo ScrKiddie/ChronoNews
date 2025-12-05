@@ -92,7 +92,7 @@ const Post = () => {
                             </div>
                         )}
                     />
-                    {role === "admin" && <Column className="text-center" field="user" header={<p className="text-center font-medium">Penulis</p>} />}
+                    {role === "admin" && <Column className="text-center" body={(rowData) => rowData.user?.name} header={<p className="text-center font-medium">Penulis</p>} />}
                     <Column
                         header={<p className="text-center font-medium ">Ringkasan</p>}
                         className="text-center max-w-md"

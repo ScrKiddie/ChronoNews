@@ -1,5 +1,5 @@
 import { ApiError } from "../types/api.tsx";
-import { ToastRef } from "../types/toast.tsx"; // Import dari types
+import { ToastRef } from "../types/toast.tsx";
 
 export const showSuccessToast = (toastRef: ToastRef, message: string) => {
     toastRef.current?.show({ severity: "success", detail: message, life: 2000 });

@@ -7,11 +7,13 @@ import {slugify} from "../utils/slugify.tsx";
 import {Post} from "../types/post.tsx";
 import {Pagination} from "../types/pagination.tsx";
 import React from "react";
+import HeadlinePostSkeleton from "./skeletons/HeadlinePostSkeleton.tsx";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
 interface HeadlinePostProps {
     headlinePost: Post | null;
+    loading: boolean;
     headlinePostPage: number;
     setHeadlinePostPage: (page: number) => void;
     headlinePostPagination: Pagination | undefined;
@@ -21,6 +23,7 @@ interface HeadlinePostProps {
 
 const HeadlinePost: React.FC<HeadlinePostProps> = ({
                           headlinePost,
+                          loading,
                           headlinePostPage,
                           setHeadlinePostPage,
                           headlinePostPagination,
@@ -34,6 +37,14 @@ const HeadlinePost: React.FC<HeadlinePostProps> = ({
         if (!item) return;
         const slug = slugify(item.title);
         navigate(`/post/${item.id}/${slug}`);
+    }
+
+    if (loading) {
+        return <HeadlinePostSkeleton />;
+    }
+
+    if (!headlinePost) {
+        return null;
     }
 
     return (
@@ -72,7 +83,7 @@ const HeadlinePost: React.FC<HeadlinePostProps> = ({
                                     }
                                 }}
                             >
-                            {truncateText(post.category?.name, 13)}
+                            {truncateText(post.category?.name || '', 13)}
                           </span> - {post.createdAt}</p>
                             <p className="mt-1 text-base line-clamp-3">
                                 {post.summary}

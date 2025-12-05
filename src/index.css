@@ -433,3 +433,7 @@ body .navbar-top {
     border-color: #f49f14 !important;
     color: #f49f14 !important;
 }
+
+.p-button-icon.pi-share-alt {
+    transform: translateX(-1px);
+}

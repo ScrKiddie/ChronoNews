@@ -4,7 +4,6 @@ import {Button} from "primereact/button";
 import {BreadCrumb, BreadCrumbProps} from "primereact/breadcrumb";
 import defaultProfilePicture from "../assets/profilepicture.svg";
 import thumbnail from "../assets/thumbnail.svg";
-import {Dialog} from "primereact/dialog";
 import {truncateText} from "../utils/truncateText.tsx";
 import {Post} from "../types/post.tsx";
 
@@ -13,11 +12,9 @@ const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 interface MainPostProps {
     mainPost: Post | null;
     handleCategoryChange: (category: string) => void;
-    isModalVisible: boolean;
-    setIsModalVisible: (visible: boolean) => void;
 }
 
-const MainPost: React.FC<MainPostProps> = ({mainPost, handleCategoryChange, isModalVisible, setIsModalVisible}) => {
+const MainPost: React.FC<MainPostProps> = ({mainPost, handleCategoryChange}) => {
     const [showUpdatedAt, setShowUpdatedAt] = useState(false);
 
     useEffect(() => {
@@ -46,20 +43,22 @@ const MainPost: React.FC<MainPostProps> = ({mainPost, handleCategoryChange, isMo
         setShowUpdatedAt(!showUpdatedAt);
     };
 
-    useEffect(() => {
-        if (isModalVisible) {
-            document.body.style.overflow = "hidden";
+    const handleShare = async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: mainPost?.title || document.title,
+                    text: mainPost?.summary || '',
+                    url: window.location.href,
+                });
+            } catch (error) {
+                console.error('Error sharing content:', error);
+                await navigator.clipboard.writeText(window.location.href);
+            }
         } else {
-            document.body.style.overflow = "auto";
+            await navigator.clipboard.writeText(window.location.href);
+            alert('Link copied to clipboard!');
         }
-
-        return () => {
-            document.body.style.overflow = "auto";
-        };
-    }, [isModalVisible]);
-
-    const toggleModal = () => {
-        setIsModalVisible(!isModalVisible);
     };
 
     if (!mainPost || !mainPost.id) {
@@ -96,7 +95,7 @@ const MainPost: React.FC<MainPostProps> = ({mainPost, handleCategoryChange, isMo
                 <div className="relative">
                     <img
                         src={mainPost?.thumbnail ? apiUri+"/post_picture/"+mainPost?.thumbnail : thumbnail as string}
-                        alt={mainPost.title}
+                        alt={mainPost.title || "Post Thumbnail"}
                         className="w-full object-cover bg-[#f59e0b]"
                     />
                     <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white p-1 px-2 rounded-md flex items-center text-xs">
@@ -111,14 +110,13 @@ const MainPost: React.FC<MainPostProps> = ({mainPost, handleCategoryChange, isMo
                                 ? `${apiUri}/profile_picture/${mainPost.user.profilePicture}`
                                 : defaultProfilePicture as string
                             }
-                            className="size-[2.6rem] lg:size-[3rem] rounded-full cursor-pointer"
+                            className="size-[2.6rem] lg:size-[3rem] rounded-full"
                             style={{border: "1px solid #d1d5db"}}
-                            onClick={toggleModal}
+                            alt={mainPost.user?.name || "Author Profile Picture"}
                         />
                         <div>
-                            <p className="text-[#475569] text:sm md:text-md font-medium flex items-center gap-1 cursor-pointer w-fit"
-                               onClick={toggleModal}>{mainPost.user?.name} {mainPost.user?.role === "admin" && (
-                                <i style={{color: 'var(--primary-color)'}} className={`pi pi-verified`}></i>)}</p>
+                            <p className="text-[#475569] text:sm md:text-md font-medium flex items-center gap-1 w-fit"
+                               >{mainPost.user?.name}</p>
                             <p className="text-[#475569] text-xs md:text-sm flex items-center">Diterbitkan: {mainPost.createdAt}
                                 {mainPost.updatedAt && (
                                     <button
@@ -142,28 +140,11 @@ const MainPost: React.FC<MainPostProps> = ({mainPost, handleCategoryChange, isMo
                         </div>
                     </div>
 
-                    <div className="flex lg:gap-2 gap-1 w-fit items-center lg:justify">
+                    <div className="flex ml-2 lg:gap-2 gap-1 w-fit items-center lg:justify">
                         <Button
-                            icon="pi pi-twitter"
-                            className="p-button-rounded md:size-[40px] size-[30px] p-button-secondary sm:flex hidden"
-                            onClick={() => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}`, "_blank")}
-                        />
-                        <Button
-                            icon="pi pi-facebook"
-                            className="p-button-rounded md:size-[40px] size-[30px] p-button-info sm:flex hidden"
-                            onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, "_blank")}
-                        />
-                        <Button
-                            icon="pi pi-whatsapp"
-                            className="p-button-rounded md:size-[40px] size-[30px] p-button-success sm:flex hidden"
-                            onClick={() => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(window.location.href)}`, "_blank")}
-                        />
-                        <Button
-                            icon="pi pi-clipboard"
+                            icon="pi pi-share-alt"
                             className="p-button-rounded md:size-[40px] size-[40px]"
-                            onClick={() => {
-                                navigator.clipboard.writeText(window.location.href);
-                            }}
+                            onClick={handleShare}
                         />
                     </div>
 
@@ -175,38 +156,6 @@ const MainPost: React.FC<MainPostProps> = ({mainPost, handleCategoryChange, isMo
                 <div className="w-full my-4 opacity-30" style={{borderTop: "1px solid #8496af"}}></div>
                 <div id="disqus_thread" className={`mt-8 mb-4`}></div>
             </main>
-            <Dialog
-                header={
-                    <h1 className="font-medium m-0 text-xl">
-                        Detail Penulis
-                    </h1>
-                }
-                key={`author-modal-${mainPost.user?.id}`}
-                visible={isModalVisible}
-                onHide={toggleModal}
-                className="w-[80%] md:w-[25%]"
-                appendTo={null}
-                blockScroll={true}
-            >
-                <div className="flex flex-col items-center mb-[24px]">
-                    <div className="relative w-fit mx-auto flex justify-center items-center">
-                        <img
-                            src={mainPost.user?.profilePicture
-                                ? `${apiUri}/profile_picture/${mainPost.user.profilePicture}`
-                                : defaultProfilePicture as string}
-                            className="size-[9rem] rounded-full"
-                            style={{border: "1px solid #d1d5db"}}
-                        />
-                    </div>
-
-                    <div className="text-center mt-4">
-                        <h3 className="text-lg font-normal">{mainPost.user?.name} {mainPost.user?.role === "admin" && (
-                            <i style={{color: 'var(--primary-color)'}} className={`pi pi-verified`}></i>)}</h3>
-                        <p className="text-sm text-gray-500">{mainPost.user?.email}</p>
-                        <p className="text-sm text-gray-500">{mainPost.user?.phoneNumber}</p>
-                    </div>
-                </div>
-            </Dialog>
         </>
 
     );

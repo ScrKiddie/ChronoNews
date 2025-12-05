@@ -6,11 +6,14 @@ import {truncateText} from "../utils/truncateText.tsx";
 import {slugify} from "../utils/slugify.tsx";
 import {Post} from "../types/post.tsx";
 import {Pagination} from "../types/pagination.tsx";
+import RegularPostSkeleton from "./skeletons/RegularPostSkeleton.tsx";
+import React from "react";
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
 interface RegularPostProps {
-    post: Post[];
+    post: Post[] | null;
+    loading: boolean;
     postPage: number;
     setPostPage: (page: number) => void;
     postSize: number;
@@ -21,6 +24,7 @@ interface RegularPostProps {
 
 const RegularPost: React.FC<RegularPostProps> = ({
                          post,
+                         loading,
                          postPage,
                          setPostPage,
                          postSize,
@@ -35,10 +39,18 @@ const RegularPost: React.FC<RegularPostProps> = ({
         navigate(`/post/${item.id}/${slug}`);
     }
 
+    if (loading) {
+        return <RegularPostSkeleton postSize={postSize} />;
+    }
+    
+    if (!post || post.length === 0) {
+        return null;
+    }
+
     return (
         <div className={`${classKu}`}>
             <DataView
-                value={post}
+                value={post || []}
                 layout="list"
                 itemTemplate={(item: Post) => (
                     <div key={item.id}
@@ -71,7 +83,7 @@ const RegularPost: React.FC<RegularPostProps> = ({
                                         }
                                     }}
                                 >
-                                    {truncateText(item.category?.name, 13)}
+                                    {truncateText(item.category?.name || '', 13)}
                                 </span> - {item.createdAt}
                             </p>
                             <p className="text-gray-600 md:line-clamp-2 line-clamp-5 text-xs sm:text-sm break-all">

@@ -62,7 +62,6 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
 
                         styleEntries.forEach((entry: any) => {
                             const [key, val] = entry.split(":").map((item: any) => item.trim());
-                            // Casting allowedStyles to any to bypass index signature error
                             if (
                                 (allowedStyles as any)[key] &&
                                 ((allowedStyles as any)[key].length === 0 || (allowedStyles as any)[key].includes(val))
@@ -142,7 +141,6 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
 
                         styleEntries.forEach((entry: any) => {
                             const [key, val] = entry.split(":").map((item: any) => item.trim());
-                            // Casting allowedStyles to any to bypass index signature error
                             if (
                                 (allowedStyles as any)[key] &&
                                 ((allowedStyles as any)[key].length === 0 || (allowedStyles as any)[key].includes(val))

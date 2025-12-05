@@ -9,13 +9,14 @@ import {processContentForEditor} from "../utils/contentProcessor.tsx";
 import {slugify} from "../utils/slugify.tsx";
 import {getDateRangeInUnix} from "../utils/dateUtils.tsx";
 import {getRelativeTime, formatDate} from "../utils/postUtils.tsx";
-import {Category, Post} from "../types/post.tsx";
+import {Post} from "../types/post.tsx";
 import {MenuItem} from "primereact/menuitem";
 import React from "react";
 import {Dropdown} from "primereact/dropdown";
+import {Category} from "../types/category.tsx";
 
 const usePost = () => {
-    const {pathname, search} = useLocation();
+    const {pathname, search, state} = useLocation();
     const navigate = useNavigate();
     const queryParams = useMemo(() => new URLSearchParams(search), [search]);
     const params = useParams();
@@ -113,19 +114,25 @@ const usePost = () => {
         return Array.isArray(data) ? data.map(p => ({...p, createdAt: getRelativeTime(p.createdAt)})) : [];
     }, [topPostsResult]);
 
+    const regularPostsExcludeIds = useMemo(() => {
+        const idsToExclude = (isPostPage
+                ? [mainPost?.id]
+                : [headlinePost?.id, ...(topPostsResult?.data || []).map((p: Post) => p.id)]
+        );
+        return idsToExclude.filter((id): id is number => id !== null && id !== undefined).join(',');
+    }, [isPostPage, mainPost?.id, headlinePost?.id, topPostsResult?.data]);
+
     const {data: regularPostsResult, isLoading: isRegularPostsLoading, isError: isRegularPostsError} = useQuery({
-        queryKey: ['posts', 'regular', currentCategory, topPosts, mainPost?.id, regularPostPage],
+        queryKey: ['posts', 'regular', currentCategory, regularPostsExcludeIds, regularPostPage],
         queryFn: ({signal}) => {
-            const idsToExclude = (isPostPage ? [mainPost?.id] : [headlinePost?.id, ...topPosts.map(p => p.id)]);
-            const excludeIds = idsToExclude.filter((id): id is number => id !== null && id !== undefined).join(',');
             return PostService.searchPost({
                 categoryName: isPostPage ? '' : (currentCategory === 'beranda' ? '' : currentCategory),
                 size: 5,
                 page: regularPostPage,
-                excludeIds
+                excludeIds: regularPostsExcludeIds
             }, signal);
         },
-        enabled: !isSearchPage && (isPostPage ? !!mainPost : !!topPostsResult),
+        enabled: !isSearchPage && (isPostPage ? !!mainPost : (!!headlineResult && !!topPostsResult)),
     });
     const posts: Post[] = useMemo(() => {
         const data = regularPostsResult?.data;
@@ -149,9 +156,13 @@ const usePost = () => {
     }, [searchResult]);
 
     useEffect(() => {
-        window.scrollTo({top: 0, left: 0, behavior: 'auto'});
+
+        if (!state?.noScroll) {
+            window.scrollTo({top: 0, left: 0, behavior: 'auto'});
+        }
+
         dropdownRef.current?.hide();
-    }, [pathname, search]);
+    }, [pathname, search, state]);
 
     useEffect(() => {
         if (mainPost && mainPost.title && slugFromUrl && mainPost.id) {
@@ -209,7 +220,7 @@ const usePost = () => {
             navigate(`/berita?category=${lowerCategory}`);
         }
     };
-    
+
     const setTopPostRange = (newRange: string) => {
         const newParams = new URLSearchParams(search);
         if (newRange === 'all') {
@@ -218,7 +229,7 @@ const usePost = () => {
             newParams.set('top_range', newRange);
         }
         setTopPostPage(1);
-        navigate({ pathname, search: newParams.toString() });
+        navigate({pathname, search: newParams.toString()}, {state: {noScroll: true}});
     };
 
     const primaryCategories = useMemo(() => categories.slice(0, 3), [categories]);

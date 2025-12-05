@@ -2,12 +2,13 @@ import {Dialog} from "primereact/dialog";
 import InputGroup from "./InputGroup.tsx";
 import SubmitButton from "./SubmitButton.tsx";
 import {Dispatch, SetStateAction} from "react";
+import {Category} from "../types/category.tsx";
 
 interface CategoryModalProps {
     visible: boolean;
     onClose: () => void;
-    data: { name: string };
-    setData: Dispatch<SetStateAction<{ name: string }>>;
+    data: Category;
+    setData: Dispatch<SetStateAction<Category>>;
     errors: Record<string, string>;
     submitLoading: boolean;
     handleSubmit: (e?: React.FormEvent) => Promise<void>;
@@ -47,7 +48,7 @@ const CategoryModal = ({
                             data={data?.name}
                             error={errors.name}
                             setData={(e) => {
-                                setData((prev: { name: string }) => ({...prev, name: e}));
+                                setData((prev: Category) => ({...prev, name: e}));
                             }}
                             setError={(e) => {errors.name = e}}
                         />

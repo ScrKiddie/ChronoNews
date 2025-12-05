@@ -1,9 +1,14 @@
 import { z } from "zod";
 import { PostCreateSchema, PostUpdateSchema } from "../schemas/postSchema.tsx";
-import { User } from "./user.tsx";
 import { Category } from "./category.tsx";
 
-export type { User, Category };
+export interface PostUser {
+    id: number;
+    name: string;
+    profilePicture?: string;
+    createdAt: string | number;
+    updatedAt?: string | number;
+}
 
 export interface Post {
     id: number | null;
@@ -15,7 +20,7 @@ export interface Post {
     createdAt: string | number;
     updatedAt?: string | number;
     category: Category;
-    user: User;
+    user: PostUser;
 }
 
 export type PostFormData = z.infer<typeof PostCreateSchema> & z.infer<typeof PostUpdateSchema> & {
