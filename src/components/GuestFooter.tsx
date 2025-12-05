@@ -33,7 +33,7 @@ const GuestFooter: React.FC<GuestFooterProps> = ({quickLinks}) => {
                     </p>
                     {quickLinks.map((category) => (
                         <p key={category.id} className="text-white text-sm">
-                            <Link to={`/${category.name.toLowerCase()}`} className="no-underline text-inherit">
+                            <Link to={`/berita?category=${category.name.toLowerCase()}`} className="no-underline text-inherit">
                                 {truncateText(category.name, 13)}
                             </Link>
                         </p>

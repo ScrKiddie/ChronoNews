@@ -12,31 +12,39 @@ import {getRelativeTime, formatDate} from "../utils/postUtils.tsx";
 import {Category, Post} from "../types/post.tsx";
 import {MenuItem} from "primereact/menuitem";
 import React from "react";
+import {Dropdown} from "primereact/dropdown";
 
 const usePost = () => {
     const {pathname, search} = useLocation();
-    const params = useParams();
     const navigate = useNavigate();
     const queryParams = useMemo(() => new URLSearchParams(search), [search]);
+    const params = useParams();
 
     const [headlinePostPage, setHeadlinePostPage] = useState(1);
     const [topPostPage, setTopPostPage] = useState(1);
     const [regularPostPage, setRegularPostPage] = useState(1);
     const [searchPostPage, setSearchPostPage] = useState(1);
 
-    const isSearchPage = pathname === '/search';
+    const isSearchPage = pathname === '/cari';
     const isPostPage = pathname.startsWith('/post/');
     const isHomePage = pathname === '/beranda';
+    const isBeritaPage = pathname === '/berita';
 
-    const currentCategory = params.category?.toLowerCase() || (isHomePage ? 'beranda' : '');
+    const getCategory = () => {
+        if (isHomePage) return 'beranda';
+        if (isBeritaPage) return queryParams.get('category')?.toLowerCase() || '';
+        return '';
+    };
+    const currentCategory = getCategory();
     const postId = params.id;
     const slugFromUrl = params.slug;
-    const searchQueryFromUrl = queryParams.get('q') || "";
+    const searchQueryFromUrl = queryParams.get('query') || "";
+    const topPostRange = queryParams.get('top_range') || 'all';
 
     const [activeIndex, setActiveIndex] = useState(0);
     const [searchQuery, setSearchQuery] = useState(searchQueryFromUrl);
     const menuRef = useRef<Menu>(null);
-    const [topPostRange, setTopPostRange] = useState('all');
+    const dropdownRef = useRef<Dropdown>(null);
 
     const {data: categories = []} = useQuery<Category[]>({
         queryKey: ['categories'],
@@ -142,6 +150,7 @@ const usePost = () => {
 
     useEffect(() => {
         window.scrollTo({top: 0, left: 0, behavior: 'auto'});
+        dropdownRef.current?.hide();
     }, [pathname, search]);
 
     useEffect(() => {
@@ -156,14 +165,15 @@ const usePost = () => {
     useEffect(() => {
         if (isSearchPage || isPostPage) setActiveIndex(-1);
         else if (categories.length > 0) {
-            if (isHomePage) setActiveIndex(0);
-            else {
+            if (currentCategory === 'beranda') {
+                setActiveIndex(0);
+            } else {
                 const primary = categories.slice(0, 3);
                 const foundIndex = primary.findIndex((cat: Category) => cat.name.toLowerCase() === currentCategory);
                 setActiveIndex(foundIndex !== -1 ? foundIndex + 1 : 4);
             }
         }
-    }, [currentCategory, categories, isSearchPage, isPostPage, isHomePage]);
+    }, [currentCategory, categories, isSearchPage, isPostPage]);
 
     useEffect(() => {
         if (searchQueryFromUrl !== searchQuery) {
@@ -192,7 +202,23 @@ const usePost = () => {
         setHeadlinePostPage(1);
         setTopPostPage(1);
         setRegularPostPage(1);
-        navigate(`/${category.toLowerCase()}`);
+        const lowerCategory = category.toLowerCase();
+        if (lowerCategory === 'beranda') {
+            navigate('/beranda');
+        } else {
+            navigate(`/berita?category=${lowerCategory}`);
+        }
+    };
+    
+    const setTopPostRange = (newRange: string) => {
+        const newParams = new URLSearchParams(search);
+        if (newRange === 'all') {
+            newParams.delete('top_range');
+        } else {
+            newParams.set('top_range', newRange);
+        }
+        setTopPostPage(1);
+        navigate({ pathname, search: newParams.toString() });
     };
 
     const primaryCategories = useMemo(() => categories.slice(0, 3), [categories]);
@@ -231,6 +257,7 @@ const usePost = () => {
         searchQuery,
         setSearchQuery,
         menuRef,
+        dropdownRef,
         allCategories,
         moreCategories,
         handleCategoryChange,

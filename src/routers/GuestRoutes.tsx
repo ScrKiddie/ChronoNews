@@ -12,8 +12,8 @@ const GuestRoutes = () => {
             <Route path="/login" element={<Login/>}/>
 
             <Route path="/beranda" element={<Post/>}/>
-            <Route path="/search" element={<Post/>}/>
-            <Route path="/:category" element={<Post/>}/>
+            <Route path="/cari" element={<Post/>}/>
+            <Route path="/berita" element={<Post/>}/>
 
             <Route path="/post/:id/:slug" element={<Post/>}/>
 

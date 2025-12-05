@@ -33,6 +33,7 @@ const Post: React.FC = () => {
         searchQuery,
         setSearchQuery,
         menuRef,
+        dropdownRef,
         allCategories,
         moreCategories,
         handleCategoryChange,
@@ -53,7 +54,7 @@ const Post: React.FC = () => {
 
     const handleSearch = () => {
         if (searchQuery.trim() !== "") {
-            navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+            navigate(`/cari?query=${encodeURIComponent(searchQuery)}`);
         }
     };
 
@@ -186,6 +187,7 @@ const Post: React.FC = () => {
                                 <div className="w-full flex md:items-center justify-between mt-4 md:flex-row flex-col text-start">
                                     <h3 className="text-[#4b5569] mb-2 md:mb-0 text-xl">Berita Populer</h3>
                                     <Dropdown
+                                        ref={dropdownRef}
                                         value={topPostRange}
                                         options={[{ label: 'Hari Ini', value: '1' }, { label: '7 Hari Terakhir', value: '7' }, { label: '30 Hari Terakhir', value: '30' }, { label: 'Semua Waktu', value: 'all' }]}
                                         onChange={(e) => setTopPostRange(e.value)}
