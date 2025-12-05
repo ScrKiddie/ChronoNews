@@ -1,4 +1,4 @@
-import {useState, useCallback, RefObject, useEffect} from "react";
+import {useState, useCallback, useEffect, useRef} from "react";
 import {z} from "zod";
 import {useAuth} from "./useAuth.tsx";
 import {PostService} from "../services/postService.tsx";
@@ -9,21 +9,15 @@ import {useCropper} from "./useCropper";
 import {handleApiError, showSuccessToast} from "../utils/toastHandler.tsx";
 import {processContentForEditor, reverseProcessContentForServer} from "../utils/contentProcessor.tsx";
 import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
+import {ToastRef} from "../types/toast.tsx";
+import {ApiPostRequest, Category, DropdownOption, User} from "../types/post.tsx";
+import {ApiError} from "../types/api.tsx";
+import {PostFormData} from "../types/post.tsx";
 
 type ModalMode = "create" | "edit" | "delete" | null;
 
-interface PostFormData {
-    title: string;
-    summary: string;
-    content: string;
-    userID: number;
-    categoryID: number;
-    thumbnail?: string;
-    deleteThumbnail?: boolean;
-}
-
 interface UsePostManagementProps {
-    toastRef: RefObject<any>;
+    toastRef: ToastRef;
     pagination: {
         page: number;
         setPage: (page: number | ((prev: number) => number)) => void;
@@ -49,10 +43,13 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
     const [modalMode, setModalMode] = useState<ModalMode>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [formData, setFormData] = useState<PostFormData>(INITIAL_FORM_DATA);
+
+    const editorContentRef = useRef("");
+
+    const [isDataSynced, setIsDataSynced] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
     const [thumbnail, setThumbnail] = useState<File | null>(null);
-    const [editorContent, setEditorContent] = useState("");
 
     const cropper = useCropper({
         setVisibleModal: setIsModalVisible,
@@ -62,33 +59,18 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
         height: 675,
     });
 
-    const closeModal = useCallback(() => {
-        setIsModalVisible(false);
-        setTimeout(() => {
-            setModalMode(null);
-            setSelectedPostId(null);
-        }, 300);
-    }, []);
-
-    const {data: categoryOptions = [], isError: isCatError, error: catError} = useQuery({
-        queryKey: ['categories'],
-        queryFn: () => CategoryService.listCategories().then(res => res.data.map((c: any) => ({label: c.name, value: c.id}))),
-        enabled: isModalVisible && (modalMode === 'create' || modalMode === 'edit'),
-    });
-
-    const {data: userOptions = [], isError: isUserError, error: userError} = useQuery({
-        queryKey: ['users', 'all'],
-        queryFn: () => UserService.searchUser({size: 1000}).then(res => [
-            {label: "Posting Sebagai Diri Sendiri", value: 0},
-            ...res.data.map((u: any) => ({label: `${u.name} - ${u.phoneNumber} - ${u.email} - ${u.role}`, value: u.id})),
-        ]),
-        enabled: isModalVisible && role === 'admin' && (modalMode === 'create' || modalMode === 'edit'),
-    });
-
-    const {data: postDataForEdit, isLoading: isModalLoading, isError: isPostError, error: postError} = useQuery({
+    const {
+        data: postDataForEdit,
+        isLoading: isModalLoading,
+        isFetching: isModalFetching,
+        isSuccess: isPostSuccess,
+        isError: isPostError,
+        error: postError
+    } = useQuery({
         queryKey: ['post', selectedPostId],
         queryFn: async () => {
-            const postData = await PostService.getPost(selectedPostId!);
+            if (!selectedPostId) return null;
+            const postData = await PostService.getPost(selectedPostId);
             return {
                 ...postData,
                 content: processContentForEditor(postData.content || ""),
@@ -98,29 +80,89 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
             };
         },
         enabled: modalMode === 'edit' && !!selectedPostId && isModalVisible,
+        gcTime: 0,
+        staleTime: 0,
     });
-    
-    useEffect(() => {
-        if (isCatError || isUserError || isPostError) {
-            handleApiError(catError || userError || postError, toastRef);
-            closeModal();
-        }
-    }, [isCatError, isUserError, isPostError, catError, userError, postError, toastRef, closeModal]);
+
+    const closeModal = useCallback(() => {
+        setIsModalVisible(false);
+        setTimeout(() => {
+            if (selectedPostId) {
+                queryClient.removeQueries({ queryKey: ['post', selectedPostId] });
+            }
+
+            setModalMode(null);
+            setSelectedPostId(null);
+            setFormData(INITIAL_FORM_DATA);
+
+            editorContentRef.current = "";
+
+            setIsDataSynced(false);
+        }, 300);
+    }, [selectedPostId, queryClient]);
+
+    const {data: categoryOptions = []} = useQuery({
+        queryKey: ['categories'],
+        queryFn: () => CategoryService.listCategories().then(res =>
+            res.data.map((c: Category) => ({ label: c.name, value: c.id }))
+        ),
+        enabled: isModalVisible,
+    });
+
+    const {data: userOptions = []} = useQuery<DropdownOption[]>({
+        queryKey: ['users', 'all'],
+        queryFn: () => UserService.searchUser().then(res => [
+            {label: "Posting Sebagai Diri Sendiri", value: 0},
+            ...res.data.map((u: User) => ({
+                label: `${u.name} - ${u.phoneNumber} - ${u.email} - ${u.role}`,
+                value: u.id
+            }))
+        ]),
+        enabled: isModalVisible && role === 'admin',
+    });
 
     useEffect(() => {
-        if (postDataForEdit) {
-            setFormData(postDataForEdit);
-            setEditorContent(postDataForEdit.content);
+        if (isPostError) {
+            handleApiError(postError as ApiError, toastRef);
+            closeModal();
         }
-    }, [postDataForEdit]);
+    }, [isPostError, postError, toastRef, closeModal]);
+
+    useEffect(() => {
+        if (
+            modalMode === 'edit' &&
+            isModalVisible &&
+            postDataForEdit &&
+            isPostSuccess &&
+            !isModalFetching &&
+            !isDataSynced
+        ) {
+            setFormData({
+                title: postDataForEdit.title,
+                summary: postDataForEdit.summary,
+                userID: postDataForEdit.userID,
+                categoryID: postDataForEdit.categoryID,
+                content: "",
+                deleteThumbnail: false,
+                thumbnail: postDataForEdit.thumbnail
+            });
+
+            editorContentRef.current = postDataForEdit.content;
+
+            setIsDataSynced(true);
+        }
+    }, [postDataForEdit, isPostSuccess, modalMode, isModalVisible, isModalFetching, isDataSynced]);
 
     const openModal = useCallback((mode: ModalMode, postId?: number) => {
         cropper.resetCropper();
         setErrors({});
         setFormData(INITIAL_FORM_DATA);
-        setEditorContent("");
+
+        editorContentRef.current = "";
+
         setThumbnail(null);
         setSelectedPostId(postId || null);
+        setIsDataSynced(false);
         setModalMode(mode);
         setIsModalVisible(true);
     }, [cropper]);
@@ -128,6 +170,7 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
     const handleMutationSuccess = (message: string) => {
         showSuccessToast(toastRef, message);
         queryClient.invalidateQueries({queryKey: ['posts', 'search']});
+        queryClient.invalidateQueries({queryKey: ['post']});
         closeModal();
     };
 
@@ -136,18 +179,18 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
             const formErrors = error.errors.reduce((acc, err) => ({...acc, [err.path[0]]: err.message}), {});
             setErrors(formErrors);
         } else {
-            handleApiError(error, toastRef);
+            handleApiError(error as ApiError, toastRef);
         }
     };
 
     const createPostMutation = useMutation({
-        mutationFn: PostService.createPost,
+        mutationFn: (data: ApiPostRequest) => PostService.createPost(data),
         onSuccess: () => handleMutationSuccess("Postingan berhasil dibuat"),
         onError: handleMutationError,
     });
 
     const updatePostMutation = useMutation({
-        mutationFn: ({id, request}: { id: number, request: any }) => PostService.updatePost(id, request),
+        mutationFn: ({id, request}: { id: number, request: PostFormData }) => PostService.updatePost(id, request),
         onSuccess: () => handleMutationSuccess("Postingan berhasil diperbarui"),
         onError: handleMutationError,
     });
@@ -158,11 +201,8 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
             showSuccessToast(toastRef, "Postingan berhasil dihapus");
             const remainingItems = totalItem - 1;
             const totalPages = Math.ceil(remainingItems / size);
-            if (page > totalPages && totalPages > 0) {
-                setPage(totalPages);
-            } else {
-                queryClient.invalidateQueries({queryKey: ['posts', 'search']});
-            }
+            if (page > totalPages && totalPages > 0) setPage(totalPages);
+            else queryClient.invalidateQueries({queryKey: ['posts', 'search']});
             closeModal();
         },
         onError: handleMutationError,
@@ -172,25 +212,41 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
         e.preventDefault();
         setErrors({});
 
-        const validationSchema = modalMode === 'create' ? PostCreateSchema : PostUpdateSchema;
+        const contentToSubmit = editorContentRef.current || "";
+
         try {
-            const validatedData = validationSchema.parse(formData);
-            
-            if (editorContent.length > 65535) {
+            const dataToValidate = { ...formData, content: contentToSubmit };
+
+            const validationSchema = modalMode === 'create' ? PostCreateSchema : PostUpdateSchema;
+            const validatedData = validationSchema.parse(dataToValidate);
+
+            if (contentToSubmit.length > 65535) {
                 setErrors({ content: "Konten terlalu panjang" });
+                return;
+            }
+            if (new Blob([contentToSubmit]).size > 314572800) {
                 return;
             }
 
             if (modalMode === "create") {
-                const request = {...validatedData, content: editorContent || "", ...(thumbnail && {thumbnail})};
-                await createPostMutation.mutateAsync(request);
-            } else if (modalMode === "edit" && selectedPostId) {
-                const cleanedContent = reverseProcessContentForServer(editorContent);
-                const request = {
+                const request: ApiPostRequest = {
                     ...validatedData,
+                    content: contentToSubmit,
+                    userID: validatedData.userID ?? 0,
+                    ...(thumbnail && { thumbnail }),
+                };
+                await createPostMutation.mutateAsync(request);
+            }
+            else if (modalMode === "edit" && selectedPostId) {
+                const cleanedContent = reverseProcessContentForServer(contentToSubmit);
+                const request: PostFormData = {
+                    title: validatedData.title,
+                    summary: validatedData.summary,
                     content: cleanedContent || "",
-                    ...(formData.deleteThumbnail && {deleteThumbnail: true}),
-                    ...(thumbnail && {thumbnail}),
+                    userID: validatedData.userID ?? formData.userID ?? 0,
+                    categoryID: validatedData.categoryID,
+                    ...(formData.deleteThumbnail && { deleteThumbnail: true }),
+                    ...(thumbnail && { thumbnail: thumbnail }),
                 };
                 await updatePostMutation.mutateAsync({id: selectedPostId, request});
             }
@@ -200,18 +256,17 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
     };
 
     const handleDeleteConfirm = async () => {
-        if (selectedPostId) {
-            await deletePostMutation.mutateAsync(selectedPostId);
-        }
+        if (selectedPostId) await deletePostMutation.mutateAsync(selectedPostId);
     };
-    
+
     const isSubmitting = createPostMutation.isPending || updatePostMutation.isPending || deletePostMutation.isPending;
+    const isLoadingCombined = isModalLoading || isModalFetching;
 
     return {
         modalState: {
             isVisible: isModalVisible,
             mode: modalMode,
-            isLoading: isModalLoading,
+            isLoading: isLoadingCombined,
             isSubmitting,
         },
         formData,
@@ -221,16 +276,9 @@ export const usePostManagement = ({toastRef, pagination}: UsePostManagementProps
         closeModal,
         handleSubmit,
         handleDeleteConfirm,
-        editorContent,
-        setEditorContent,
-        cropperProps: {
-            ...cropper,
-            setThumbnail: setThumbnail,
-        },
-        options: {
-            category: categoryOptions,
-            user: userOptions,
-        },
+        cropperProps: { ...cropper, setThumbnail },
+        options: { category: categoryOptions, user: userOptions },
         role,
+        editorContentRef,
     };
 };

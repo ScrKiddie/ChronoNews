@@ -15,7 +15,7 @@ interface UseCropperReturn {
     fileInputRef: RefObject<HTMLInputElement>;
     imageRef: RefObject<HTMLImageElement>;
     cropperRef: RefObject<Cropper | null>;
-    selectedImage: string | null | ArrayBuffer;
+    selectedImage: string | null;
     visibleCropImageModal: boolean;
     croppedImage: string | null;
     handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -38,7 +38,7 @@ export const useCropper = ({
     const imageRef = useRef<HTMLImageElement>(null!);
     const cropperRef = useRef<Cropper | null>(null);
 
-    const [selectedImage, setSelectedImage] = useState<string | null | ArrayBuffer>(null);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [visibleCropImageModal, setVisibleCropImageModal] = useState(false);
     const [croppedImage, setCroppedImage] = useState<string | null>(null);
     const [imageFormat, setImageFormat] = useState("image/jpeg");
@@ -66,7 +66,7 @@ export const useCropper = ({
                 setVisibleModal(false);
             }
             setVisibleCropImageModal(true);
-            setSelectedImage(reader.result);
+            setSelectedImage(reader.result as string);
             destroyCropper();
         };
         reader.readAsDataURL(file);

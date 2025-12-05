@@ -6,6 +6,9 @@ export interface Category {
 export interface User {
     id: number;
     name: string;
+    email: string;
+    phoneNumber: string;
+    role: string
 }
 
 export interface Post {
@@ -44,4 +47,33 @@ export interface SearchFilters {
     startDate?: number;
     endDate?: number;
     userID?: number | string;
+}
+
+export interface PostFormData {
+    title: string;
+    summary: string;
+    content: string;
+    userID?: number;
+    categoryID: number;
+    thumbnail?: string | File;
+    deleteThumbnail?: boolean;
+}
+
+export interface ApiPostRequest {
+    title: string;
+    summary: string;
+    content: string;
+    userID: number;
+    categoryID: number;
+    thumbnail?: File;
+    deleteThumbnail?: boolean;
+}
+
+export interface PostFormErrors {
+    [key: string]: string | undefined;
+}
+
+export interface DropdownOption {
+    label: string;
+    value: number;
 }

@@ -1,8 +1,8 @@
-import {Button} from "primereact/button";
-import {Column} from "primereact/column";
-import {useToast} from "../../hooks/useToast.tsx";
+import { Button } from "primereact/button";
+import { Column } from "primereact/column";
+import { useToast } from "../../hooks/useToast.tsx";
 import useSearchPost from "../../hooks/useSearchPost.tsx";
-import {usePostManagement} from "../../hooks/usePostManagement.tsx";
+import { usePostManagement } from "../../hooks/usePostManagement.tsx";
 import ReusableLazyTable from "../../components/ReusableLazyTable.tsx";
 import LoadingRetry from "../../components/LoadingRetry.tsx";
 import PostModal from "../../components/PostModal.tsx";
@@ -36,25 +36,24 @@ const Post = () => {
         closeModal,
         handleSubmit,
         handleDeleteConfirm,
-        editorContent,
-        setEditorContent,
         cropperProps,
         options,
         role,
+        editorContentRef,
     } = usePostManagement({
         toastRef,
-        pagination: {page, setPage, totalItem, size},
+        pagination: { page, setPage, totalItem, size },
     });
 
     const actionTemplate = (rowData: { id: number }) => (
         <div className="flex items-center justify-center gap-2">
             <Button
-                icon={<i className="pi pi-pen-to-square" style={{fontSize: '1.4rem'}}></i>}
+                icon={<i className="pi pi-pen-to-square" style={{ fontSize: '1.4rem' }}></i>}
                 className="size-11"
                 onClick={() => openModal("edit", rowData.id)}
             />
             <Button
-                icon={<i className="pi pi-trash" style={{fontSize: '1.25rem'}}></i>}
+                icon={<i className="pi pi-trash" style={{ fontSize: '1.25rem' }}></i>}
                 severity="secondary"
                 className="size-11"
                 onClick={() => openModal("delete", rowData.id)}
@@ -87,7 +86,7 @@ const Post = () => {
                             </div>
                         )}
                     />
-                    {role === "admin" && <Column className="text-center" field="user" header={<p className="text-center font-medium">Penulis</p>}/>}
+                    {role === "admin" && <Column className="text-center" field="user" header={<p className="text-center font-medium">Penulis</p>} />}
                     <Column
                         header={<p className="text-center font-medium ">Ringkasan</p>}
                         className="text-center max-w-md"
@@ -97,11 +96,11 @@ const Post = () => {
                             </div>
                         )}
                     />
-                    <Column className="text-center" field="category" header={<p className="text-center font-medium">Kategori</p>}/>
-                    <Column className="text-center " field="createdAt" header={<p className="text-center font-medium">Publikasi</p>}/>
-                    <Column className="text-center" field="updatedAt" header={<p className="text-center font-medium">Revisi</p>}/>
-                    <Column className="text-center" field="viewCount" header={<p className="text-center font-medium">Viewer</p>}/>
-                    <Column body={actionTemplate} className="text-center" header={<p className="text-center font-medium">Aksi</p>}/>
+                    <Column className="text-center" field="category" header={<p className="text-center font-medium">Kategori</p>} />
+                    <Column className="text-center " field="createdAt" header={<p className="text-center font-medium">Publikasi</p>} />
+                    <Column className="text-center" field="updatedAt" header={<p className="text-center font-medium">Revisi</p>} />
+                    <Column className="text-center" field="viewCount" header={<p className="text-center font-medium">Viewer</p>} />
+                    <Column body={actionTemplate} className="text-center" header={<p className="text-center font-medium">Aksi</p>} />
                 </ReusableLazyTable>
             </div>
 
@@ -122,24 +121,20 @@ const Post = () => {
                 errors={errors}
                 submitLoading={modalState.isSubmitting}
                 handleSubmit={handleSubmit}
-                // options
-                role={role}
+                role={role ?? ''}
                 userOptions={options.user}
                 categoryOptions={options.category}
-                // cropper & thumbnail
                 croppedImage={cropperProps.croppedImage}
                 fileInputRef={cropperProps.fileInputRef}
                 handleClickUploadButton={cropperProps.handleClickUploadButton}
                 handleImageChange={cropperProps.handleImageChange}
                 setCroppedImage={cropperProps.setCroppedImage}
                 setThumbnail={cropperProps.setThumbnail}
-                // editor
-                editorContent={editorContent}
-                setEditorContent={setEditorContent}
+                editorContentRef={editorContentRef}
             />
 
             {/* Modal Loading for fetching data */}
-            <LoadingModal modalLoading={modalState.isLoading}/>
+            <LoadingModal modalLoading={modalState.isLoading} />
 
             {/* Crop Image Modal */}
             <CropImageModal
@@ -156,7 +151,7 @@ const Post = () => {
             <DeleteModal
                 submitLoading={modalState.isSubmitting}
                 visibleModal={modalState.isVisible && modalState.mode === "delete"}
-                setVisibleModal={(isVisible) => !isVisible && closeModal()}
+                setVisibleModal={closeModal}
                 onSubmit={handleDeleteConfirm}
             />
         </div>

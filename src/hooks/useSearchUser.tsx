@@ -3,11 +3,11 @@ import { UserService } from "../services/userService.tsx";
 import { useAuth } from "./useAuth.tsx";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { handleApiErrorWithRetry } from "../utils/toastHandler.tsx";
-import { UserSearchFilters } from "../types/user.tsx";
+import { SearchParams } from '../types/search';
 
 const useSearchUser = () => {
     const { token } = useAuth();
-    const [searchParams, setSearchParams] = useState<UserSearchFilters>({});
+    const [searchParams, setSearchParams] = useState<SearchParams>({});
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(5);
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);

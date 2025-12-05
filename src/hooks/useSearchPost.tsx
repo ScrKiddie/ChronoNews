@@ -4,13 +4,14 @@ import {useAuth} from "./useAuth.tsx";
 import {useQuery, keepPreviousData} from "@tanstack/react-query";
 import {handleApiErrorWithRetry} from "../utils/toastHandler.tsx";
 import {Post, SearchFilters} from "../types/post.tsx";
+import {SearchParams} from "../types/search.tsx";
 
 const useSearchPost = (params: { countMode?: boolean } = {}) => {
     const { countMode = false } = params;
     const [startDate, setStartDate] = useState(0);
     const [endDate, setEndDate] = useState(0);
     const {sub, role} = useAuth();
-    const [searchParams, setSearchParams] = useState({
+    const [searchParams, setSearchParams] = useState<SearchParams>({
         title: "",
         categoryName: "",
         userName: "",

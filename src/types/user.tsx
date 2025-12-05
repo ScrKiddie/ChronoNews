@@ -2,13 +2,6 @@ import { z } from "zod";
 import { UserCreateSchema, UserUpdateSchema } from "../schemas/userSchema.tsx";
 import { ProfileSchema } from "../schemas/profileSchema.tsx";
 
-export type UserSearchFilters = {
-    name?: string;
-    phoneNumber?: string;
-    email?: string;
-    role?: string;
-};
-
 export type User = z.infer<typeof UserCreateSchema> & {
     id: number;
     profilePicture?: string;

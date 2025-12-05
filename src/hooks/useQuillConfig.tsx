@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {useEffect} from "react";
 import Quill from "quill";
 import {Scope} from "parchment";
@@ -22,7 +23,7 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
 
         // @ts-expect-error: intentionally overriding type requirement
         class ImageFormat extends BaseImageFormat {
-            static create(value) {
+            static create(value: any) {
                 const node = super.create(value);
                 if (typeof value === 'object' && value.src) {
                     node.setAttribute('src', value.src);
@@ -32,8 +33,8 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
                 }
                 return node;
             }
-            static formats(domNode) {
-                const formats = {};
+            static formats(domNode: any) {
+                const formats: any = {};
                 ImageFormatAttributesList.forEach((attribute) => {
                     if (domNode.hasAttribute(attribute)) {
                         formats[attribute] = domNode.getAttribute(attribute);
@@ -41,29 +42,30 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
                 });
                 return formats;
             }
-            
-            static value(domNode) {
+
+            static value(domNode: any) {
                 return {
                     src: domNode.getAttribute('src'),
                     id: domNode.getAttribute('data-id'),
                 };
             }
 
-            format(name, value) {
+            format(name: any, value: any) {
                 if (ImageFormatAttributesList.includes(name)) {
                     if (name === "style" && value) {
                         const styleEntries = value
                             .split(";")
-                            .map((entry) => entry.trim())
+                            .map((entry: any) => entry.trim())
                             .filter(Boolean);
 
-                        const newStyles = {};
+                        const newStyles: any = {};
 
-                        styleEntries.forEach((entry) => {
-                            const [key, val] = entry.split(":").map((item) => item.trim());
+                        styleEntries.forEach((entry: any) => {
+                            const [key, val] = entry.split(":").map((item: any) => item.trim());
+                            // Casting allowedStyles to any to bypass index signature error
                             if (
-                                allowedStyles[key] &&
-                                (allowedStyles[key].length === 0 || allowedStyles[key].includes(val))
+                                (allowedStyles as any)[key] &&
+                                ((allowedStyles as any)[key].length === 0 || (allowedStyles as any)[key].includes(val))
                             ) {
                                 newStyles[key] = val;
                             }
@@ -94,7 +96,7 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
 
         // @ts-expect-error: intentionally overriding type requirement
         class VideoBlot extends BlockEmbed {
-            static create(value) {
+            static create(value: any) {
                 const node = super.create(value);
                 node.setAttribute("contenteditable", "false");
                 node.setAttribute("frameborder", "0");
@@ -103,12 +105,12 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
                 return node;
             }
 
-            static sanitize(url) {
+            static sanitize(url: any) {
                 return url;
             }
 
-            static formats(domNode) {
-                const formats = {};
+            static formats(domNode: any) {
+                const formats: any = {};
                 const attrs = ["height", "width", "style"];
 
                 attrs.forEach((attr) => {
@@ -120,7 +122,7 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
                 return formats;
             }
 
-            format(name, value) {
+            format(name: any, value: any) {
                 const allowedStyles = {
                     display: ["inline", "block"],
                     float: ["left", "right", "none"],
@@ -133,16 +135,17 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
                     if (name === "style" && value) {
                         const styleEntries = value
                             .split(";")
-                            .map((entry) => entry.trim())
+                            .map((entry: any) => entry.trim())
                             .filter(Boolean);
 
-                        const newStyles = {};
+                        const newStyles: any = {};
 
-                        styleEntries.forEach((entry) => {
-                            const [key, val] = entry.split(":").map((item) => item.trim());
+                        styleEntries.forEach((entry: any) => {
+                            const [key, val] = entry.split(":").map((item: any) => item.trim());
+                            // Casting allowedStyles to any to bypass index signature error
                             if (
-                                allowedStyles[key] &&
-                                (allowedStyles[key].length === 0 || allowedStyles[key].includes(val))
+                                (allowedStyles as any)[key] &&
+                                ((allowedStyles as any)[key].length === 0 || (allowedStyles as any)[key].includes(val))
                             ) {
                                 newStyles[key] = val;
                             }
@@ -165,7 +168,7 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
                 }
             }
 
-            static value(domNode) {
+            static value(domNode: any) {
                 return domNode.getAttribute("src");
             }
         }
@@ -285,8 +288,6 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
             },
         },
     });
-
-
 
     return { getQuillModules, uploadImage, imageHandler };
 };
