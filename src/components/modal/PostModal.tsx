@@ -3,7 +3,7 @@ import { Button } from 'primereact/button';
 import { Editor } from 'primereact/editor';
 import { Dropdown } from 'primereact/dropdown';
 import useQuillConfig from '../../hooks/useQuillConfig.tsx';
-import { useCallback, useState, useEffect, useMemo, memo, useRef } from 'react';
+import React, { useCallback, useState, useEffect, useMemo, memo, useRef } from 'react';
 import { InputTextarea } from 'primereact/inputtextarea';
 import InputGroup from '../ui/InputGroup.tsx';
 import { useSidebar } from '../../hooks/useSidebar.tsx';
@@ -143,8 +143,7 @@ const PostModal = ({
 
     const handleEditorChange = useCallback(
         (e: CustomEditorChangeEvent) => {
-            const htmlValue = e.htmlValue || '';
-            editorContentRef.current = htmlValue;
+            editorContentRef.current = e.htmlValue || '';
         },
         [editorContentRef]
     );

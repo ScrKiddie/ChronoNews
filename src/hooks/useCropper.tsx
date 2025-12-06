@@ -27,6 +27,8 @@ interface UseCropperReturn {
     setCroppedImage: Dispatch<SetStateAction<string | null>>;
 }
 
+export type { UseCropperReturn };
+
 export const useCropper = ({
     setVisibleModal,
     setProfilePicture,

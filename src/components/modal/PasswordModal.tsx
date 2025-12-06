@@ -1,7 +1,7 @@
 import { Dialog } from 'primereact/dialog';
 import InputGroup from '../ui/InputGroup.tsx';
 import SubmitButton from '../ui/SubmitButton.tsx';
-import { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { z } from 'zod';
 import { PasswordSchema } from '../../schemas/passwordSchema.tsx';
 
