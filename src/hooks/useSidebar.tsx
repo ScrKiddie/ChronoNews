@@ -1,8 +1,8 @@
-import React, {useEffect, useRef, useState} from "react";
-import {useAuth} from "./useAuth.tsx";
-import {useLocation, useNavigate} from "react-router-dom";
-import {useToast} from "./useToast.tsx";
-import {Button} from "primereact/button";
+import React, { useEffect, useRef, useState } from 'react';
+import { useAuth } from './useAuth.tsx';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useToast } from './useToast.tsx';
+import { Button } from 'primereact/button';
 
 export const useSidebar = () => {
     const toastRef = useToast();
@@ -10,8 +10,8 @@ export const useSidebar = () => {
     const [toggled, setToggled] = useState(false);
     const [isMenuVisible, setIsMenuVisible] = useState(false);
     const [key, setKey] = useState(0);
-    const [isModalLogoutVisible, setIsModalLogoutVisible] = useState(false)
-    const {logout} = useAuth();
+    const [isModalLogoutVisible, setIsModalLogoutVisible] = useState(false);
+    const { logout } = useAuth();
     const buttonRef = useRef<Button>(null);
     const menuContainerRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
@@ -28,13 +28,17 @@ export const useSidebar = () => {
 
     const onLogout = () => {
         logout();
-        toastRef.current?.show({severity: "success", detail: "Berhasil keluar dari sistem", life: 2000});
-        navigate("/login");
-    }
+        toastRef.current?.show({
+            severity: 'success',
+            detail: 'Berhasil keluar dari sistem',
+            life: 2000,
+        });
+        navigate('/login');
+    };
 
     useEffect(() => {
         document.querySelectorAll('.ps-menu-label').forEach((menuLabel) => {
-            (menuLabel as HTMLElement).style.display = collapsed ? "none" : "block";
+            (menuLabel as HTMLElement).style.display = collapsed ? 'none' : 'block';
         });
     }, [collapsed]);
 
@@ -48,10 +52,10 @@ export const useSidebar = () => {
         };
 
         handleResize();
-        window.addEventListener("resize", handleResize);
+        window.addEventListener('resize', handleResize);
 
         return () => {
-            window.removeEventListener("resize", handleResize);
+            window.removeEventListener('resize', handleResize);
         };
     }, []);
 
@@ -75,12 +79,11 @@ export const useSidebar = () => {
             }
         };
 
-        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener('mousedown', handleClickOutside);
         return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
-
 
     return {
         collapsed,
@@ -97,6 +100,6 @@ export const useSidebar = () => {
         isModalLogoutVisible,
         setIsModalLogoutVisible,
         onLogout,
-        lastPath
+        lastPath,
     };
 };

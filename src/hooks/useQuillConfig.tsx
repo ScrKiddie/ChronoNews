@@ -1,25 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {useEffect} from "react";
-import Quill from "quill";
-import {Scope} from "parchment";
-import ResizeModule from "@botom/quill-resize-module";
-import {ImageService} from "../services/imageService.tsx";
-import {useToast} from "./useToast.tsx";
-import {showErrorToast} from "../utils/toastHandler.tsx";
+import { useEffect } from 'react';
+import Quill from 'quill';
+import { Scope } from 'parchment';
+import ResizeModule from '@botom/quill-resize-module';
+import { ImageService } from '../lib/api/imageService.tsx';
+import { useToast } from './useToast.tsx';
+import { showErrorToast } from '../lib/utils/toastHandler.tsx';
 
-const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChange?: (isLoading: boolean) => void } = {}) => {
+const useQuillConfig = ({
+    onUploadStateChange = () => {},
+}: { onUploadStateChange?: (isLoading: boolean) => void } = {}) => {
     const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
     const toast = useToast();
 
     useEffect(() => {
-        const ImageFormatAttributesList = ["id", "height", "width", "style"];
+        const ImageFormatAttributesList = ['id', 'height', 'width', 'style'];
         const allowedStyles = {
-            display: ["inline", "block"],
-            float: ["left", "right"],
+            display: ['inline', 'block'],
+            float: ['left', 'right'],
             margin: [],
         };
 
-        const BaseImageFormat = Quill.import("formats/image");
+        const BaseImageFormat = Quill.import('formats/image');
 
         // @ts-expect-error: intentionally overriding type requirement
         class ImageFormat extends BaseImageFormat {
@@ -52,19 +54,20 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
 
             format(name: any, value: any) {
                 if (ImageFormatAttributesList.includes(name)) {
-                    if (name === "style" && value) {
+                    if (name === 'style' && value) {
                         const styleEntries = value
-                            .split(";")
+                            .split(';')
                             .map((entry: any) => entry.trim())
                             .filter(Boolean);
 
                         const newStyles: any = {};
 
                         styleEntries.forEach((entry: any) => {
-                            const [key, val] = entry.split(":").map((item: any) => item.trim());
+                            const [key, val] = entry.split(':').map((item: any) => item.trim());
                             if (
                                 (allowedStyles as any)[key] &&
-                                ((allowedStyles as any)[key].length === 0 || (allowedStyles as any)[key].includes(val))
+                                ((allowedStyles as any)[key].length === 0 ||
+                                    (allowedStyles as any)[key].includes(val))
                             ) {
                                 newStyles[key] = val;
                             }
@@ -72,9 +75,9 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
 
                         const styleString = Object.entries(newStyles)
                             .map(([key, val]) => `${key}: ${val}`)
-                            .join("; ");
+                            .join('; ');
                         // @ts-expect-error: intentionally overriding type requirement
-                        this.domNode.setAttribute("style", styleString);
+                        this.domNode.setAttribute('style', styleString);
                     } else if (value) {
                         // @ts-expect-error: intentionally overriding type requirement
                         this.domNode.setAttribute(name, value);
@@ -90,17 +93,17 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
 
         // @ts-expect-error: intentionally overriding type requirement
         Quill.register(ImageFormat, true);
-        Quill.register("modules/resize", ResizeModule, true);
-        const BlockEmbed = Quill.import("blots/block/embed");
+        Quill.register('modules/resize', ResizeModule, true);
+        const BlockEmbed = Quill.import('blots/block/embed');
 
         // @ts-expect-error: intentionally overriding type requirement
         class VideoBlot extends BlockEmbed {
             static create(value: any) {
                 const node = super.create(value);
-                node.setAttribute("contenteditable", "false");
-                node.setAttribute("frameborder", "0");
-                node.setAttribute("allowfullscreen", true);
-                node.setAttribute("src", this.sanitize(value));
+                node.setAttribute('contenteditable', 'false');
+                node.setAttribute('frameborder', '0');
+                node.setAttribute('allowfullscreen', true);
+                node.setAttribute('src', this.sanitize(value));
                 return node;
             }
 
@@ -110,7 +113,7 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
 
             static formats(domNode: any) {
                 const formats: any = {};
-                const attrs = ["height", "width", "style"];
+                const attrs = ['height', 'width', 'style'];
 
                 attrs.forEach((attr) => {
                     if (domNode.hasAttribute(attr)) {
@@ -123,27 +126,28 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
 
             format(name: any, value: any) {
                 const allowedStyles = {
-                    display: ["inline", "block"],
-                    float: ["left", "right", "none"],
+                    display: ['inline', 'block'],
+                    float: ['left', 'right', 'none'],
                     margin: [],
-                    "max-width": [],
-                    "max-height": [],
+                    'max-width': [],
+                    'max-height': [],
                 };
 
-                if (["height", "width", "style"].includes(name)) {
-                    if (name === "style" && value) {
+                if (['height', 'width', 'style'].includes(name)) {
+                    if (name === 'style' && value) {
                         const styleEntries = value
-                            .split(";")
+                            .split(';')
                             .map((entry: any) => entry.trim())
                             .filter(Boolean);
 
                         const newStyles: any = {};
 
                         styleEntries.forEach((entry: any) => {
-                            const [key, val] = entry.split(":").map((item: any) => item.trim());
+                            const [key, val] = entry.split(':').map((item: any) => item.trim());
                             if (
                                 (allowedStyles as any)[key] &&
-                                ((allowedStyles as any)[key].length === 0 || (allowedStyles as any)[key].includes(val))
+                                ((allowedStyles as any)[key].length === 0 ||
+                                    (allowedStyles as any)[key].includes(val))
                             ) {
                                 newStyles[key] = val;
                             }
@@ -151,9 +155,9 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
 
                         const styleString = Object.entries(newStyles)
                             .map(([key, val]) => `${key}: ${val}`)
-                            .join("; ");
+                            .join('; ');
                         // @ts-expect-error: intentionally overriding type requirement
-                        this.domNode.setAttribute("style", styleString);
+                        this.domNode.setAttribute('style', styleString);
                     } else if (value) {
                         // @ts-expect-error: intentionally overriding type requirement
                         this.domNode.setAttribute(name, value);
@@ -167,26 +171,25 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
             }
 
             static value(domNode: any) {
-                return domNode.getAttribute("src");
+                return domNode.getAttribute('src');
             }
         }
 
         // @ts-expect-error: intentionally overriding type requirement
-        VideoBlot.blotName = "video";
+        VideoBlot.blotName = 'video';
         // @ts-expect-error: intentionally overriding type requirement
-        VideoBlot.tagName = "iframe";
+        VideoBlot.tagName = 'iframe';
         // @ts-expect-error: intentionally overriding type requirement
         VideoBlot.scope = Scope.BLOCK_BLOT;
         // @ts-expect-error: intentionally overriding type requirement
         Quill.register(VideoBlot, true);
-
     }, []);
 
     function imageHandler(this: { quill: Quill }) {
         const quillInstance = this.quill;
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
-        input.setAttribute('accept', ".png, .jpg, .jpeg, .jpe, .jfif, .jif, .jfi");
+        input.setAttribute('accept', '.png, .jpg, .jpeg, .jpe, .jfif, .jif, .jfi');
         input.click();
 
         input.onchange = async () => {
@@ -195,14 +198,14 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
                 await uploadImage(quillInstance, file);
             }
         };
-    };
+    }
 
     const uploadImage = async (quillInstance: Quill, file: File) => {
         const MAX_SIZE_MB = 10;
         const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
         const MAX_DIMENSION = 16383;
-        const allowedExtensions = [".png", ".jpg", ".jpeg", ".jpe", ".jfif", ".jif", ".jfi"];
-        const allowedContentTypes = ["image/png", "image/jpeg", "image/pjpeg", "image/apng"];
+        const allowedExtensions = ['.png', '.jpg', '.jpeg', '.jpe', '.jfif', '.jif', '.jfi'];
+        const allowedContentTypes = ['image/png', 'image/jpeg', 'image/pjpeg', 'image/apng'];
 
         if (file.size > MAX_SIZE_BYTES) {
             showErrorToast(toast, `Ukuran file melebihi ${MAX_SIZE_MB}MB.`);
@@ -210,13 +213,19 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
         }
 
         const fileExtension = `.${file.name.split('.').pop()?.toLowerCase()}`;
-        if (!allowedContentTypes.includes(file.type) || !allowedExtensions.includes(fileExtension)) {
-            showErrorToast(toast, "Tipe file tidak valid.");
+        if (
+            !allowedContentTypes.includes(file.type) ||
+            !allowedExtensions.includes(fileExtension)
+        ) {
+            showErrorToast(toast, 'Tipe file tidak valid.');
             return;
         }
 
         try {
-            const { width, height } = await new Promise<{width: number, height: number}>((resolve, reject) => {
+            const { width, height } = await new Promise<{
+                width: number;
+                height: number;
+            }>((resolve, reject) => {
                 const img = new Image();
                 const objectUrl = URL.createObjectURL(file);
                 img.onload = () => {
@@ -225,7 +234,7 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
                 };
                 img.onerror = () => {
                     URL.revokeObjectURL(objectUrl);
-                    reject(new Error("Gagal membaca file gambar."));
+                    reject(new Error('Gagal membaca file gambar.'));
                 };
                 img.src = objectUrl;
             });
@@ -249,10 +258,15 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
             }
             const imageUrl = `${apiUri}/post_picture/${response.name}`;
 
-            quillInstance.insertEmbed(range.index, 'image', { src: imageUrl, id: String(response.id) }, Quill.sources.USER);
+            quillInstance.insertEmbed(
+                range.index,
+                'image',
+                { src: imageUrl, id: String(response.id) },
+                Quill.sources.USER
+            );
             quillInstance.setSelection(range.index + 1, Quill.sources.SILENT);
         } catch (error) {
-            console.error("An unexpected error occurred during image upload:", error);
+            void error;
         } finally {
             onUploadStateChange(false);
         }
@@ -261,28 +275,34 @@ const useQuillConfig = ({ onUploadStateChange = () => {} }: { onUploadStateChang
     const getQuillModules = () => ({
         clipboard: {
             matchers: [
-                ['img', (node: any, delta: any) => {
-                    if (node.src && node.src.startsWith('data:image/')) {
-                        return { ops: [] };
-                    }
-                    return delta;
-                }],
-                [Node.ELEMENT_NODE, (node: any, delta: any) => {
-                    if (node.tagName === 'IMG' && node.src && node.src.startsWith('data:')) {
-                        return { ops: [] };
-                    }
-                    return delta;
-                }],
+                [
+                    'img',
+                    (node: any, delta: any) => {
+                        if (node.src && node.src.startsWith('data:image/')) {
+                            return { ops: [] };
+                        }
+                        return delta;
+                    },
+                ],
+                [
+                    Node.ELEMENT_NODE,
+                    (node: any, delta: any) => {
+                        if (node.tagName === 'IMG' && node.src && node.src.startsWith('data:')) {
+                            return { ops: [] };
+                        }
+                        return delta;
+                    },
+                ],
             ],
         },
         resize: {
             showSize: true,
             locale: {
-                altTip: "Hold down the alt key to zoom",
-                floatLeft: "Left",
-                floatRight: "Right",
-                center: "Mid",
-                restore: "Reset",
+                altTip: 'Hold down the alt key to zoom',
+                floatLeft: 'Left',
+                floatRight: 'Right',
+                center: 'Mid',
+                restore: 'Reset',
             },
         },
     });

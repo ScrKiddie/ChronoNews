@@ -1,22 +1,21 @@
-import {useState, useCallback, useEffect, FormEvent} from "react";
-import { z } from "zod";
-import { CategoryService } from "../services/categoryService.tsx";
-import { CategorySchema } from "../schemas/categorySchema.tsx";
-import { handleApiError, showSuccessToast } from "../utils/toastHandler.tsx";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApiError } from "../types/api.tsx";
-import { ToastRef } from "../types/toast.tsx";
-import {Category} from "../types/category.tsx";
+import { useState, useCallback, useEffect, FormEvent } from 'react';
+import { z } from 'zod';
+import { CategoryService } from '../lib/api/categoryService.tsx';
+import { CategorySchema } from '../schemas/categorySchema.tsx';
+import { handleApiError, showSuccessToast } from '../lib/utils/toastHandler.tsx';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ApiError } from '../types/api.tsx';
+import { ToastRef } from '../types/toast.tsx';
+import { Category } from '../types/category.tsx';
 
-type ModalMode = "create" | "edit" | "delete" | null;
-
+type ModalMode = 'create' | 'edit' | 'delete' | null;
 
 interface UseCategoryProps {
     toastRef: ToastRef;
 }
 
 const INITIAL_FORM_DATA: Category = {
-    name: "",
+    name: '',
 };
 
 export const useCategory = ({ toastRef }: UseCategoryProps) => {
@@ -29,9 +28,17 @@ export const useCategory = ({ toastRef }: UseCategoryProps) => {
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
 
-    const { data: listData = [], isLoading: isListLoading, isError, error, refetch, isFetching } = useQuery({
+    const {
+        data: listData = [],
+        isLoading: isListLoading,
+        isError,
+        error,
+        refetch,
+        isFetching,
+    } = useQuery({
         queryKey: ['categories'],
-        queryFn: ({ signal }) => CategoryService.listCategories(signal).then(res => res.data || []),
+        queryFn: ({ signal }) =>
+            CategoryService.listCategories(signal).then((res) => res.data || []),
         retry: false,
     });
 
@@ -59,7 +66,7 @@ export const useCategory = ({ toastRef }: UseCategoryProps) => {
         data: categoryDataForEdit,
         isLoading: isModalLoading,
         isError: isGetCategoryError,
-        error: getCategoryError
+        error: getCategoryError,
     } = useQuery({
         queryKey: ['category', selectedCategoryId],
         queryFn: () => CategoryService.getCategory(selectedCategoryId!),
@@ -77,7 +84,15 @@ export const useCategory = ({ toastRef }: UseCategoryProps) => {
                 setIsModalVisible(true);
             }
         }
-    }, [categoryDataForEdit, modalMode, isModalLoading, isGetCategoryError, getCategoryError, toastRef, closeModal]);
+    }, [
+        categoryDataForEdit,
+        modalMode,
+        isModalLoading,
+        isGetCategoryError,
+        getCategoryError,
+        toastRef,
+        closeModal,
+    ]);
 
     const openModal = useCallback((mode: ModalMode, categoryId?: number) => {
         setErrors({});
@@ -95,62 +110,80 @@ export const useCategory = ({ toastRef }: UseCategoryProps) => {
         closeModal();
     };
 
-    const handleMutationError = (error: unknown) => {
-        if (error instanceof z.ZodError) {
-            const formErrors = error.errors.reduce((acc, err) => ({ ...acc, [err.path[0]]: err.message }), {});
-            setErrors(formErrors);
-        } else {
-            handleApiError(error as ApiError, toastRef);
-        }
-    };
+    const handleMutationError = useCallback(
+        (error: unknown) => {
+            if (error instanceof z.ZodError) {
+                const formErrors = error.errors.reduce(
+                    (acc, err) => ({ ...acc, [err.path[0]]: err.message }),
+                    {}
+                );
+                setErrors(formErrors);
+            } else {
+                handleApiError(error as ApiError, toastRef);
+            }
+        },
+        [toastRef]
+    );
 
     const createMutation = useMutation({
         mutationFn: CategoryService.createCategory,
-        onSuccess: () => handleMutationSuccess("Kategori berhasil dibuat"),
+        onSuccess: () => handleMutationSuccess('Kategori berhasil dibuat'),
         onError: handleMutationError,
     });
 
     const updateMutation = useMutation({
         mutationFn: (data: Category) => CategoryService.updateCategory(selectedCategoryId!, data),
-        onSuccess: () => handleMutationSuccess("Kategori berhasil diperbarui"),
+        onSuccess: () => handleMutationSuccess('Kategori berhasil diperbarui'),
         onError: handleMutationError,
     });
 
     const deleteMutation = useMutation({
         mutationFn: () => CategoryService.deleteCategory(selectedCategoryId!),
-        onSuccess: () => handleMutationSuccess("Kategori berhasil dihapus"),
+        onSuccess: () => handleMutationSuccess('Kategori berhasil dihapus'),
         onError: (error) => handleApiError(error as ApiError, toastRef),
     });
 
-    const handleSubmit = useCallback(async (e?: FormEvent) => {
-        e?.preventDefault();
-        setErrors({});
+    const handleSubmit = useCallback(
+        async (e?: FormEvent) => {
+            e?.preventDefault();
+            setErrors({});
 
-        switch (modalMode) {
-            case "create":
-            case "edit":
-                try {
-                    const validatedData = CategorySchema.parse(formData);
-                    if (modalMode === "create") {
-                        await createMutation.mutateAsync(validatedData);
-                    } else {
-                        if (!selectedCategoryId) return;
-                        await updateMutation.mutateAsync(validatedData);
+            switch (modalMode) {
+                case 'create':
+                case 'edit':
+                    try {
+                        const validatedData = CategorySchema.parse(formData);
+                        if (modalMode === 'create') {
+                            await createMutation.mutateAsync(validatedData);
+                        } else {
+                            if (!selectedCategoryId) return;
+                            await updateMutation.mutateAsync(validatedData);
+                        }
+                    } catch (error) {
+                        if (error instanceof z.ZodError) {
+                            handleMutationError(error);
+                        }
                     }
-                } catch (error) {
-                    if (error instanceof z.ZodError) {
-                        handleMutationError(error);
-                    }
-                }
-                break;
-            case "delete":
-                if (!selectedCategoryId) return;
-                await deleteMutation.mutateAsync();
-                break;
-        }
-    }, [modalMode, formData, selectedCategoryId, createMutation, updateMutation, deleteMutation]);
+                    break;
+                case 'delete':
+                    if (!selectedCategoryId) return;
+                    await deleteMutation.mutateAsync();
+                    break;
+            }
+        },
+        [
+            modalMode,
+            formData,
+            selectedCategoryId,
+            createMutation,
+            updateMutation,
+            deleteMutation,
+            handleMutationError,
+        ]
+    );
 
-    const isSubmitting = createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
+    const isSubmitting =
+        createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
 
     return {
         modalState: {

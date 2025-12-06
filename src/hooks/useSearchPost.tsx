@@ -1,33 +1,52 @@
-import {useState, useEffect} from "react";
-import {PostService} from "../services/postService.tsx";
-import {useAuth} from "./useAuth.tsx";
-import {useQuery, keepPreviousData} from "@tanstack/react-query";
-import {Post} from "../types/post.tsx";
-import {PostSearchParams} from "../types/search.tsx";
-import { ApiError } from "../types/api.tsx";
+import { useState, useEffect } from 'react';
+import { PostService } from '../lib/api/postService.tsx';
+import { useAuth } from './useAuth.tsx';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { Post } from '../types/post.tsx';
+import { PostSearchParams } from '../types/search.tsx';
+import { ApiError } from '../types/api.tsx';
 
 const useSearchPost = (params: { countMode?: boolean } = {}) => {
     const { countMode = false } = params;
     const [startDate, setStartDate] = useState(0);
     const [endDate, setEndDate] = useState(0);
-    const {sub, role} = useAuth();
+    const { sub, role } = useAuth();
     const [searchParams, setSearchParams] = useState<PostSearchParams>({
-        title: "",
-        categoryName: "",
-        userName: "",
-        summary: "",
+        title: '',
+        categoryName: '',
+        userName: '',
+        summary: '',
         page: 1,
         size: 5,
     });
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
 
     useEffect(() => {
-        setSearchParams(prev => ({ ...prev, page: 1 }));
-    }, [searchParams.title, searchParams.categoryName, searchParams.userName, searchParams.summary, searchParams.size, startDate, endDate]);
+        setSearchParams((prev) => ({ ...prev, page: 1 }));
+    }, [
+        searchParams.title,
+        searchParams.categoryName,
+        searchParams.userName,
+        searchParams.summary,
+        searchParams.size,
+        startDate,
+        endDate,
+    ]);
 
-    const queryKey = ['posts', 'search', { searchParams, startDate, endDate, countMode, role, sub }];
+    const queryKey = [
+        'posts',
+        'search',
+        { searchParams, startDate, endDate, countMode, role, sub },
+    ];
 
-    const { data: searchResult, isLoading, isError, isFetching, error, refetch } = useQuery({
+    const {
+        data: searchResult,
+        isLoading,
+        isError,
+        isFetching,
+        error,
+        refetch,
+    } = useQuery({
         queryKey,
         queryFn: ({ signal }) => {
             const filters: PostSearchParams = {
@@ -35,12 +54,12 @@ const useSearchPost = (params: { countMode?: boolean } = {}) => {
             };
 
             if (countMode) {
-                filters.sort = "-view_count";
+                filters.sort = '-view_count';
                 if (startDate) filters.startDate = startDate;
                 if (endDate) filters.endDate = endDate;
             }
 
-            if (role === "journalist" && sub) {
+            if (role === 'journalist' && sub) {
                 filters.userID = sub;
             }
 
@@ -52,22 +71,23 @@ const useSearchPost = (params: { countMode?: boolean } = {}) => {
             }
             const formattedData = response.data.map((post: Post) => ({
                 id: post.id,
-                category: post.category?.name || "Tidak Ada Kategori",
-                user: post.user?.name || "Tidak Ada User",
+                category: post.category?.name || 'Tidak Ada Kategori',
+                user: post.user?.name || 'Tidak Ada User',
                 title: post.title,
                 summary: post.summary,
-                createdAt: typeof post.createdAt === 'number'
-                    ? new Date(post.createdAt * 1000).toLocaleString()
-                    : new Date(post.createdAt).toLocaleString(),
+                createdAt:
+                    typeof post.createdAt === 'number'
+                        ? new Date(post.createdAt * 1000).toLocaleString()
+                        : new Date(post.createdAt).toLocaleString(),
 
                 updatedAt: post.updatedAt
-                    ? (typeof post.updatedAt === 'number'
+                    ? typeof post.updatedAt === 'number'
                         ? new Date(post.updatedAt * 1000).toLocaleString()
-                        : new Date(post.updatedAt).toLocaleString())
-                    : "Belum diperbarui",
+                        : new Date(post.updatedAt).toLocaleString()
+                    : 'Belum diperbarui',
 
-                thumbnail: post.thumbnail || "Tidak Ada Gambar",
-                viewCount: post.viewCount
+                thumbnail: post.thumbnail || 'Tidak Ada Gambar',
+                viewCount: post.viewCount,
             }));
             return { posts: formattedData, pagination: response.pagination };
         },
@@ -85,8 +105,8 @@ const useSearchPost = (params: { countMode?: boolean } = {}) => {
         }
     }, [isError, error, isLoading, isFetching]);
 
-    const setPage = (page: number) => setSearchParams(prev => ({ ...prev, page }));
-    const setSize = (size: number) => setSearchParams(prev => ({ ...prev, size }));
+    const setPage = (page: number) => setSearchParams((prev) => ({ ...prev, page }));
+    const setSize = (size: number) => setSearchParams((prev) => ({ ...prev, size }));
 
     return {
         data: searchResult?.posts ?? [],

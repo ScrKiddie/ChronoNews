@@ -1,6 +1,6 @@
-import { z } from "zod";
-import { PostCreateSchema, PostUpdateSchema } from "../schemas/postSchema.tsx";
-import { Category } from "./category.tsx";
+import { z } from 'zod';
+import { PostCreateSchema, PostUpdateSchema } from '../schemas/postSchema.tsx';
+import { Category } from './category.tsx';
 
 export interface PostUser {
     id: number;
@@ -23,10 +23,11 @@ export interface Post {
     user: PostUser;
 }
 
-export type PostFormData = z.infer<typeof PostCreateSchema> & z.infer<typeof PostUpdateSchema> & {
-    thumbnail?: string | File;
-    deleteThumbnail?: boolean;
-};
+export type PostFormData = z.infer<typeof PostCreateSchema> &
+    z.infer<typeof PostUpdateSchema> & {
+        thumbnail?: string | File;
+        deleteThumbnail?: boolean;
+    };
 
 export type ApiPostRequest = z.infer<typeof PostCreateSchema> & {
     thumbnail?: File;

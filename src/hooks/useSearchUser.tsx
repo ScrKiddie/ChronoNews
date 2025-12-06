@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import { UserService } from "../services/userService.tsx";
-import { useAuth } from "./useAuth.tsx";
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { useState, useEffect } from 'react';
+import { UserService } from '../lib/api/userService.tsx';
+import { useAuth } from './useAuth.tsx';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { UserSearchParams } from '../types/search';
-import { ApiError } from "../types/api.tsx";
+import { ApiError } from '../types/api.tsx';
 
 const useSearchUser = () => {
     const { token } = useAuth();
@@ -14,8 +14,14 @@ const useSearchUser = () => {
     const [visibleConnectionError, setVisibleConnectionError] = useState(false);
 
     useEffect(() => {
-        setSearchParams(prev => ({ ...prev, page: 1 }));
-    }, [searchParams.name, searchParams.email, searchParams.phoneNumber, searchParams.role, searchParams.size]);
+        setSearchParams((prev) => ({ ...prev, page: 1 }));
+    }, [
+        searchParams.name,
+        searchParams.email,
+        searchParams.phoneNumber,
+        searchParams.role,
+        searchParams.size,
+    ]);
 
     const queryKey = ['users', 'search', { searchParams }];
 
@@ -52,8 +58,8 @@ const useSearchUser = () => {
         }
     }, [isError, error, isLoading, isFetching]);
 
-    const setPage = (page: number) => setSearchParams(prev => ({ ...prev, page }));
-    const setSize = (size: number) => setSearchParams(prev => ({ ...prev, size }));
+    const setPage = (page: number) => setSearchParams((prev) => ({ ...prev, page }));
+    const setSize = (size: number) => setSearchParams((prev) => ({ ...prev, size }));
 
     return {
         data: searchResult?.users ?? [],

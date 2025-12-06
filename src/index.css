@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
 
@@ -16,11 +17,9 @@ small {
 
 * {
     font-family: Poppins;
-
 }
-.menu-news{
+.menu-news {
     z-index: 2000 !important;
-
 }
 .p-dropdown {
     box-shadow: none;
@@ -55,7 +54,12 @@ small {
     z-index: 1000 !important;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     font-weight: 600;
     margin: 0;
 }
@@ -78,7 +82,7 @@ p {
     min-width: fit-content !important;
 }
 
-.ql-editor[contenteditable="false"] {
+.ql-editor[contenteditable='false'] {
     background-color: rgba(205, 92, 92, 0) !important;
     border: 0px;
     padding: 0px;
@@ -89,11 +93,9 @@ p {
     border: 0px !important;
 }
 
-
 .text-justify {
     overflow-wrap: break-word;
     word-break: break-word;
-
 }
 
 .ql-snow .ql-tooltip {
@@ -108,9 +110,8 @@ p {
     border-radius: 4px;
 }
 
-
 .ql-editor {
-    font-family: "Poppins";
+    font-family: 'Poppins';
     min-height: 320px;
     max-height: fit-content;
 }
@@ -136,7 +137,7 @@ body {
 
 .ql-tooltip {
     z-index: 10000 !important;
-    font-family: "Poppins";
+    font-family: 'Poppins';
 }
 
 .ql-blank,
@@ -150,7 +151,6 @@ body {
     font-style: normal !important;
 }
 
-
 body .ql-tooltip a,
 body .ql-editing a {
     color: #383838 !important;
@@ -162,7 +162,6 @@ body .ql-editing a {
     outline: none;
 }
 
-
 .p-message {
     margin: 0px;
 }
@@ -173,7 +172,7 @@ body .ql-editing a {
     box-shadow: none;
 }
 
-.ql-editor[contenteditable="false"] {
+.ql-editor[contenteditable='false'] {
     overflow: hidden;
     min-height: fit-content;
     max-height: fit-content;
@@ -184,10 +183,9 @@ body .ql-editing a {
     width: 80% !important;
 }
 
-input.p-inputtext.p-component[readonly][role="combobox"] {
+input.p-inputtext.p-component[readonly][role='combobox'] {
     padding: 12px;
 }
-
 
 .p-password-input {
     width: 100%;
@@ -234,7 +232,6 @@ input.p-inputtext.p-component[readonly][role="combobox"] {
     flex-grow: 0 !important;
 }
 
-
 .ps-menuitem-root {
     display: flex;
     align-items: center;
@@ -253,7 +250,8 @@ body .navbar-top {
     width: 100%;
 }
 
-#user-cropper .cropper-crop-box, #user-cropper .cropper-view-box {
+#user-cropper .cropper-crop-box,
+#user-cropper .cropper-view-box {
     border-radius: 50%;
 }
 
@@ -262,7 +260,8 @@ body .navbar-top {
     outline: 0;
 }
 
-.p-datatable-emptymessage td, .p-paginator-current {
+.p-datatable-emptymessage td,
+.p-paginator-current {
     text-align: center !important;
     font-size: 16px;
     cursor: default;
@@ -286,7 +285,8 @@ body .navbar-top {
     border-top-right-radius: 6px;
 }
 
-.p-tabmenu-nav, .p-menuitem-link {
+.p-tabmenu-nav,
+.p-menuitem-link {
     font-weight: 500;
     border-radius: 0px;
 }
@@ -339,40 +339,41 @@ body .navbar-top {
     color: #f59e0b !important;
 }
 
-.p-scrolltop{
+.p-scrolltop {
     z-index: 15000 !important;
 }
-.p-dialog-header-icons button{
+.p-dialog-header-icons button {
     box-shadow: none !important;
 }
 
-.p-dropdown-item, .p-dropdown-item-label{
+.p-dropdown-item,
+.p-dropdown-item-label {
     white-space: normal !important;
     display: block !important;
-
 }
 
-.p-dropdown-panel{
+.p-dropdown-panel {
     width: 1px;
 }
 
-.p-galleria-thumbnail-next, .p-galleria-thumbnail-prev{
+.p-galleria-thumbnail-next,
+.p-galleria-thumbnail-prev {
     display: none;
 }
-.p-galleria-thumbnail-item-content{
+.p-galleria-thumbnail-item-content {
     height: fit-content !important;
 }
 #disqus_thread a {
     color: #f49f14;
 }
-#disqus_thread button span{
+#disqus_thread button span {
     color: white;
 }
 #editor-resizer .toolbar {
     border-radius: 6px !important;
 }
-.p-paginator-right-content{
-    margin: 0
+.p-paginator-right-content {
+    margin: 0;
 }
 
 .p-input-icon svg:focus {
@@ -384,7 +385,7 @@ body .navbar-top {
     outline-offset: 2px !important;
     color: #f49f14 !important;
 }
-.p-tabmenu-nav{
+.p-tabmenu-nav {
     height: 100%;
 }
 
@@ -408,7 +409,6 @@ body .navbar-top {
     box-shadow: none !important;
     border-color: transparent !important;
 }
-
 
 .ql-toolbar.ql-snow button:focus-visible {
     outline: 1px solid #f49f14 !important;

@@ -1,7 +1,7 @@
-import {useState, useRef, RefObject, ChangeEvent, SetStateAction, Dispatch} from "react";
-import Cropper from "cropperjs";
-import {showErrorToast} from "../utils/toastHandler.tsx";
-import {ToastRef} from "../types/toast.tsx";
+import { useState, useRef, RefObject, ChangeEvent, SetStateAction, Dispatch } from 'react';
+import Cropper from 'cropperjs';
+import { showErrorToast } from '../lib/utils/toastHandler.tsx';
+import { ToastRef } from '../types/toast.tsx';
 
 export interface UseCropperParams {
     setVisibleModal?: (visible: boolean) => void;
@@ -28,12 +28,12 @@ interface UseCropperReturn {
 }
 
 export const useCropper = ({
-                               setVisibleModal,
-                               setProfilePicture,
-                               toastRef,
-                               width = 800,
-                               height = 800,
-                           }: UseCropperParams): UseCropperReturn => {
+    setVisibleModal,
+    setProfilePicture,
+    toastRef,
+    width = 800,
+    height = 800,
+}: UseCropperParams): UseCropperReturn => {
     const fileInputRef = useRef<HTMLInputElement>(null!);
     const imageRef = useRef<HTMLImageElement>(null!);
     const cropperRef = useRef<Cropper | null>(null);
@@ -41,20 +41,20 @@ export const useCropper = ({
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [visibleCropImageModal, setVisibleCropImageModal] = useState(false);
     const [croppedImage, setCroppedImage] = useState<string | null>(null);
-    const [imageFormat, setImageFormat] = useState("image/jpeg");
+    const [imageFormat, setImageFormat] = useState('image/jpeg');
 
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        const validFormats = ["image/png", "image/jpeg", "image/jpg"];
+        const validFormats = ['image/png', 'image/jpeg', 'image/jpg'];
 
         if (!validFormats.includes(file.type)) {
             if (toastRef) {
-                showErrorToast(toastRef, "Format gambar tidak valid");
+                showErrorToast(toastRef, 'Format gambar tidak valid');
             }
             setSelectedImage(null);
-            e.target.value = "";
+            e.target.value = '';
             return;
         }
 
@@ -80,7 +80,7 @@ export const useCropper = ({
         setSelectedImage(null);
         destroyCropper();
         if (fileInputRef.current) {
-            fileInputRef.current.value = "";
+            fileInputRef.current.value = '';
         }
     };
 
@@ -94,7 +94,7 @@ export const useCropper = ({
                 width,
                 height,
                 imageSmoothingEnabled: true,
-                imageSmoothingQuality: "high",
+                imageSmoothingQuality: 'high',
             });
 
             canvas.toBlob((blob) => {
@@ -102,7 +102,7 @@ export const useCropper = ({
                     const fileSize = blob.size;
                     if (fileSize > 2 * 1024 * 1024) {
                         if (toastRef) {
-                            showErrorToast(toastRef, "Hasil crop gambar melebihi 2MB");
+                            showErrorToast(toastRef, 'Hasil crop gambar melebihi 2MB');
                         }
                         setVisibleCropImageModal(false);
                         if (setVisibleModal) {
@@ -113,7 +113,7 @@ export const useCropper = ({
 
                     setCroppedImage(URL.createObjectURL(blob));
                     if (setProfilePicture) {
-                        const fileExtension = imageFormat.split("/")[1];
+                        const fileExtension = imageFormat.split('/')[1];
                         const file = new File([blob], `profile.${fileExtension}`, {
                             type: imageFormat,
                         });

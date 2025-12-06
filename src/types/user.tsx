@@ -1,6 +1,6 @@
-import { z } from "zod";
-import { UserCreateSchema, UserUpdateSchema } from "../schemas/userSchema.tsx";
-import { ProfileSchema } from "../schemas/profileSchema.tsx";
+import { z } from 'zod';
+import { UserCreateSchema, UserUpdateSchema } from '../schemas/userSchema.tsx';
+import { ProfileSchema } from '../schemas/profileSchema';
 
 export type User = z.infer<typeof UserCreateSchema> & {
     id: number;
@@ -23,10 +23,11 @@ export type ProfileUpdateServiceRequest = z.infer<typeof ProfileSchema> & {
     deleteProfilePicture?: boolean;
 };
 
-export type UserManagementFormData = z.infer<typeof UserCreateSchema> & z.infer<typeof UserUpdateSchema> & {
-    deleteProfilePicture?: boolean;
-    profilePicture?: string;
-};
+export type UserManagementFormData = z.infer<typeof UserCreateSchema> &
+    z.infer<typeof UserUpdateSchema> & {
+        deleteProfilePicture?: boolean;
+        profilePicture?: string;
+    };
 
 export type ProfileFormData = z.infer<typeof ProfileSchema> & {
     deleteProfilePicture?: boolean;

@@ -1,18 +1,18 @@
-import {useState, useCallback, FormEvent} from "react";
-import { z } from "zod";
-import { PasswordSchema } from "../schemas/passwordSchema.tsx";
-import { PasswordService } from "../services/passwordService.tsx";
-import { handleApiError, showSuccessToast } from "../utils/toastHandler.tsx";
-import { useMutation } from "@tanstack/react-query";
-import { ToastRef } from "../types/toast.tsx";
-import { ApiError } from "../types/api.tsx";
+import { useState, useCallback, FormEvent } from 'react';
+import { z } from 'zod';
+import { PasswordSchema } from '../schemas/passwordSchema.tsx';
+import { PasswordService } from '../lib/api/passwordService.tsx';
+import { handleApiError, showSuccessToast } from '../lib/utils/toastHandler.tsx';
+import { useMutation } from '@tanstack/react-query';
+import { ToastRef } from '../types/toast.tsx';
+import { ApiError } from '../types/api.tsx';
 
 type PasswordData = z.infer<typeof PasswordSchema>;
 
 const INITIAL_DATA: PasswordData = {
-    oldPassword: "",
-    password: "",
-    confirmPassword: "",
+    oldPassword: '',
+    password: '',
+    confirmPassword: '',
 };
 
 export const usePassword = (toastRef: ToastRef) => {
@@ -23,7 +23,7 @@ export const usePassword = (toastRef: ToastRef) => {
     const updatePasswordMutation = useMutation({
         mutationFn: PasswordService.updatePassword,
         onSuccess: () => {
-            showSuccessToast(toastRef, "Password berhasil diperbarui");
+            showSuccessToast(toastRef, 'Password berhasil diperbarui');
             handleCloseModal();
         },
         onError: (error: ApiError) => {
@@ -32,7 +32,7 @@ export const usePassword = (toastRef: ToastRef) => {
             if (error?.status === 401 && error.message) {
                 setErrors({ oldPassword: error.message });
             }
-        }
+        },
     });
 
     const handleVisibleModal = useCallback(() => {
@@ -54,9 +54,11 @@ export const usePassword = (toastRef: ToastRef) => {
             await updatePasswordMutation.mutateAsync(validatedData);
         } catch (error) {
             if (error instanceof z.ZodError) {
-                setErrors(error.errors.reduce((acc, err) => ({ ...acc, [err.path[0]]: err.message }), {}));
+                setErrors(
+                    error.errors.reduce((acc, err) => ({ ...acc, [err.path[0]]: err.message }), {})
+                );
             } else {
-                console.error("Caught unexpected error in handleSubmit:", error);
+                void error;
             }
         }
     };
