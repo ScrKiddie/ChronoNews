@@ -99,6 +99,16 @@ const Home = () => {
     const [range, setRange] = useState('all');
     const filteredList = role === 'admin' ? list : list.filter((item) => item.title === 'Berita');
 
+    const handleDateRangeChange = (e: DropdownChangeEvent) => {
+        const value = e.value;
+        const { start, end } = getDateRangeInUnix(value);
+
+        setRange(value);
+        setStartDate(start ?? 0);
+        setEndDate(end ?? 0);
+        setPage(1);
+    };
+
     return (
         <div className={`min-h-screen`}>
             <div className="flex flex-col ">
@@ -192,15 +202,7 @@ const Home = () => {
                                             <Dropdown
                                                 value={range}
                                                 options={waktuOptions}
-                                                onChange={(e: DropdownChangeEvent) => {
-                                                    const value = e.value;
-                                                    const { start, end } =
-                                                        getDateRangeInUnix(value);
-                                                    setRange(value);
-                                                    setStartDate(start ?? 0);
-                                                    setEndDate(end ?? 0);
-                                                    setPage(1);
-                                                }}
+                                                onChange={handleDateRangeChange}
                                                 placeholder="Pilih Waktu"
                                                 className={`md:w-[200px] w-full`}
                                             />

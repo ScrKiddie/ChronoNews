@@ -7,6 +7,7 @@ import { Post } from '../../types/post.tsx';
 import { Pagination } from '../../types/pagination.tsx';
 import React from 'react';
 import HeadlinePostSkeleton from '../ui/HeadlinePostSkeleton.tsx';
+import SafeImage from '../ui/SafeImage.tsx';
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
@@ -14,7 +15,7 @@ interface HeadlinePostProps {
     headlinePost: Post | null;
     loading: boolean;
     headlinePostPage: number;
-    setHeadlinePostPage: (page: number) => void;
+    handlePageChange: (page: number) => void;
     headlinePostPagination: Pagination | undefined;
     headlineSize: number;
     handleCategoryChange: (category: string) => void;
@@ -24,7 +25,7 @@ const HeadlinePost: React.FC<HeadlinePostProps> = ({
     headlinePost,
     loading,
     headlinePostPage,
-    setHeadlinePostPage,
+    handlePageChange,
     headlinePostPagination,
     headlineSize,
     handleCategoryChange,
@@ -53,7 +54,7 @@ const HeadlinePost: React.FC<HeadlinePostProps> = ({
                     className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg w-full break-all"
                 >
                     <div className="relative w-full aspect-[16/9] bg-[#f59e0b] rounded-t-lg overflow-hidden">
-                        <img
+                        <SafeImage
                             src={
                                 headlinePost.thumbnail
                                     ? `${apiUri}/post_picture/${headlinePost.thumbnail}`
@@ -69,7 +70,7 @@ const HeadlinePost: React.FC<HeadlinePostProps> = ({
                         </div>
                     </div>
 
-                    <div className="px-4 pb-6 pt-2 ">
+                    <div className="p-4 ">
                         <h3
                             className="text-lg md:text-2xl font-semibold w-fit cursor-pointer line-clamp-2 text-gray-800"
                             onClick={() => handleNavigate(headlinePost)}
@@ -103,7 +104,7 @@ const HeadlinePost: React.FC<HeadlinePostProps> = ({
                     first={(headlinePostPage - 1) * headlineSize}
                     rows={headlineSize}
                     totalRecords={headlinePostPagination.totalItem || 0}
-                    onPageChange={(e: PaginatorPageChangeEvent) => setHeadlinePostPage(e.page + 1)}
+                    onPageChange={(e: PaginatorPageChangeEvent) => handlePageChange(e.page + 1)}
                     template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                     className="mt-4"
                 />

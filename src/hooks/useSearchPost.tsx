@@ -93,6 +93,7 @@ const useSearchPost = (params: { countMode?: boolean } = {}) => {
         },
         placeholderData: keepPreviousData,
         retry: false,
+        staleTime: 0,
     });
 
     useEffect(() => {

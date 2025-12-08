@@ -7,7 +7,7 @@ import SidebarResponsive from '../components/layout/SidebarResponsive.tsx';
 import Category from '../features/auth/Category.tsx';
 import Post from '../features/auth/Post.tsx';
 
-const GuestRoutes = () => {
+const AuthRoutes = () => {
     const { token, isAuthChecked, role } = useAuth();
 
     if (!isAuthChecked) {
@@ -68,4 +68,4 @@ const GuestRoutes = () => {
     );
 };
 
-export default GuestRoutes;
+export default AuthRoutes;

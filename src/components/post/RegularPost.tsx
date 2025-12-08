@@ -8,6 +8,7 @@ import { Post } from '../../types/post.tsx';
 import { Pagination } from '../../types/pagination.tsx';
 import RegularPostSkeleton from '../ui/RegularPostSkeleton.tsx';
 import React from 'react';
+import SafeImage from '../ui/SafeImage.tsx';
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
@@ -15,7 +16,7 @@ interface RegularPostProps {
     post: Post[] | null;
     loading: boolean;
     postPage: number;
-    setPostPage: (page: number) => void;
+    handlePageChange: (page: number) => void;
     postSize: number;
     postPagination: Pagination | undefined;
     classKu?: string;
@@ -26,7 +27,7 @@ const RegularPost: React.FC<RegularPostProps> = ({
     post,
     loading,
     postPage,
-    setPostPage,
+    handlePageChange,
     postSize,
     postPagination,
     classKu = '',
@@ -58,7 +59,7 @@ const RegularPost: React.FC<RegularPostProps> = ({
                         className={`flex mb-3 break-all justify-between h-40 shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg overflow-hidden`}
                     >
                         <div className="relative flex-shrink-0 w-48 sm:w-56 md:w-64 lg:w-72 h-full bg-[#f59e0b] overflow-hidden">
-                            <img
+                            <SafeImage
                                 src={
                                     item.thumbnail
                                         ? `${apiUri}/post_picture/${item.thumbnail}`
@@ -106,7 +107,7 @@ const RegularPost: React.FC<RegularPostProps> = ({
                     first={(postPage - 1) * postSize}
                     rows={postSize}
                     totalRecords={postPagination.totalItem || 0}
-                    onPageChange={(e: PaginatorPageChangeEvent) => setPostPage(e.page + 1)}
+                    onPageChange={(e: PaginatorPageChangeEvent) => handlePageChange(e.page + 1)}
                     template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                 />
             )}

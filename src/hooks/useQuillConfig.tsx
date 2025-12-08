@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect } from 'react';
-import Quill from 'quill';
+import { useEffect, useState } from 'react';
 import { Scope } from 'parchment';
-import ResizeModule from '@botom/quill-resize-module';
 import { ImageService } from '../lib/api/imageService.tsx';
 import { useToast } from './useToast.tsx';
 import { showErrorToast } from '../lib/utils/toastHandler.tsx';
@@ -10,182 +8,201 @@ import { showErrorToast } from '../lib/utils/toastHandler.tsx';
 const useQuillConfig = ({
     onUploadStateChange = () => {},
 }: { onUploadStateChange?: (isLoading: boolean) => void } = {}) => {
+    const [isClient, setIsClient] = useState(false);
     const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
     const toast = useToast();
 
     useEffect(() => {
-        const ImageFormatAttributesList = ['id', 'height', 'width', 'style'];
-        const allowedStyles = {
-            display: ['inline', 'block'],
-            float: ['left', 'right'],
-            margin: [],
-        };
-
-        const BaseImageFormat = Quill.import('formats/image');
-
-        // @ts-expect-error: intentionally overriding type requirement
-        class ImageFormat extends BaseImageFormat {
-            static create(value: any) {
-                const node = super.create(value);
-                if (typeof value === 'object' && value.src) {
-                    node.setAttribute('src', value.src);
-                    if (value.id) {
-                        node.setAttribute('data-id', value.id);
-                    }
-                }
-                return node;
-            }
-            static formats(domNode: any) {
-                const formats: any = {};
-                ImageFormatAttributesList.forEach((attribute) => {
-                    if (domNode.hasAttribute(attribute)) {
-                        formats[attribute] = domNode.getAttribute(attribute);
-                    }
-                });
-                return formats;
-            }
-
-            static value(domNode: any) {
-                return {
-                    src: domNode.getAttribute('src'),
-                    id: domNode.getAttribute('data-id'),
-                };
-            }
-
-            format(name: any, value: any) {
-                if (ImageFormatAttributesList.includes(name)) {
-                    if (name === 'style' && value) {
-                        const styleEntries = value
-                            .split(';')
-                            .map((entry: any) => entry.trim())
-                            .filter(Boolean);
-
-                        const newStyles: any = {};
-
-                        styleEntries.forEach((entry: any) => {
-                            const [key, val] = entry.split(':').map((item: any) => item.trim());
-                            if (
-                                (allowedStyles as any)[key] &&
-                                ((allowedStyles as any)[key].length === 0 ||
-                                    (allowedStyles as any)[key].includes(val))
-                            ) {
-                                newStyles[key] = val;
-                            }
-                        });
-
-                        const styleString = Object.entries(newStyles)
-                            .map(([key, val]) => `${key}: ${val}`)
-                            .join('; ');
-                        // @ts-expect-error: intentionally overriding type requirement
-                        this.domNode.setAttribute('style', styleString);
-                    } else if (value) {
-                        // @ts-expect-error: intentionally overriding type requirement
-                        this.domNode.setAttribute(name, value);
-                    } else {
-                        // @ts-expect-error: intentionally overriding type requirement
-                        this.domNode.removeAttribute(name);
-                    }
-                } else {
-                    super.format(name, value);
-                }
-            }
-        }
-
-        // @ts-expect-error: intentionally overriding type requirement
-        Quill.register(ImageFormat, true);
-        Quill.register('modules/resize', ResizeModule, true);
-        const BlockEmbed = Quill.import('blots/block/embed');
-
-        // @ts-expect-error: intentionally overriding type requirement
-        class VideoBlot extends BlockEmbed {
-            static create(value: any) {
-                const node = super.create(value);
-                node.setAttribute('contenteditable', 'false');
-                node.setAttribute('frameborder', '0');
-                node.setAttribute('allowfullscreen', true);
-                node.setAttribute('src', this.sanitize(value));
-                return node;
-            }
-
-            static sanitize(url: any) {
-                return url;
-            }
-
-            static formats(domNode: any) {
-                const formats: any = {};
-                const attrs = ['height', 'width', 'style'];
-
-                attrs.forEach((attr) => {
-                    if (domNode.hasAttribute(attr)) {
-                        formats[attr] = domNode.getAttribute(attr);
-                    }
-                });
-
-                return formats;
-            }
-
-            format(name: any, value: any) {
-                const allowedStyles = {
-                    display: ['inline', 'block'],
-                    float: ['left', 'right', 'none'],
-                    margin: [],
-                    'max-width': [],
-                    'max-height': [],
-                };
-
-                if (['height', 'width', 'style'].includes(name)) {
-                    if (name === 'style' && value) {
-                        const styleEntries = value
-                            .split(';')
-                            .map((entry: any) => entry.trim())
-                            .filter(Boolean);
-
-                        const newStyles: any = {};
-
-                        styleEntries.forEach((entry: any) => {
-                            const [key, val] = entry.split(':').map((item: any) => item.trim());
-                            if (
-                                (allowedStyles as any)[key] &&
-                                ((allowedStyles as any)[key].length === 0 ||
-                                    (allowedStyles as any)[key].includes(val))
-                            ) {
-                                newStyles[key] = val;
-                            }
-                        });
-
-                        const styleString = Object.entries(newStyles)
-                            .map(([key, val]) => `${key}: ${val}`)
-                            .join('; ');
-                        // @ts-expect-error: intentionally overriding type requirement
-                        this.domNode.setAttribute('style', styleString);
-                    } else if (value) {
-                        // @ts-expect-error: intentionally overriding type requirement
-                        this.domNode.setAttribute(name, value);
-                    } else {
-                        // @ts-expect-error: intentionally overriding type requirement
-                        this.domNode.removeAttribute(name);
-                    }
-                } else {
-                    super.format(name, value);
-                }
-            }
-
-            static value(domNode: any) {
-                return domNode.getAttribute('src');
-            }
-        }
-
-        // @ts-expect-error: intentionally overriding type requirement
-        VideoBlot.blotName = 'video';
-        // @ts-expect-error: intentionally overriding type requirement
-        VideoBlot.tagName = 'iframe';
-        // @ts-expect-error: intentionally overriding type requirement
-        VideoBlot.scope = Scope.BLOCK_BLOT;
-        // @ts-expect-error: intentionally overriding type requirement
-        Quill.register(VideoBlot, true);
+        setIsClient(true);
     }, []);
 
-    function imageHandler(this: { quill: Quill }) {
+    useEffect(() => {
+        if (!isClient) return;
+
+        const initializeQuill = async () => {
+            const [Quill, ResizeModule] = await Promise.all([
+                import('quill'),
+                import('@botom/quill-resize-module'),
+            ]);
+
+            const ImageFormatAttributesList = ['id', 'height', 'width', 'style'];
+            const allowedStyles = {
+                display: ['inline', 'block'],
+                float: ['left', 'right'],
+                margin: [],
+            };
+
+            const BaseImageFormat = Quill.default.import('formats/image');
+
+            // @ts-expect-error: intentionally overriding type requirement
+            class ImageFormat extends BaseImageFormat {
+                static create(value: any) {
+                    const node = super.create(value);
+                    if (typeof value === 'object' && value.src) {
+                        node.setAttribute('src', value.src);
+                        if (value.id) {
+                            node.setAttribute('data-id', value.id);
+                        }
+                    }
+                    return node;
+                }
+
+                static formats(domNode: any) {
+                    const formats: any = {};
+                    ImageFormatAttributesList.forEach((attribute) => {
+                        if (domNode.hasAttribute(attribute)) {
+                            formats[attribute] = domNode.getAttribute(attribute);
+                        }
+                    });
+                    return formats;
+                }
+
+                static value(domNode: any) {
+                    return {
+                        src: domNode.getAttribute('src'),
+                        id: domNode.getAttribute('data-id'),
+                    };
+                }
+
+                format(name: any, value: any) {
+                    if (ImageFormatAttributesList.includes(name)) {
+                        if (name === 'style' && value) {
+                            const styleEntries = value
+                                .split(';')
+                                .map((entry: any) => entry.trim())
+                                .filter(Boolean);
+
+                            const newStyles: any = {};
+
+                            styleEntries.forEach((entry: any) => {
+                                const [key, val] = entry.split(':').map((item: any) => item.trim());
+                                if (
+                                    (allowedStyles as any)[key] &&
+                                    ((allowedStyles as any)[key].length === 0 ||
+                                        (allowedStyles as any)[key].includes(val))
+                                ) {
+                                    newStyles[key] = val;
+                                }
+                            });
+
+                            const styleString = Object.entries(newStyles)
+                                .map(([key, val]) => `${key}: ${val}`)
+                                .join('; ');
+                            // @ts-expect-error: intentionally overriding type requirement
+                            this.domNode.setAttribute('style', styleString);
+                        } else if (value) {
+                            // @ts-expect-error: intentionally overriding type requirement
+                            this.domNode.setAttribute(name, value);
+                        } else {
+                            // @ts-expect-error: intentionally overriding type requirement
+                            this.domNode.removeAttribute(name);
+                        }
+                    } else {
+                        super.format(name, value);
+                    }
+                }
+            }
+
+            // @ts-expect-error: intentionally overriding type requirement
+            Quill.default.register(ImageFormat, true);
+            Quill.default.register('modules/resize', ResizeModule.default, true);
+            const BlockEmbed = Quill.default.import('blots/block/embed');
+
+            // @ts-expect-error: intentionally overriding type requirement
+            class VideoBlot extends BlockEmbed {
+                static create(value: any) {
+                    const node = super.create(value);
+                    node.setAttribute('contenteditable', 'false');
+                    node.setAttribute('frameborder', '0');
+                    node.setAttribute('allowfullscreen', true);
+                    node.setAttribute('src', this.sanitize(value));
+                    return node;
+                }
+
+                static sanitize(url: any) {
+                    return url;
+                }
+
+                static formats(domNode: any) {
+                    const formats: any = {};
+                    const attrs = ['height', 'width', 'style'];
+
+                    attrs.forEach((attr) => {
+                        if (domNode.hasAttribute(attr)) {
+                            formats[attr] = domNode.getAttribute(attr);
+                        }
+                    });
+
+                    return formats;
+                }
+
+                format(name: any, value: any) {
+                    const allowedStyles = {
+                        display: ['inline', 'block'],
+                        float: ['left', 'right', 'none'],
+                        margin: [],
+                        'max-width': [],
+                        'max-height': [],
+                    };
+
+                    if (['height', 'width', 'style'].includes(name)) {
+                        if (name === 'style' && value) {
+                            const styleEntries = value
+                                .split(';')
+                                .map((entry: any) => entry.trim())
+                                .filter(Boolean);
+
+                            const newStyles: any = {};
+
+                            styleEntries.forEach((entry: any) => {
+                                const [key, val] = entry.split(':').map((item: any) => item.trim());
+                                if (
+                                    (allowedStyles as any)[key] &&
+                                    ((allowedStyles as any)[key].length === 0 ||
+                                        (allowedStyles as any)[key].includes(val))
+                                ) {
+                                    newStyles[key] = val;
+                                }
+                            });
+
+                            const styleString = Object.entries(newStyles)
+                                .map(([key, val]) => `${key}: ${val}`)
+                                .join('; ');
+                            // @ts-expect-error: intentionally overriding type requirement
+                            this.domNode.setAttribute('style', styleString);
+                        } else if (value) {
+                            // @ts-expect-error: intentionally overriding type requirement
+                            this.domNode.setAttribute(name, value);
+                        } else {
+                            // @ts-expect-error: intentionally overriding type requirement
+                            this.domNode.removeAttribute(name);
+                        }
+                    } else {
+                        super.format(name, value);
+                    }
+                }
+
+                static value(domNode: any) {
+                    return domNode.getAttribute('src');
+                }
+            }
+
+            // @ts-expect-error: intentionally overriding type requirement
+            VideoBlot.blotName = 'video';
+            // @ts-expect-error: intentionally overriding type requirement
+            VideoBlot.tagName = 'iframe';
+            // @ts-expect-error: intentionally overriding type requirement
+            VideoBlot.scope = Scope.BLOCK_BLOT;
+            // @ts-expect-error: intentionally overriding type requirement
+            Quill.default.register(VideoBlot, true);
+        };
+
+        initializeQuill();
+    }, [isClient]);
+
+    function imageHandler(this: { quill: any }) {
+        if (!isClient) return;
+
         const quillInstance = this.quill;
         const input = document.createElement('input');
         input.setAttribute('type', 'file');
@@ -200,7 +217,9 @@ const useQuillConfig = ({
         };
     }
 
-    const uploadImage = async (quillInstance: Quill, file: File) => {
+    const uploadImage = async (quillInstance: any, file: File) => {
+        if (!isClient) return;
+
         const MAX_SIZE_MB = 10;
         const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
         const MAX_DIMENSION = 16383;
@@ -262,9 +281,9 @@ const useQuillConfig = ({
                 range.index,
                 'image',
                 { src: imageUrl, id: String(response.id) },
-                Quill.sources.USER
+                'user'
             );
-            quillInstance.setSelection(range.index + 1, Quill.sources.SILENT);
+            quillInstance.setSelection(range.index + 1, 'silent');
         } catch (error) {
             void error;
         } finally {
@@ -272,42 +291,50 @@ const useQuillConfig = ({
         }
     };
 
-    const getQuillModules = () => ({
-        clipboard: {
-            matchers: [
-                [
-                    'img',
-                    (node: any, delta: any) => {
-                        if (node.src && node.src.startsWith('data:image/')) {
-                            return { ops: [] };
-                        }
-                        return delta;
-                    },
-                ],
-                [
-                    Node.ELEMENT_NODE,
-                    (node: any, delta: any) => {
-                        if (node.tagName === 'IMG' && node.src && node.src.startsWith('data:')) {
-                            return { ops: [] };
-                        }
-                        return delta;
-                    },
-                ],
-            ],
-        },
-        resize: {
-            showSize: true,
-            locale: {
-                altTip: 'Hold down the alt key to zoom',
-                floatLeft: 'Left',
-                floatRight: 'Right',
-                center: 'Mid',
-                restore: 'Reset',
-            },
-        },
-    });
+    const getQuillModules = () => {
+        if (!isClient) return {};
 
-    return { getQuillModules, uploadImage, imageHandler };
+        return {
+            clipboard: {
+                matchers: [
+                    [
+                        'img',
+                        (node: any, delta: any) => {
+                            if (node.src && node.src.startsWith('data:image/')) {
+                                return { ops: [] };
+                            }
+                            return delta;
+                        },
+                    ],
+                    [
+                        Node.ELEMENT_NODE,
+                        (node: any, delta: any) => {
+                            if (
+                                node.tagName === 'IMG' &&
+                                node.src &&
+                                node.src.startsWith('data:')
+                            ) {
+                                return { ops: [] };
+                            }
+                            return delta;
+                        },
+                    ],
+                ],
+            },
+            resize: {
+                showSize: true,
+                locale: {
+                    altTip: 'Hold down the alt key to zoom',
+                    floatLeft: 'Left',
+                    floatRight: 'Right',
+                    center: 'Mid',
+                    restore: 'Reset',
+                },
+            },
+        };
+    };
+
+    return { getQuillModules, uploadImage, imageHandler, isClient };
 };
 
 export default useQuillConfig;

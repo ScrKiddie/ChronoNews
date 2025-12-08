@@ -1,9 +1,26 @@
-import MainRouter from './routes/MainRouter';
-import { APIOptions, PrimeReactProvider } from 'primereact/api';
 import 'primereact/resources/themes/lara-light-amber/theme.css';
 import 'primeicons/primeicons.css';
 import { AuthProvider } from './context/AuthProvider.tsx';
 import { ToastProvider } from './context/ToastProvider.tsx';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { APIOptions, PrimeReactProvider } from 'primereact/api';
+import { Route, Routes } from 'react-router-dom';
+import GuestRoutes from './routes/GuestRoutes.tsx';
+import AuthRoutes from './routes/AuthRoutes.tsx';
+import { InitialDataStructure } from './types/initialData.tsx';
+
+interface AppProps {
+    initialData?: InitialDataStructure;
+}
+
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnWindowFocus: false,
+            retry: 1,
+        },
+    },
+});
 
 const primeReactConfig: Partial<APIOptions> = {
     autoZIndex: false,
@@ -29,15 +46,21 @@ const primeReactConfig: Partial<APIOptions> = {
         },
     },
 };
-const App = () => {
+
+const App = ({ initialData }: AppProps) => {
     return (
-        <AuthProvider>
-            <PrimeReactProvider value={primeReactConfig}>
-                <ToastProvider>
-                    <MainRouter />
-                </ToastProvider>
-            </PrimeReactProvider>
-        </AuthProvider>
+        <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+                <PrimeReactProvider value={primeReactConfig}>
+                    <ToastProvider>
+                        <Routes>
+                            <Route path="/*" element={<GuestRoutes initialData={initialData} />} />
+                            <Route path="/admin/*" element={<AuthRoutes />} />
+                        </Routes>
+                    </ToastProvider>
+                </PrimeReactProvider>
+            </AuthProvider>
+        </QueryClientProvider>
     );
 };
 

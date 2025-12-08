@@ -236,7 +236,6 @@ export const usePostManagement = ({ toastRef, pagination }: UsePostManagementPro
     const handleMutationSuccess = (message: string) => {
         showSuccessToast(toastRef, message);
         queryClient.invalidateQueries({ queryKey: ['posts', 'search'] });
-        queryClient.invalidateQueries({ queryKey: ['post'] });
         closeModal();
     };
 

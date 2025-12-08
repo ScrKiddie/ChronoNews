@@ -329,20 +329,19 @@ const PostModal = ({
             <form onSubmit={handleSubmit} className="w-full">
                 <div className="flex flex-col p-4 gap-4">
                     <div className="w-full">
-                        <div className="flex flex-col gap-1">
-                            <label className="font-medium">Judul</label>
-                            <input
-                                ref={titleInputRef}
-                                type="text"
-                                className="p-inputtext p-component w-full"
-                                value={data?.title || ''}
-                                onChange={(e) => {
-                                    setData((prev) => ({ ...prev, title: e.target.value }));
-                                    if (errors.title) errors.title = undefined;
-                                }}
-                            />
-                            {errors.title && <small className="p-error">{errors.title}</small>}
-                        </div>
+                        <InputGroup
+                            type="text"
+                            label="Judul"
+                            data={data?.title || ''}
+                            setData={(value) => {
+                                setData((prev) => ({ ...prev, title: value }));
+                                if (errors.title) errors.title = undefined;
+                            }}
+                            error={errors.title}
+                            setError={(error) => {
+                                if (error) errors.title = error;
+                            }}
+                        />
                     </div>
 
                     {role == 'admin' ? (

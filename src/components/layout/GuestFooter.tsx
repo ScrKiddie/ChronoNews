@@ -2,9 +2,11 @@ import React from 'react';
 import ChronoNewsLogo from '../../../public/chrononews.svg';
 import { Link } from 'react-router-dom';
 import { truncateText } from '../../lib/utils/truncateText.tsx';
+import SafeImage from '../ui/SafeImage.tsx';
+import { Category } from '../../types/category.tsx';
 
 interface GuestFooterProps {
-    quickLinks: Array<{ id: string; name: string }>;
+    quickLinks: Category[];
 }
 
 const GuestFooter: React.FC<GuestFooterProps> = ({ quickLinks }) => {
@@ -13,7 +15,11 @@ const GuestFooter: React.FC<GuestFooterProps> = ({ quickLinks }) => {
             <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
                 <div className="flex flex-col mx-auto items-center">
                     <div className="flex items-center gap-1">
-                        <img src={ChronoNewsLogo as string} className="w-8" alt="ChronoNewsLogo" />
+                        <SafeImage
+                            src={ChronoNewsLogo as string}
+                            className="w-8"
+                            alt="ChronoNewsLogo"
+                        />
                         <h1 className="text-white font-bold text-2xl">
                             CHRONO<span className="text-[#f59e0b]">NEWS</span>
                         </h1>
@@ -29,7 +35,7 @@ const GuestFooter: React.FC<GuestFooterProps> = ({ quickLinks }) => {
                         Tautan Cepat
                     </h2>
                     <p key={'beranda'} className="text-white text-sm ">
-                        <Link to={`/beranda`} className="no-underline text-inherit">
+                        <Link to={`/berita`} className="no-underline text-inherit">
                             Beranda
                         </Link>
                     </p>

@@ -7,6 +7,7 @@ import { Post } from '../../types/post.tsx';
 import { Pagination } from '../../types/pagination.tsx';
 import { FC } from 'react';
 import TopPostSkeleton from '../ui/TopPostSkeleton.tsx';
+import SafeImage from '../ui/SafeImage.tsx';
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
@@ -14,7 +15,7 @@ interface TopPostProps {
     topPost: Post[] | null;
     loading: boolean;
     topPostPage: number;
-    setTopPostPage: (page: number) => void;
+    handlePageChange: (page: number) => void;
     topPostSize: number;
     topPostPagination: Pagination | undefined;
     handleCategoryChange: (category: string) => void;
@@ -24,7 +25,7 @@ const TopPost: FC<TopPostProps> = ({
     topPost,
     loading,
     topPostPage,
-    setTopPostPage,
+    handlePageChange,
     topPostSize,
     topPostPagination,
     handleCategoryChange,
@@ -51,7 +52,7 @@ const TopPost: FC<TopPostProps> = ({
                     <div key={post.id} className="break-all">
                         <div className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg flex flex-col h-full">
                             <div className="relative w-full aspect-[16/9] bg-[#f59e0b] rounded-t-lg overflow-hidden">
-                                <img
+                                <SafeImage
                                     src={
                                         post.thumbnail
                                             ? `${apiUri}/post_picture/${post.thumbnail}`
@@ -102,7 +103,7 @@ const TopPost: FC<TopPostProps> = ({
                     first={(topPostPage - 1) * topPostSize}
                     rows={topPostSize}
                     totalRecords={topPostPagination.totalItem || 0}
-                    onPageChange={(e: PaginatorPageChangeEvent) => setTopPostPage(e.page + 1)}
+                    onPageChange={(e: PaginatorPageChangeEvent) => handlePageChange(e.page + 1)}
                     template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
                     className="mt-4"
                 />

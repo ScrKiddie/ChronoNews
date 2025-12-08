@@ -49,12 +49,10 @@ export const useUserManagement = ({ toastRef, pagination }: UseUserManagementPro
 
     const closeModal = useCallback(() => {
         setIsModalVisible(false);
-        setTimeout(() => {
-            setModalMode(null);
-            setSelectedUserId(null);
-            setFormData(INITIAL_FORM_DATA);
-            setErrors({});
-        }, 300);
+        setModalMode(null);
+        setSelectedUserId(null);
+        setFormData(INITIAL_FORM_DATA);
+        setErrors({});
     }, []);
 
     const {
@@ -152,11 +150,10 @@ export const useUserManagement = ({ toastRef, pagination }: UseUserManagementPro
     const updateUserMutation = useMutation({
         mutationFn: ({ id, request }: { id: number; request: UserUpdateRequest }) =>
             UserService.updateUser(id, request),
-        onSuccess: (_, variables) => {
+        onSuccess: () => {
             showSuccessToast(toastRef, 'Pengguna berhasil diperbarui');
-            queryClient.invalidateQueries({ queryKey: ['users'] });
-            queryClient.invalidateQueries({ queryKey: ['user', variables.id] });
             closeModal();
+            queryClient.invalidateQueries({ queryKey: ['users'] });
         },
         onError: handleMutationError,
     });

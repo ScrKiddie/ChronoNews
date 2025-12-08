@@ -67,16 +67,16 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
 
     const breadcrumbItems: BreadCrumbProps['model'] = [
         {
-            label: 'Home',
+            label: 'Beranda',
             template: () => (
                 <span
                     className="text-[#475569]  cursor-pointer font-[600]"
                     onClick={() => {
-                        handleCategoryChange('');
+                        handleCategoryChange('beranda');
                     }}
                 >
                     {' '}
-                    Home
+                    Beranda
                 </span>
             ),
         },

@@ -4,18 +4,22 @@ import NotFound from '../features/guest/NotFound.tsx';
 import Post from '../features/guest/Post.tsx';
 import Reset from '../features/guest/Reset.tsx';
 import Forgot from '../features/guest/ResetRequest.tsx';
+import { InitialDataStructure } from '../types/initialData.tsx';
 
-const GuestRoutes = () => {
+interface GuestRoutesProps {
+    initialData?: InitialDataStructure;
+}
+
+const GuestRoutes = ({ initialData }: GuestRoutesProps) => {
     return (
         <Routes>
-            <Route path="/" element={<Navigate to="/beranda" replace />} />
+            <Route path="/" element={<Navigate to="/berita" replace />} />
             <Route path="/login" element={<Login />} />
 
-            <Route path="/beranda" element={<Post />} />
-            <Route path="/cari" element={<Post />} />
-            <Route path="/berita" element={<Post />} />
+            <Route path="/cari" element={<Post initialData={initialData} />} />
+            <Route path="/berita" element={<Post initialData={initialData} />} />
 
-            <Route path="/post/:id/:slug" element={<Post />} />
+            <Route path="/post/:id/:slug" element={<Post initialData={initialData} />} />
 
             <Route path="/reset" element={<Reset />} />
             <Route path="/reset/request" element={<Forgot />} />

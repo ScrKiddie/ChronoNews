@@ -1,6 +1,8 @@
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
 export const processContentForEditor = (htmlContent: string): string => {
+    if (typeof window === 'undefined') return htmlContent || '';
+
     if (!htmlContent) return '';
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, 'text/html');
@@ -14,6 +16,8 @@ export const processContentForEditor = (htmlContent: string): string => {
 };
 
 export const reverseProcessContentForServer = (htmlContent: string): string => {
+    if (typeof window === 'undefined') return htmlContent || '';
+
     if (!htmlContent) return '';
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlContent, 'text/html');

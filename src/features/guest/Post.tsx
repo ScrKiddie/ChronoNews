@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TabMenu } from 'primereact/tabmenu';
 import { InputText } from 'primereact/inputtext';
 import { Menu } from 'primereact/menu';
@@ -18,8 +18,16 @@ import EmptyData from '../../components/ui/EmptyData.tsx';
 import MiniEmptyData from '../../components/ui/MiniEmptyData.tsx';
 import { Dropdown } from 'primereact/dropdown';
 import { Skeleton } from 'primereact/skeleton';
+import SafeImage from '../../components/ui/SafeImage.tsx';
+import { InitialDataStructure } from '../../types/initialData.tsx';
 
-const Post: React.FC = () => {
+interface PostProps {
+    initialData?: InitialDataStructure;
+}
+
+const Post: React.FC<PostProps> = ({ initialData }) => {
+    const [isRetrying, setIsRetrying] = useState(false);
+
     const {
         categories,
         headlinePost,
@@ -44,21 +52,28 @@ const Post: React.FC = () => {
         topPostRange,
         setTopPostRange,
         headlinePostPage,
-        setHeadlinePostPage,
         headlinePostPagination,
         topPostPage,
-        setTopPostPage,
         topPostPagination,
         regularPostPage,
-        setRegularPostPage,
         regularPostPagination,
         searchPostPage,
-        setSearchPostPage,
         searchPostPagination,
         sizes,
-    } = usePost();
+        handlePageChange,
+        refetchAll,
+    } = usePost(initialData);
 
     const navigate = useNavigate();
+
+    const handleRetry = async () => {
+        setIsRetrying(true);
+        try {
+            await refetchAll(true);
+        } finally {
+            setIsRetrying(false);
+        }
+    };
 
     const handleSearch = () => {
         if (searchQuery.trim() !== '') {
@@ -93,7 +108,7 @@ const Post: React.FC = () => {
                                 loading={true}
                                 post={null}
                                 postPage={searchPostPage}
-                                setPostPage={setSearchPostPage}
+                                handlePageChange={(page) => handlePageChange('search', page)}
                                 postSize={sizes.search}
                                 postPagination={searchPostPagination}
                                 handleCategoryChange={handleCategoryChange}
@@ -108,7 +123,7 @@ const Post: React.FC = () => {
                             loading={false}
                             post={searchPosts}
                             postPage={searchPostPage}
-                            setPostPage={setSearchPostPage}
+                            handlePageChange={(page) => handlePageChange('search', page)}
                             postSize={sizes.search}
                             postPagination={searchPostPagination}
                             handleCategoryChange={handleCategoryChange}
@@ -133,7 +148,7 @@ const Post: React.FC = () => {
                             loading={true}
                             post={null}
                             postPage={regularPostPage}
-                            setPostPage={setRegularPostPage}
+                            handlePageChange={(page) => handlePageChange('regular', page)}
                             postSize={sizes.regular}
                             postPagination={regularPostPagination}
                             handleCategoryChange={handleCategoryChange}
@@ -146,7 +161,7 @@ const Post: React.FC = () => {
                             loading={false}
                             post={posts}
                             postPage={regularPostPage}
-                            setPostPage={setRegularPostPage}
+                            handlePageChange={(page) => handlePageChange('regular', page)}
                             postSize={sizes.regular}
                             postPagination={regularPostPagination}
                             handleCategoryChange={handleCategoryChange}
@@ -176,7 +191,7 @@ const Post: React.FC = () => {
                         loading={true}
                         headlinePost={null}
                         headlinePostPage={headlinePostPage}
-                        setHeadlinePostPage={setHeadlinePostPage}
+                        handlePageChange={(page) => handlePageChange('headline', page)}
                         headlinePostPagination={headlinePostPagination}
                         headlineSize={sizes.headline}
                         handleCategoryChange={handleCategoryChange}
@@ -188,7 +203,7 @@ const Post: React.FC = () => {
                         loading={false}
                         headlinePost={headlinePost}
                         headlinePostPage={headlinePostPage}
-                        setHeadlinePostPage={setHeadlinePostPage}
+                        handlePageChange={(page) => handlePageChange('headline', page)}
                         headlinePostPagination={headlinePostPagination}
                         headlineSize={sizes.headline}
                         handleCategoryChange={handleCategoryChange}
@@ -201,7 +216,9 @@ const Post: React.FC = () => {
                         {loading ? <Skeleton width="10rem" /> : 'Berita Populer'}
                     </h3>
                     {loading ? (
-                        <Skeleton className={`md:w-[200px]`} height="2.5rem" />
+                        <div className={`md:w-[200px] w-full`}>
+                            <Skeleton height="2.5rem" />
+                        </div>
                     ) : (
                         <Dropdown
                             ref={dropdownRef}
@@ -223,7 +240,7 @@ const Post: React.FC = () => {
                         loading={true}
                         topPost={null}
                         topPostPage={topPostPage}
-                        setTopPostPage={setTopPostPage}
+                        handlePageChange={(page) => handlePageChange('top', page)}
                         topPostSize={sizes.top}
                         topPostPagination={topPostPagination}
                         handleCategoryChange={handleCategoryChange}
@@ -235,7 +252,7 @@ const Post: React.FC = () => {
                         loading={false}
                         topPost={topPosts}
                         topPostPage={topPostPage}
-                        setTopPostPage={setTopPostPage}
+                        handlePageChange={(page) => handlePageChange('top', page)}
                         topPostSize={sizes.top}
                         topPostPagination={topPostPagination}
                         handleCategoryChange={handleCategoryChange}
@@ -251,7 +268,7 @@ const Post: React.FC = () => {
                         loading={true}
                         post={null}
                         postPage={regularPostPage}
-                        setPostPage={setRegularPostPage}
+                        handlePageChange={(page) => handlePageChange('regular', page)}
                         postSize={sizes.regular}
                         postPagination={regularPostPagination}
                         handleCategoryChange={handleCategoryChange}
@@ -263,7 +280,7 @@ const Post: React.FC = () => {
                         loading={false}
                         post={posts}
                         postPage={regularPostPage}
-                        setPostPage={setRegularPostPage}
+                        handlePageChange={(page) => handlePageChange('regular', page)}
                         postSize={sizes.regular}
                         postPagination={regularPostPagination}
                         handleCategoryChange={handleCategoryChange}
@@ -283,7 +300,7 @@ const Post: React.FC = () => {
                 <nav className="flex justify-between items-center xl:flex-row flex-col bg-white w-full xl:fixed h-[56px]">
                     <div className="flex xl:block justify-between items-center w-full xl:w-fit mt-2 xl:mt-0">
                         <div className="flex items-center h-full ml-3">
-                            <img
+                            <SafeImage
                                 src={String(ChronoNewsLogo)}
                                 className="xl:w-8 w-11"
                                 alt="ChronoNewsLogo"
@@ -344,21 +361,15 @@ const Post: React.FC = () => {
             </div>
 
             <div className="relative min-h-screen p-4 mx-auto max-w-4xl bg-white xl:pt-[4.6rem] pt-32 rounded-md">
-                {error ? (
-                    <LoadingRetry
-                        visibleConnectionError={true}
-                        onRetry={() => window.location.reload()}
-                    />
+                {isRetrying ? (
+                    renderContent()
+                ) : error ? (
+                    <LoadingRetry visibleConnectionError={true} onRetry={handleRetry} />
                 ) : (
                     renderContent()
                 )}
             </div>
-            <GuestFooter
-                quickLinks={(categories || []).map((cat) => ({
-                    ...cat,
-                    id: String(cat.id),
-                }))}
-            />
+            <GuestFooter quickLinks={categories} />
         </div>
     );
 };
