@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { PostService } from '../lib/api/postService.tsx';
 import { CategoryService } from '../lib/api/categoryService.tsx';
 import { truncateText } from '../lib/utils/truncateText.tsx';
@@ -89,6 +89,8 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
             };
         },
         enabled: shouldFetchSpecificData('post', 'postError') && isPostPage && !!postId,
+        staleTime: 0,
+        gcTime: 0,
     });
 
     const mainPost = useMemo(() => {
@@ -129,7 +131,8 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
         enabled:
             shouldFetchSpecificData('posts_headline', 'posts_headlineError') &&
             headlineQueryEnabled,
-        placeholderData: keepPreviousData,
+        staleTime: 0,
+        gcTime: 0,
     });
     const headlineResult = manualData?.posts_headline ?? headlineQuery.data;
 
@@ -163,7 +166,8 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
             !isPostPage &&
             !isSearchPage &&
             !!headlineResult,
-        placeholderData: keepPreviousData,
+        staleTime: 0,
+        gcTime: 0,
     });
     const topPostsResult = manualData?.posts_top ?? topPostsQuery.data;
     const topPosts: Post[] = useMemo(() => {
@@ -197,7 +201,8 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
             shouldFetchSpecificData('posts_regular', 'posts_regularError') &&
             !isSearchPage &&
             (isPostPage ? !!mainPost : !!headlineResult && !!topPostsResult),
-        placeholderData: keepPreviousData,
+        staleTime: 0,
+        gcTime: 0,
     });
     const regularPostsResult = manualData?.posts_regular ?? regularPostsQuery.data;
     const posts: Post[] = useMemo(() => {
@@ -225,7 +230,8 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
                 signal
             ),
         enabled: shouldFetchSpecificData('posts_search', 'posts_searchError') && isSearchPage,
-        placeholderData: keepPreviousData,
+        staleTime: 0,
+        gcTime: 0,
     });
     const searchResult = manualData?.posts_search ?? searchQueryQuery.data;
     const searchPosts: Post[] = useMemo(() => {
@@ -235,18 +241,118 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
             : [];
     }, [searchResult]);
 
-    const hasAnySsrError = useMemo(
+    const isAnyFetching = useMemo(() => {
+        return (
+            categoriesQuery.isFetching ||
+            mainPostQuery.isFetching ||
+            headlineQuery.isFetching ||
+            topPostsQuery.isFetching ||
+            regularPostsQuery.isFetching ||
+            searchQueryQuery.isFetching
+        );
+    }, [
+        categoriesQuery.isFetching,
+        mainPostQuery.isFetching,
+        headlineQuery.isFetching,
+        topPostsQuery.isFetching,
+        regularPostsQuery.isFetching,
+        searchQueryQuery.isFetching,
+    ]);
+
+    const computedError = useMemo(() => {
+        if (isAnyFetching) return false;
+
+        if (isSearchPage) {
+            if (
+                searchQueryQuery.isSuccess ||
+                (manualData?.posts_search?.data && !manualData.posts_searchError)
+            ) {
+                return false;
+            }
+            return searchQueryQuery.isError || !!manualData?.posts_searchError;
+        }
+
+        if (isPostPage) {
+            if (mainPostQuery.isSuccess || (manualData?.post && !manualData.postError)) {
+                return false;
+            }
+            if (mainPostQuery.isError || !!manualData?.postError) return true;
+        }
+
+        if (categoriesQuery.isError || manualData?.generalError) return true;
+
+        return (
+            headlineQuery.isError ||
+            !!manualData?.posts_headlineError ||
+            topPostsQuery.isError ||
+            !!manualData?.posts_topError ||
+            regularPostsQuery.isError ||
+            !!manualData?.posts_regularError
+        );
+    }, [
+        isAnyFetching,
+        isSearchPage,
+        isPostPage,
+        categoriesQuery.isError,
+        manualData,
+        searchQueryQuery.isError,
+        searchQueryQuery.isSuccess,
+        mainPostQuery.isError,
+        mainPostQuery.isSuccess,
+        headlineQuery.isError,
+        topPostsQuery.isError,
+        regularPostsQuery.isError,
+    ]);
+
+    const loading = useMemo(
         () =>
-            !!(
-                manualData?.postError ||
-                manualData?.posts_headlineError ||
-                manualData?.posts_topError ||
-                manualData?.posts_regularError ||
-                manualData?.posts_searchError ||
-                manualData?.generalError
-            ),
-        [manualData]
+            isAnyFetching ||
+            mainPostQuery.isLoading ||
+            headlineQuery.isLoading ||
+            topPostsQuery.isLoading ||
+            regularPostsQuery.isLoading ||
+            searchQueryQuery.isLoading,
+        [
+            isAnyFetching,
+            mainPostQuery.isLoading,
+            headlineQuery.isLoading,
+            topPostsQuery.isLoading,
+            regularPostsQuery.isLoading,
+            searchQueryQuery.isLoading,
+        ]
     );
+
+    useEffect(() => {
+        const isMainContentSafe =
+            (isSearchPage && searchQueryQuery.isSuccess) || (isPostPage && mainPostQuery.isSuccess);
+
+        const isCategoriesBroken =
+            (categoriesQuery.isError || !categories || categories.length === 0) &&
+            !categoriesQuery.isFetching;
+
+        if (isMainContentSafe && isCategoriesBroken) {
+            categoriesQuery.refetch();
+
+            if (manualData?.generalError) {
+                setManualData((prev) => {
+                    if (!prev) return undefined;
+                    const n = { ...prev };
+                    delete n.generalError;
+                    return n;
+                });
+            }
+        }
+    }, [
+        isSearchPage,
+        searchQueryQuery.isSuccess,
+        isPostPage,
+        mainPostQuery.isSuccess,
+        categoriesQuery.isError,
+        categoriesQuery.isFetching,
+        categories,
+        manualData?.generalError,
+        categoriesQuery,
+    ]);
 
     useEffect(() => {
         if (!state?.noScroll) {
@@ -302,22 +408,22 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
     useEffect(() => {
         if (isSearchPage || isPostPage) {
             setActiveIndex(-1);
-        } else if (categories.length > 0) {
-            if (isHomePage) {
-                setActiveIndex(0);
+        } else if (isHomePage) {
+            setActiveIndex(0);
+        } else if (!categories || categories.length === 0) {
+            setActiveIndex(-1);
+        } else {
+            if (isDesktop) {
+                const primary = categories.slice(0, 3);
+                const foundIndex = primary.findIndex(
+                    (cat: Category) => cat.name.toLowerCase() === currentCategory
+                );
+                setActiveIndex(foundIndex !== -1 ? foundIndex + 1 : 4);
             } else {
-                if (isDesktop) {
-                    const primary = categories.slice(0, 3);
-                    const foundIndex = primary.findIndex(
-                        (cat: Category) => cat.name.toLowerCase() === currentCategory
-                    );
-                    setActiveIndex(foundIndex !== -1 ? foundIndex + 1 : 4);
-                } else {
-                    const foundIndex = categories.findIndex(
-                        (cat: Category) => cat.name.toLowerCase() === currentCategory
-                    );
-                    setActiveIndex(foundIndex !== -1 ? foundIndex + 1 : 0);
-                }
+                const foundIndex = categories.findIndex(
+                    (cat: Category) => cat.name.toLowerCase() === currentCategory
+                );
+                setActiveIndex(foundIndex !== -1 ? foundIndex + 1 : 0);
             }
         }
     }, [currentCategory, categories, isSearchPage, isPostPage, isHomePage, isDesktop]);
@@ -364,10 +470,17 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
             setManualData((prevData) => {
                 if (!prevData) return undefined;
                 const newData = { ...prevData };
+
                 delete newData.posts_headline;
                 delete newData.posts_top;
                 delete newData.posts_regular;
                 delete newData.posts_search;
+
+                delete newData.posts_headlineError;
+                delete newData.posts_topError;
+                delete newData.posts_regularError;
+                delete newData.posts_searchError;
+
                 return newData;
             });
 
@@ -389,8 +502,13 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
         setManualData((prevData) => {
             if (!prevData) return undefined;
             const newData = { ...prevData };
+
             delete newData.posts_top;
             delete newData.posts_regular;
+
+            delete newData.posts_topError;
+            delete newData.posts_regularError;
+
             return newData;
         });
 
@@ -413,16 +531,24 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
                     if (!prevData) return undefined;
                     const newData = { ...prevData };
                     delete newData.posts_regular;
+                    delete newData.posts_regularError;
                     return newData;
                 });
             } else {
                 setManualData((prevData) => {
                     if (!prevData) return undefined;
                     const newData = { ...prevData };
+
                     delete newData.posts_headline;
                     delete newData.posts_top;
                     delete newData.posts_regular;
                     delete newData.posts_search;
+
+                    delete newData.posts_headlineError;
+                    delete newData.posts_topError;
+                    delete newData.posts_regularError;
+                    delete newData.posts_searchError;
+
                     return newData;
                 });
             }
@@ -433,63 +559,103 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
     );
 
     const refetchAll = useCallback(
-        (refetchAllQueries = false) => {
-            if (refetchAllQueries) {
-                setManualData(undefined);
+        async (isFullRetry = false) => {
+            if (isFullRetry) {
+                setManualData((prev) => {
+                    if (!prev) return undefined;
+                    if (prev.categories && !prev.generalError) {
+                        return { categories: prev.categories };
+                    }
+                    return undefined;
+                });
+
                 viewIncrementedRef.current = false;
-                return queryClient.refetchQueries(
-                    {
-                        predicate: (query) =>
-                            !!query.state.error &&
-                            Array.isArray(query.queryKey) &&
-                            (query.queryKey[0] === 'categories' ||
-                                query.queryKey[0] === 'post' ||
-                                query.queryKey[0] === 'posts'),
+
+                await queryClient.resetQueries({
+                    predicate: (query) => {
+                        const key = query.queryKey[0];
+                        if (key === 'post' || key === 'posts') return true;
+                        if (key === 'categories') {
+                            const data = query.state.data as Category[] | undefined;
+                            return query.state.status === 'error' || !data || data.length === 0;
+                        }
+                        return false;
                     },
-                    { throwOnError: false }
-                );
+                });
+                return;
             }
+
             if (!manualData) {
-                return Promise.all([
-                    queryClient.refetchQueries({ queryKey: ['categories'] }),
-                    queryClient.refetchQueries({ queryKey: ['post'] }),
-                    queryClient.refetchQueries({ queryKey: ['posts'] }),
-                ]);
+                return queryClient.resetQueries({
+                    predicate: (query) => {
+                        const key = query.queryKey[0];
+                        const status = query.state.status;
+
+                        if (key === 'categories') {
+                            const data = query.state.data as Category[] | undefined;
+                            return status === 'error' || !data || data.length === 0;
+                        }
+
+                        if (key === 'post' || key === 'posts') {
+                            if (status === 'success') return false;
+                            return true;
+                        }
+                        return false;
+                    },
+                });
             }
-            const promises = [];
+
             const newManualData = { ...manualData };
-            if (manualData.generalError) {
-                promises.push(queryClient.refetchQueries({ queryKey: ['categories'] }));
+            let hasChanges = false;
+
+            const clearError = (
+                dataKey: keyof InitialDataStructure,
+                errorKey: keyof InitialDataStructure
+            ) => {
+                if (
+                    manualData[errorKey] ||
+                    (dataKey === 'categories' &&
+                        (!manualData[dataKey] || manualData[dataKey]?.length === 0))
+                ) {
+                    if (dataKey === 'categories')
+                        queryClient.resetQueries({ queryKey: ['categories'] });
+                    delete newManualData[errorKey];
+                    delete newManualData[dataKey];
+                    hasChanges = true;
+                }
+            };
+
+            if (
+                manualData.generalError ||
+                !manualData.categories ||
+                manualData.categories.length === 0
+            ) {
+                queryClient.resetQueries({ queryKey: ['categories'] });
                 delete newManualData.generalError;
                 delete newManualData.categories;
+                hasChanges = true;
             }
-            if (manualData.postError) {
-                promises.push(queryClient.refetchQueries({ queryKey: ['post'] }));
-                delete newManualData.postError;
-                delete newManualData.post;
-            }
-            if (manualData.posts_headlineError) {
-                promises.push(queryClient.refetchQueries({ queryKey: ['posts', 'headline'] }));
-                delete newManualData.posts_headlineError;
-                delete newManualData.posts_headline;
-            }
-            if (manualData.posts_topError) {
-                promises.push(queryClient.refetchQueries({ queryKey: ['posts', 'top'] }));
-                delete newManualData.posts_topError;
-                delete newManualData.posts_top;
-            }
-            if (manualData.posts_regularError) {
-                promises.push(queryClient.refetchQueries({ queryKey: ['posts', 'regular'] }));
-                delete newManualData.posts_regularError;
-                delete newManualData.posts_regular;
-            }
-            if (manualData.posts_searchError) {
-                promises.push(queryClient.refetchQueries({ queryKey: ['posts', 'search'] }));
-                delete newManualData.posts_searchError;
-                delete newManualData.posts_search;
-            }
-            setManualData(Object.keys(newManualData).length > 0 ? newManualData : undefined);
-            return Promise.all(promises);
+
+            if (manualData.postError) clearError('post', 'postError');
+            if (manualData.posts_headlineError) clearError('posts_headline', 'posts_headlineError');
+            if (manualData.posts_topError) clearError('posts_top', 'posts_topError');
+            if (manualData.posts_regularError) clearError('posts_regular', 'posts_regularError');
+            if (manualData.posts_searchError) clearError('posts_search', 'posts_searchError');
+
+            if (hasChanges)
+                setManualData(Object.keys(newManualData).length > 0 ? newManualData : undefined);
+
+            return queryClient.resetQueries({
+                predicate: (query) => {
+                    const key = query.queryKey[0];
+                    const status = query.state.status;
+                    if (key === 'post' || key === 'posts') {
+                        if (status === 'success') return false;
+                        return true;
+                    }
+                    return false;
+                },
+            });
         },
         [queryClient, manualData]
     );
@@ -537,16 +703,6 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
         [remainingCategories, handleCategoryChange]
     );
 
-    const loading = useMemo(
-        () =>
-            mainPostQuery.isLoading ||
-            headlineQuery.isLoading ||
-            topPostsQuery.isLoading ||
-            regularPostsQuery.isLoading ||
-            searchQueryQuery.isLoading,
-        [mainPostQuery, headlineQuery, topPostsQuery, regularPostsQuery, searchQueryQuery]
-    );
-
     const notFound = useMemo(
         () => isPostPage && !mainPostQuery.isLoading && !mainPostQuery.isError && !mainPost,
         [isPostPage, mainPostQuery.isLoading, mainPostQuery.isError, mainPost]
@@ -560,13 +716,7 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
         searchPosts,
         mainPost,
         loading,
-        error:
-            mainPostQuery.isError ||
-            headlineQuery.isError ||
-            topPostsQuery.isError ||
-            regularPostsQuery.isError ||
-            searchQueryQuery.isError ||
-            hasAnySsrError,
+        error: computedError,
         notFound,
         activeIndex,
         setActiveIndex,

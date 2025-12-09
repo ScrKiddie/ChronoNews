@@ -2,6 +2,7 @@ import ReactDOMServer from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom/server';
 import App from './App';
 import fetchInitialData from './lib/utils/fetchInitialData.tsx';
+import { generatePostHead, generateDefaultHead } from './lib/utils/generatePostHead.tsx';
 
 interface RenderOptions {
     url: string;
@@ -19,11 +20,18 @@ export async function render(options: RenderOptions) {
         return { redirect: dataOrRedirect.redirect };
     }
 
+    let headHtml;
+    if (dataOrRedirect.post) {
+        headHtml = generatePostHead(dataOrRedirect.post);
+    } else {
+        headHtml = generateDefaultHead();
+    }
+
     const appHtml = ReactDOMServer.renderToString(
         <StaticRouter location={url}>
             <App initialData={dataOrRedirect} />
         </StaticRouter>
     );
 
-    return { appHtml, initialData: dataOrRedirect };
+    return { appHtml, headHtml, initialData: dataOrRedirect };
 }

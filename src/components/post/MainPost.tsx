@@ -9,6 +9,7 @@ import { Post } from '../../types/post.tsx';
 import MainPostSkeleton from '../ui/MainPostSkeleton.tsx';
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 interface MainPostProps {
     mainPost: Post | null;
@@ -38,6 +39,32 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
             document.body.appendChild(script);
         }
     }, [mainPost?.id]);
+
+    useEffect(() => {
+        if (!mainPost) return;
+
+        const updateClientSideHead = () => {
+            document.title = `${mainPost.title} - ${mainPost.category?.name || 'Berita'} | ChronoNews`;
+
+            let metaDesc = document.querySelector('meta[name="description"]') as HTMLMetaElement;
+            if (!metaDesc) {
+                metaDesc = document.createElement('meta');
+                metaDesc.name = 'description';
+                document.head.appendChild(metaDesc);
+            }
+            metaDesc.content = mainPost.summary;
+
+            let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+            if (!canonicalLink) {
+                canonicalLink = document.createElement('link');
+                canonicalLink.rel = 'canonical';
+                document.head.appendChild(canonicalLink);
+            }
+            canonicalLink.href = `${BASE_URL}/post/${mainPost.id}`;
+        };
+
+        updateClientSideHead();
+    }, [mainPost]);
 
     const toggleUpdatedAt = () => {
         setShowUpdatedAt(!showUpdatedAt);

@@ -39,13 +39,14 @@ async function handleRequest(req, res, url, renderFunction) {
             return;
         }
 
-        const { appHtml, initialData } = result;
+        const { appHtml, headHtml, initialData } = result;
 
         const templatePath = isProd ? resolve('dist/client/index.html') : resolve('index.html');
         const template = await fs.readFile(templatePath, 'utf-8');
         const htmlTemplate = isProd ? template : await vite.transformIndexHtml(url, template);
 
         const html = htmlTemplate
+            .replace('<!--ssr-head-outlet-->', headHtml)
             .replace('<!--ssr-outlet-->', appHtml)
             .replace(
                 'window.__INITIAL_DATA__ = undefined;',
