@@ -20,28 +20,8 @@ import { Dropdown } from 'primereact/dropdown';
 import { Skeleton } from 'primereact/skeleton';
 import SafeImage from '../../components/ui/SafeImage.tsx';
 import { InitialDataStructure } from '../../types/initialData.tsx';
-
-const styles = `
-  @keyframes simpleFade {
-    from { 
-      opacity: 0; 
-    }
-    to { 
-      opacity: 1; 
-    }
-  }
-  .animate-fade-in {
-    animation: simpleFade 0.2s ease-out forwards;
-  }
-`;
-
-const FadeWrapper = ({
-    children,
-    className = '',
-}: {
-    children: React.ReactNode;
-    className?: string;
-}) => <div className={`animate-fade-in ${className}`}>{children}</div>;
+import { restoreDefaultHead } from '../../lib/utils/restoreHead.tsx';
+import { FadeWrapper } from '../../components/ui/FadeWrapper.tsx';
 
 interface PostProps {
     initialData?: InitialDataStructure;
@@ -99,6 +79,12 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
     } = usePost(initialData, isDesktop);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!isPostPage) {
+            restoreDefaultHead();
+        }
+    }, [isPostPage]);
 
     const handleRetry = async () => {
         setIsRetrying(true);
@@ -364,8 +350,6 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
 
     return (
         <div className="min-h-screen bg-white">
-            <style>{styles}</style>
-
             <ScrollTop
                 className={`bg-[#f59e0b] color-[#465569] ${loading && 'hidden'} ${error && 'hidden'}`}
             />

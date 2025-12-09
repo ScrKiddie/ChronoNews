@@ -1,6 +1,6 @@
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
-import defaultProfilePicture from '../../assets/profilepicture.svg';
+import defaultProfilePicture from '../../../public/profilepicture.svg';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import InputGroup from '../ui/InputGroup.tsx';
 import SubmitButton from '../ui/SubmitButton.tsx';

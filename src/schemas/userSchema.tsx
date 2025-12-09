@@ -89,6 +89,6 @@ export const UserUpdateSchema = z.object({
     name: validateName,
     phoneNumber: validatePhoneNumber,
     email: validateEmail,
-    password: validatePassword.optional(),
+    password: validatePassword.or(z.literal('')).optional(),
     role: validateRole,
 });

@@ -44,13 +44,13 @@ async function handleRequest(req, res, url, renderFunction) {
         const templatePath = isProd ? resolve('dist/client/index.html') : resolve('index.html');
         const template = await fs.readFile(templatePath, 'utf-8');
         const htmlTemplate = isProd ? template : await vite.transformIndexHtml(url, template);
-
+        const safeJsonData = JSON.stringify(initialData).replace(/</g, '\\u003c');
         const html = htmlTemplate
             .replace('<!--ssr-head-outlet-->', headHtml)
             .replace('<!--ssr-outlet-->', appHtml)
             .replace(
                 'window.__INITIAL_DATA__ = undefined;',
-                `window.__INITIAL_DATA__ = ${JSON.stringify(initialData)};`
+                `window.__INITIAL_DATA__ = ${safeJsonData};`
             );
 
         res.statusCode = 200;

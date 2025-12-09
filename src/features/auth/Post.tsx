@@ -97,7 +97,7 @@ const Post = () => {
                     {role === 'admin' && (
                         <Column
                             className="text-center"
-                            body={(rowData) => rowData.user?.name}
+                            body={(rowData) => rowData.user}
                             header={<p className="text-center font-medium">Penulis</p>}
                         />
                     )}

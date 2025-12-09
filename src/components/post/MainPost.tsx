@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from 'primereact/button';
 import { BreadCrumb, BreadCrumbProps } from 'primereact/breadcrumb';
-import defaultProfilePicture from '../../assets/profilepicture.svg';
-import thumbnail from '../../assets/thumbnail.svg';
+import defaultProfilePicture from '../../../public/profilepicture.svg';
+import thumbnail from '../../../public/thumbnail.svg';
 import { truncateText } from '../../lib/utils/truncateText.tsx';
 import { Post } from '../../types/post.tsx';
 import MainPostSkeleton from '../ui/MainPostSkeleton.tsx';

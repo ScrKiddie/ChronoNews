@@ -1,7 +1,7 @@
 import { DataView } from 'primereact/dataview';
 import { Paginator, PaginatorPageChangeEvent } from 'primereact/paginator';
 import { useNavigate } from 'react-router-dom';
-import thumbnail from '../../assets/thumbnail.svg';
+import thumbnail from '../../../public/thumbnail.svg';
 import { truncateText } from '../../lib/utils/truncateText.tsx';
 import { slugify } from '../../lib/utils/slugify.tsx';
 import { Post } from '../../types/post.tsx';

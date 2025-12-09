@@ -12,7 +12,7 @@ import { useAuth } from '../../hooks/useAuth.tsx';
 import { DropdownOption, PostFormData, PostFormErrors } from '../../types/post.tsx';
 import { MenuItem } from 'primereact/menuitem';
 import Quill from 'quill';
-import defaultThumbnail from '../../assets/thumbnail.svg';
+import defaultThumbnail from '../../../public/thumbnail.svg';
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
