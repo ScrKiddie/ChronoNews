@@ -228,7 +228,9 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
         if (!loading && isCompletelyEmpty) {
             return (
                 <div className="relative min-h-[80vh] flex items-center justify-center">
-                    <EmptyData message="Belum ada berita untuk ditampilkan." />
+                    <FadeWrapper key="empty-loading">
+                        <EmptyData message="Belum ada berita untuk ditampilkan." />
+                    </FadeWrapper>
                 </div>
             );
         }
