@@ -20,6 +20,7 @@
         "chart.js": "^4.4.9",
         "cropperjs": "^1.6.2",
         "dotenv": "^17.2.3",
+        "isomorphic-dompurify": "^2.34.0",
         "js-cookie": "^3.0.5",
         "jwt-decode": "^4.0.0",
         "parchment": "^3.0.0",

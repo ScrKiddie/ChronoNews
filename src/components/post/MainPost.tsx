@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Editor } from 'primereact/editor';
 import { Button } from 'primereact/button';
 import { BreadCrumb, BreadCrumbProps } from 'primereact/breadcrumb';
 import defaultProfilePicture from '../../assets/profilepicture.svg';
@@ -7,6 +6,10 @@ import thumbnail from '../../assets/thumbnail.svg';
 import { truncateText } from '../../lib/utils/truncateText.tsx';
 import { Post } from '../../types/post.tsx';
 import MainPostSkeleton from '../ui/MainPostSkeleton.tsx';
+
+import DOMPurify from 'isomorphic-dompurify';
+
+import 'quill/dist/quill.snow.css';
 
 const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -124,6 +127,8 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
         },
     ];
 
+    const sanitizedContent = DOMPurify.sanitize(mainPost?.content || '');
+
     return (
         <>
             <main className={`break-all`}>
@@ -203,13 +208,14 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
                     style={{ borderTop: '1px solid #8496af' }}
                 ></div>
 
-                <Editor
-                    key={mainPost.id}
-                    className="content-view min-h-0"
-                    headerTemplate={<></>}
-                    value={mainPost?.content}
-                    readOnly
-                />
+                <div className="ql-snow">
+                    <div
+                        className="ql-editor content-view min-h-0 !p-0"
+                        contentEditable={false}
+                        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+                    />
+                </div>
+
                 <div
                     className="w-full my-4 opacity-30"
                     style={{ borderTop: '1px solid #8496af' }}
