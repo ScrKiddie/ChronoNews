@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { PostService } from '../lib/api/postService.tsx';
 import { CategoryService } from '../lib/api/categoryService.tsx';
 import { truncateText } from '../lib/utils/truncateText.tsx';
@@ -69,6 +69,7 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
         queryFn: ({ signal }) =>
             CategoryService.listCategories(signal).then((res) => res.data || []),
         enabled: shouldFetchSpecificData('categories', 'generalError'),
+        staleTime: 5 * 60 * 1000,
     });
 
     const categories = useMemo(() => {
@@ -128,6 +129,7 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
         enabled:
             shouldFetchSpecificData('posts_headline', 'posts_headlineError') &&
             headlineQueryEnabled,
+        placeholderData: keepPreviousData,
     });
     const headlineResult = manualData?.posts_headline ?? headlineQuery.data;
 
@@ -161,6 +163,7 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
             !isPostPage &&
             !isSearchPage &&
             !!headlineResult,
+        placeholderData: keepPreviousData,
     });
     const topPostsResult = manualData?.posts_top ?? topPostsQuery.data;
     const topPosts: Post[] = useMemo(() => {
@@ -194,6 +197,7 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
             shouldFetchSpecificData('posts_regular', 'posts_regularError') &&
             !isSearchPage &&
             (isPostPage ? !!mainPost : !!headlineResult && !!topPostsResult),
+        placeholderData: keepPreviousData,
     });
     const regularPostsResult = manualData?.posts_regular ?? regularPostsQuery.data;
     const posts: Post[] = useMemo(() => {
@@ -221,6 +225,7 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
                 signal
             ),
         enabled: shouldFetchSpecificData('posts_search', 'posts_searchError') && isSearchPage,
+        placeholderData: keepPreviousData,
     });
     const searchResult = manualData?.posts_search ?? searchQueryQuery.data;
     const searchPosts: Post[] = useMemo(() => {
@@ -535,15 +540,10 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
     const loading = useMemo(
         () =>
             mainPostQuery.isLoading ||
-            mainPostQuery.isFetching ||
             headlineQuery.isLoading ||
-            headlineQuery.isFetching ||
             topPostsQuery.isLoading ||
-            topPostsQuery.isFetching ||
             regularPostsQuery.isLoading ||
-            regularPostsQuery.isFetching ||
-            searchQueryQuery.isLoading ||
-            searchQueryQuery.isFetching,
+            searchQueryQuery.isLoading,
         [mainPostQuery, headlineQuery, topPostsQuery, regularPostsQuery, searchQueryQuery]
     );
 

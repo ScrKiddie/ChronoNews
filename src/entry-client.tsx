@@ -16,9 +16,23 @@ const appElement = (
     </StrictMode>
 );
 
+const revealContent = () => {
+    requestAnimationFrame(() => {
+        container.style.opacity = '1';
+        container.style.pointerEvents = 'auto';
+
+        setTimeout(() => {
+            const antiFoucStyle = document.getElementById('anti-fouc');
+            if (antiFoucStyle) antiFoucStyle.remove();
+        }, 500);
+    });
+};
+
 if (initialData) {
     hydrateRoot(container, appElement);
+    revealContent();
 } else {
     const root = createRoot(container);
     root.render(appElement);
+    revealContent();
 }

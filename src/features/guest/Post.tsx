@@ -21,6 +21,28 @@ import { Skeleton } from 'primereact/skeleton';
 import SafeImage from '../../components/ui/SafeImage.tsx';
 import { InitialDataStructure } from '../../types/initialData.tsx';
 
+const styles = `
+  @keyframes simpleFade {
+    from { 
+      opacity: 0; 
+    }
+    to { 
+      opacity: 1; 
+    }
+  }
+  .animate-fade-in {
+    animation: simpleFade 0.2s ease-out forwards;
+  }
+`;
+
+const FadeWrapper = ({
+    children,
+    className = '',
+}: {
+    children: React.ReactNode;
+    className?: string;
+}) => <div className={`animate-fade-in ${className}`}>{children}</div>;
+
 interface PostProps {
     initialData?: InitialDataStructure;
 }
@@ -115,7 +137,7 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
                         <h3 className="text-[#4b5569] text-xl mb-3">Hasil Pencarian</h3>
                     )}
                     {loading ? (
-                        <>
+                        <FadeWrapper key="search-loading">
                             <h3 className="text-[#4b5563] mb-4 text-xl">
                                 <Skeleton width="10rem" />
                             </h3>
@@ -128,21 +150,26 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
                                 postPagination={searchPostPagination}
                                 handleCategoryChange={handleCategoryChange}
                             />
-                        </>
+                        </FadeWrapper>
                     ) : !searchPosts || searchPosts.length === 0 ? (
-                        <div className="absolute inset-0 flex items-center justify-center">
+                        <FadeWrapper
+                            key="search-empty"
+                            className="absolute inset-0 flex items-center justify-center"
+                        >
                             <EmptyData message="Tidak ada hasil yang ditemukan untuk kata kunci Anda. Coba cari dengan kata kunci lain." />
-                        </div>
+                        </FadeWrapper>
                     ) : (
-                        <RegularPost
-                            loading={false}
-                            post={searchPosts}
-                            postPage={searchPostPage}
-                            handlePageChange={(page) => handlePageChange('search', page)}
-                            postSize={sizes.search}
-                            postPagination={searchPostPagination}
-                            handleCategoryChange={handleCategoryChange}
-                        />
+                        <FadeWrapper key="search-data">
+                            <RegularPost
+                                loading={false}
+                                post={searchPosts}
+                                postPage={searchPostPage}
+                                handlePageChange={(page) => handlePageChange('search', page)}
+                                postSize={sizes.search}
+                                postPagination={searchPostPagination}
+                                handleCategoryChange={handleCategoryChange}
+                            />
+                        </FadeWrapper>
                     )}
                 </div>
             );
@@ -151,37 +178,48 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
         if (isPostPage) {
             return (
                 <>
-                    <MainPost
-                        mainPost={mainPost || null}
-                        handleCategoryChange={handleCategoryChange}
-                    />
+                    <FadeWrapper
+                        key={mainPost?.id ? `main-post-${mainPost.id}` : 'main-post-loading'}
+                    >
+                        <MainPost
+                            mainPost={mainPost || null}
+                            handleCategoryChange={handleCategoryChange}
+                        />
+                    </FadeWrapper>
+
                     <h3 className="text-[#4b5563] my-4 text-xl">
                         {loading ? <Skeleton width="10rem" /> : 'Berita Lainnya'}
                     </h3>
                     {loading ? (
-                        <RegularPost
-                            loading={true}
-                            post={null}
-                            postPage={regularPostPage}
-                            handlePageChange={(page) => handlePageChange('regular', page)}
-                            postSize={sizes.regular}
-                            postPagination={regularPostPagination}
-                            handleCategoryChange={handleCategoryChange}
-                            classKu="mt-4"
-                        />
+                        <FadeWrapper key="post-regular-loading">
+                            <RegularPost
+                                loading={true}
+                                post={null}
+                                postPage={regularPostPage}
+                                handlePageChange={(page) => handlePageChange('regular', page)}
+                                postSize={sizes.regular}
+                                postPagination={regularPostPagination}
+                                handleCategoryChange={handleCategoryChange}
+                                classKu="mt-4"
+                            />
+                        </FadeWrapper>
                     ) : hasNoRegularPosts ? (
-                        <MiniEmptyData message="Belum ada berita lainnya di kategori ini." />
+                        <FadeWrapper key="post-regular-empty">
+                            <MiniEmptyData message="Belum ada berita lainnya di kategori ini." />
+                        </FadeWrapper>
                     ) : (
-                        <RegularPost
-                            loading={false}
-                            post={posts}
-                            postPage={regularPostPage}
-                            handlePageChange={(page) => handlePageChange('regular', page)}
-                            postSize={sizes.regular}
-                            postPagination={regularPostPagination}
-                            handleCategoryChange={handleCategoryChange}
-                            classKu="mt-4"
-                        />
+                        <FadeWrapper key="post-regular-data">
+                            <RegularPost
+                                loading={false}
+                                post={posts}
+                                postPage={regularPostPage}
+                                handlePageChange={(page) => handlePageChange('regular', page)}
+                                postSize={sizes.regular}
+                                postPagination={regularPostPagination}
+                                handleCategoryChange={handleCategoryChange}
+                                classKu="mt-4"
+                            />
+                        </FadeWrapper>
                     )}
                 </>
             );
@@ -201,27 +239,33 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
                     {loading ? <Skeleton width="10rem" /> : 'Berita Terkini'}
                 </h3>
                 {loading ? (
-                    <HeadlinePost
-                        loading={true}
-                        headlinePost={null}
-                        headlinePostPage={headlinePostPage}
-                        handlePageChange={(page) => handlePageChange('headline', page)}
-                        headlinePostPagination={headlinePostPagination}
-                        headlineSize={sizes.headline}
-                        handleCategoryChange={handleCategoryChange}
-                    />
+                    <FadeWrapper key="headline-loading">
+                        <HeadlinePost
+                            loading={true}
+                            headlinePost={null}
+                            headlinePostPage={headlinePostPage}
+                            handlePageChange={(page) => handlePageChange('headline', page)}
+                            headlinePostPagination={headlinePostPagination}
+                            headlineSize={sizes.headline}
+                            handleCategoryChange={handleCategoryChange}
+                        />
+                    </FadeWrapper>
                 ) : hasNoHeadline ? (
-                    <MiniEmptyData message="Tidak ada berita terkini untuk ditampilkan." />
+                    <FadeWrapper key="headline-empty">
+                        <MiniEmptyData message="Tidak ada berita terkini untuk ditampilkan." />
+                    </FadeWrapper>
                 ) : (
-                    <HeadlinePost
-                        loading={false}
-                        headlinePost={headlinePost}
-                        headlinePostPage={headlinePostPage}
-                        handlePageChange={(page) => handlePageChange('headline', page)}
-                        headlinePostPagination={headlinePostPagination}
-                        headlineSize={sizes.headline}
-                        handleCategoryChange={handleCategoryChange}
-                    />
+                    <FadeWrapper key="headline-data">
+                        <HeadlinePost
+                            loading={false}
+                            headlinePost={headlinePost}
+                            headlinePostPage={headlinePostPage}
+                            handlePageChange={(page) => handlePageChange('headline', page)}
+                            headlinePostPagination={headlinePostPagination}
+                            headlineSize={sizes.headline}
+                            handleCategoryChange={handleCategoryChange}
+                        />
+                    </FadeWrapper>
                 )}
 
                 <div className="w-full flex md:items-center justify-between mt-4 md:flex-row flex-col text-start">
@@ -233,70 +277,84 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
                             <Skeleton height="2.5rem" />
                         </div>
                     ) : (
-                        <Dropdown
-                            ref={dropdownRef}
-                            value={topPostRange}
-                            options={[
-                                { label: 'Hari Ini', value: '1' },
-                                { label: '7 Hari Terakhir', value: '7' },
-                                { label: '30 Hari Terakhir', value: '30' },
-                                { label: 'Semua Waktu', value: 'all' },
-                            ]}
-                            onChange={(e) => setTopPostRange(e.value)}
-                            placeholder="Pilih Waktu"
-                            className="md:w-[200px] w-full guest"
-                        />
+                        <FadeWrapper>
+                            <Dropdown
+                                ref={dropdownRef}
+                                value={topPostRange}
+                                options={[
+                                    { label: 'Hari Ini', value: '1' },
+                                    { label: '7 Hari Terakhir', value: '7' },
+                                    { label: '30 Hari Terakhir', value: '30' },
+                                    { label: 'Semua Waktu', value: 'all' },
+                                ]}
+                                onChange={(e) => setTopPostRange(e.value)}
+                                placeholder="Pilih Waktu"
+                                className="md:w-[200px] w-full guest"
+                            />
+                        </FadeWrapper>
                     )}
                 </div>
                 {loading ? (
-                    <TopPost
-                        loading={true}
-                        topPost={null}
-                        topPostPage={topPostPage}
-                        handlePageChange={(page) => handlePageChange('top', page)}
-                        topPostSize={sizes.top}
-                        topPostPagination={topPostPagination}
-                        handleCategoryChange={handleCategoryChange}
-                    />
+                    <FadeWrapper key="top-loading">
+                        <TopPost
+                            loading={true}
+                            topPost={null}
+                            topPostPage={topPostPage}
+                            handlePageChange={(page) => handlePageChange('top', page)}
+                            topPostSize={sizes.top}
+                            topPostPagination={topPostPagination}
+                            handleCategoryChange={handleCategoryChange}
+                        />
+                    </FadeWrapper>
                 ) : hasNoTopPosts ? (
-                    <MiniEmptyData message="Tidak ada berita populer untuk ditampilkan." />
+                    <FadeWrapper key="top-empty">
+                        <MiniEmptyData message="Tidak ada berita populer untuk ditampilkan." />
+                    </FadeWrapper>
                 ) : (
-                    <TopPost
-                        loading={false}
-                        topPost={topPosts}
-                        topPostPage={topPostPage}
-                        handlePageChange={(page) => handlePageChange('top', page)}
-                        topPostSize={sizes.top}
-                        topPostPagination={topPostPagination}
-                        handleCategoryChange={handleCategoryChange}
-                    />
+                    <FadeWrapper key="top-data">
+                        <TopPost
+                            loading={false}
+                            topPost={topPosts}
+                            topPostPage={topPostPage}
+                            handlePageChange={(page) => handlePageChange('top', page)}
+                            topPostSize={sizes.top}
+                            topPostPagination={topPostPagination}
+                            handleCategoryChange={handleCategoryChange}
+                        />
+                    </FadeWrapper>
                 )}
 
                 <h3 className="text-[#4b5569] text-xl my-3">
                     {loading ? <Skeleton width="10rem" /> : 'Berita Lainnya'}
                 </h3>
                 {loading ? (
-                    <RegularPost
-                        loading={true}
-                        post={null}
-                        postPage={regularPostPage}
-                        handlePageChange={(page) => handlePageChange('regular', page)}
-                        postSize={sizes.regular}
-                        postPagination={regularPostPagination}
-                        handleCategoryChange={handleCategoryChange}
-                    />
+                    <FadeWrapper key="regular-loading">
+                        <RegularPost
+                            loading={true}
+                            post={null}
+                            postPage={regularPostPage}
+                            handlePageChange={(page) => handlePageChange('regular', page)}
+                            postSize={sizes.regular}
+                            postPagination={regularPostPagination}
+                            handleCategoryChange={handleCategoryChange}
+                        />
+                    </FadeWrapper>
                 ) : hasNoRegularPosts ? (
-                    <MiniEmptyData message="Tidak ada berita lainnya untuk ditampilkan." />
+                    <FadeWrapper key="regular-empty">
+                        <MiniEmptyData message="Tidak ada berita lainnya untuk ditampilkan." />
+                    </FadeWrapper>
                 ) : (
-                    <RegularPost
-                        loading={false}
-                        post={posts}
-                        postPage={regularPostPage}
-                        handlePageChange={(page) => handlePageChange('regular', page)}
-                        postSize={sizes.regular}
-                        postPagination={regularPostPagination}
-                        handleCategoryChange={handleCategoryChange}
-                    />
+                    <FadeWrapper key="regular-data">
+                        <RegularPost
+                            loading={false}
+                            post={posts}
+                            postPage={regularPostPage}
+                            handlePageChange={(page) => handlePageChange('regular', page)}
+                            postSize={sizes.regular}
+                            postPagination={regularPostPagination}
+                            handleCategoryChange={handleCategoryChange}
+                        />
+                    </FadeWrapper>
                 )}
             </>
         );
@@ -304,6 +362,8 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
 
     return (
         <div className="min-h-screen bg-white">
+            <style>{styles}</style>
+
             <ScrollTop
                 className={`bg-[#f59e0b] color-[#465569] ${loading && 'hidden'} ${error && 'hidden'}`}
             />
