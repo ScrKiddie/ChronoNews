@@ -16,7 +16,7 @@ import { Dropdown } from 'primereact/dropdown';
 import { Category } from '../types/category.tsx';
 import { InitialDataStructure } from '../types/initialData.tsx';
 
-const usePost = (InitialDataProp: InitialDataStructure | undefined) => {
+const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: boolean) => {
     const { pathname, search, state } = useLocation();
     const navigate = useNavigate();
     const queryParams = useMemo(() => new URLSearchParams(search), [search]);
@@ -295,19 +295,27 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined) => {
     }, [mainPost, slugFromUrl, navigate]);
 
     useEffect(() => {
-        if (isSearchPage || isPostPage) setActiveIndex(-1);
-        else if (categories.length > 0) {
+        if (isSearchPage || isPostPage) {
+            setActiveIndex(-1);
+        } else if (categories.length > 0) {
             if (isHomePage) {
                 setActiveIndex(0);
             } else {
-                const primary = categories.slice(0, 3);
-                const foundIndex = primary.findIndex(
-                    (cat: Category) => cat.name.toLowerCase() === currentCategory
-                );
-                setActiveIndex(foundIndex !== -1 ? foundIndex + 1 : 4);
+                if (isDesktop) {
+                    const primary = categories.slice(0, 3);
+                    const foundIndex = primary.findIndex(
+                        (cat: Category) => cat.name.toLowerCase() === currentCategory
+                    );
+                    setActiveIndex(foundIndex !== -1 ? foundIndex + 1 : 4);
+                } else {
+                    const foundIndex = categories.findIndex(
+                        (cat: Category) => cat.name.toLowerCase() === currentCategory
+                    );
+                    setActiveIndex(foundIndex !== -1 ? foundIndex + 1 : 0);
+                }
             }
         }
-    }, [currentCategory, categories, isSearchPage, isPostPage, isHomePage]);
+    }, [currentCategory, categories, isSearchPage, isPostPage, isHomePage, isDesktop]);
 
     useEffect(() => {
         setSearchQuery(searchQueryFromUrl);
@@ -483,7 +491,8 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined) => {
 
     const primaryCategories = useMemo(() => categories.slice(0, 3), [categories]);
     const remainingCategories = useMemo(() => categories.slice(3), [categories]);
-    const allCategories: MenuItem[] = useMemo(
+
+    const allDesktopCategories: MenuItem[] = useMemo(
         () => [
             { label: 'Beranda', command: () => handleCategoryChange('beranda') },
             ...primaryCategories.map((cat: Category) => ({
@@ -502,6 +511,18 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined) => {
         ],
         [primaryCategories, remainingCategories, handleCategoryChange]
     );
+
+    const allMobileCategories: MenuItem[] = useMemo(
+        () => [
+            { label: 'Beranda', command: () => handleCategoryChange('beranda') },
+            ...categories.map((cat: Category) => ({
+                label: truncateText(cat.name, 13),
+                command: () => handleCategoryChange(cat.name.toLowerCase()),
+            })),
+        ],
+        [categories, handleCategoryChange]
+    );
+
     const moreCategories: MenuItem[] = useMemo(
         () =>
             remainingCategories.map((cat: Category) => ({
@@ -553,7 +574,8 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined) => {
         setSearchQuery,
         menuRef,
         dropdownRef,
-        allCategories,
+        allDesktopCategories,
+        allMobileCategories,
         moreCategories,
         handleCategoryChange,
         isSearchPage,

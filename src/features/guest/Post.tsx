@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TabMenu } from 'primereact/tabmenu';
 import { InputText } from 'primereact/inputtext';
 import { Menu } from 'primereact/menu';
@@ -27,6 +27,17 @@ interface PostProps {
 
 const Post: React.FC<PostProps> = ({ initialData }) => {
     const [isRetrying, setIsRetrying] = useState(false);
+    const [isDesktop, setIsDesktop] = useState(false);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsDesktop(window.innerWidth >= 1024);
+        };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const {
         categories,
@@ -44,7 +55,8 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
         setSearchQuery,
         menuRef,
         dropdownRef,
-        allCategories,
+        allDesktopCategories,
+        allMobileCategories,
         moreCategories,
         handleCategoryChange,
         isSearchPage,
@@ -62,7 +74,7 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
         sizes,
         handlePageChange,
         refetchAll,
-    } = usePost(initialData);
+    } = usePost(initialData, isDesktop);
 
     const navigate = useNavigate();
 
@@ -91,6 +103,9 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
     const hasNoRegularPosts = !posts || posts.length === 0;
 
     const isCompletelyEmpty = isCategoryPage && hasNoHeadline && hasNoTopPosts && hasNoRegularPosts;
+
+    const hasLainnyaTab = isDesktop && moreCategories.length > 0;
+    const lainnyaIndex = allDesktopCategories.length - 1;
 
     const renderContent = () => {
         if (isSearchPage) {
@@ -182,7 +197,6 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
 
         return (
             <>
-                {/* Berita Terkini */}
                 <h3 className="text-[#4b5563] mb-3 text-xl">
                     {loading ? <Skeleton width="10rem" /> : 'Berita Terkini'}
                 </h3>
@@ -210,7 +224,6 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
                     />
                 )}
 
-                {/* Berita Populer */}
                 <div className="w-full flex md:items-center justify-between mt-4 md:flex-row flex-col text-start">
                     <h3 className="text-[#4b5569] mb-2 md:mb-0 text-xl">
                         {loading ? <Skeleton width="10rem" /> : 'Berita Populer'}
@@ -259,7 +272,6 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
                     />
                 )}
 
-                {/* Berita Lainnya */}
                 <h3 className="text-[#4b5569] text-xl my-3">
                     {loading ? <Skeleton width="10rem" /> : 'Berita Lainnya'}
                 </h3>
@@ -347,14 +359,16 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
                         </div>
                     </div>
                 </nav>
+
                 <TabMenu
-                    model={allCategories}
+                    model={isDesktop ? allDesktopCategories : allMobileCategories}
                     activeIndex={activeIndex}
                     onTabChange={(e) => {
-                        if (e.index !== 4) {
-                            setActiveIndex(e.index);
-                            menuRef.current?.hide(e.originalEvent);
+                        if (hasLainnyaTab && e.index === lainnyaIndex) {
+                            return;
                         }
+                        setActiveIndex(e.index);
+                        menuRef.current?.hide(e.originalEvent);
                     }}
                     className="lg:h-full overflow-y-hidden h-[58px] w-full"
                 />
