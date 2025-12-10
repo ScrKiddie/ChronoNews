@@ -420,15 +420,13 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
                 />
             </div>
 
-            <div className="relative min-h-screen p-4 mx-auto max-w-4xl bg-white xl:pt-[4.6rem] pt-32 rounded-md">
-                {isRetrying ? (
-                    renderContent()
-                ) : error ? (
-                    <LoadingRetry visibleConnectionError={true} onRetry={handleRetry} />
-                ) : (
-                    renderContent()
-                )}
-            </div>
+            {error && !isRetrying ? (
+                <LoadingRetry visibleConnectionError={true} onRetry={handleRetry} />
+            ) : (
+                <div className="relative min-h-screen p-4 mx-auto max-w-4xl bg-white xl:pt-[4.6rem] pt-32 rounded-md">
+                    {renderContent()}
+                </div>
+            )}
             <GuestFooter quickLinks={categories} />
         </div>
     );

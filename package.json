@@ -10,7 +10,8 @@
         "build": "npm run build:client && npm run build:server",
         "serve": "cross-env NODE_ENV=production node server.js",
         "lint": "eslint .",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "start": "npm run serve"
     },
     "dependencies": {
         "@botom/quill-resize-module": "^2.0.1",
