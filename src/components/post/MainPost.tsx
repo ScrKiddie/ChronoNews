@@ -11,8 +11,7 @@ import DOMPurify from 'isomorphic-dompurify';
 
 import 'quill/dist/quill.snow.css';
 
-const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const baseUrl = import.meta.env.VITE_BASE_URL;
 
 interface MainPostProps {
     mainPost: Post | null;
@@ -63,7 +62,7 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
                 canonicalLink.rel = 'canonical';
                 document.head.appendChild(canonicalLink);
             }
-            canonicalLink.href = `${BASE_URL}/post/${mainPost.id}`;
+            canonicalLink.href = `${baseUrl}/post/${mainPost.id}`;
         };
 
         updateClientSideHead();
@@ -139,11 +138,7 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
 
                 <div className="relative w-full h-0 pb-[56.25%] bg-[#f59e0b] overflow-hidden">
                     <img
-                        src={
-                            mainPost?.thumbnail
-                                ? apiUri + '/post_picture/' + mainPost?.thumbnail
-                                : (thumbnail as string)
-                        }
+                        src={mainPost?.thumbnail ? mainPost?.thumbnail : (thumbnail as string)}
                         alt={mainPost.title || 'Post Thumbnail'}
                         className="absolute top-0 left-0 w-full h-full object-cover"
                     />
@@ -157,7 +152,7 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
                         <img
                             src={
                                 mainPost.user?.profilePicture
-                                    ? `${apiUri}/profile_picture/${mainPost.user.profilePicture}`
+                                    ? `${mainPost.user.profilePicture}`
                                     : (defaultProfilePicture as string)
                             }
                             className="size-[2.6rem] lg:size-[3rem] rounded-full"

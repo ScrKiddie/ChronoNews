@@ -9,7 +9,6 @@ const useQuillConfig = ({
     onUploadStateChange = () => {},
 }: { onUploadStateChange?: (isLoading: boolean) => void } = {}) => {
     const [isClient, setIsClient] = useState(false);
-    const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
     const toast = useToast();
 
     useEffect(() => {
@@ -275,7 +274,7 @@ const useQuillConfig = ({
             if (!response) {
                 return;
             }
-            const imageUrl = `${apiUri}/post_picture/${response.name}`;
+            const imageUrl = `${response.name}`;
 
             quillInstance.insertEmbed(
                 range.index,

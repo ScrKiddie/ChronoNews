@@ -9,8 +9,6 @@ import { FC } from 'react';
 import TopPostSkeleton from '../ui/TopPostSkeleton.tsx';
 import SafeImage from '../ui/SafeImage.tsx';
 
-const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
-
 interface TopPostProps {
     topPost: Post[] | null;
     loading: boolean;
@@ -54,9 +52,7 @@ const TopPost: FC<TopPostProps> = ({
                             <div className="relative w-full aspect-[16/9] bg-[#f59e0b] rounded-t-lg overflow-hidden">
                                 <SafeImage
                                     src={
-                                        post.thumbnail
-                                            ? `${apiUri}/post_picture/${post.thumbnail}`
-                                            : (thumbnail as string)
+                                        post.thumbnail ? `${post.thumbnail}` : (thumbnail as string)
                                     }
                                     alt={post.title}
                                     className="absolute top-0 left-0 w-full h-full object-cover cursor-pointer"

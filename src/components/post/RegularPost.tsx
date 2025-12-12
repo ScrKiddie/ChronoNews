@@ -10,8 +10,6 @@ import RegularPostSkeleton from '../ui/RegularPostSkeleton.tsx';
 import React from 'react';
 import SafeImage from '../ui/SafeImage.tsx';
 
-const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
-
 interface RegularPostProps {
     post: Post[] | null;
     loading: boolean;
@@ -60,11 +58,7 @@ const RegularPost: React.FC<RegularPostProps> = ({
                     >
                         <div className="relative flex-shrink-0 w-48 sm:w-56 md:w-64 lg:w-72 h-full bg-[#f59e0b] overflow-hidden">
                             <SafeImage
-                                src={
-                                    item.thumbnail
-                                        ? `${apiUri}/post_picture/${item.thumbnail}`
-                                        : (thumbnail as string)
-                                }
+                                src={item.thumbnail ? `${item.thumbnail}` : (thumbnail as string)}
                                 alt={item.title}
                                 className="absolute top-0 left-0 h-full w-full object-cover cursor-pointer"
                                 onClick={() => handleNavigate(item)}

@@ -5,7 +5,6 @@ import { PostService } from '../lib/api/postService.tsx';
 import { CategoryService } from '../lib/api/categoryService.tsx';
 import { truncateText } from '../lib/utils/truncateText.tsx';
 import { Menu } from 'primereact/menu';
-import { processContentForEditor } from '../lib/utils/contentProcessor.tsx';
 import { slugify } from '../lib/utils/slugify.tsx';
 import { getDateRangeInUnix } from '../lib/utils/dateUtils.tsx';
 import { getRelativeTime, formatDate } from '../lib/utils/postUtils.tsx';
@@ -83,7 +82,7 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
             const postData = await PostService.getPost(postId);
             return {
                 ...postData,
-                content: processContentForEditor(postData.content),
+                content: postData.content,
                 createdAt: formatDate(postData.createdAt),
                 updatedAt: postData.updatedAt ? formatDate(postData.updatedAt) : '',
             };
@@ -98,7 +97,7 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
             if (manualData?.post?.id === parseInt(postId)) {
                 return {
                     ...manualData.post,
-                    content: processContentForEditor(manualData.post.content),
+                    content: manualData.post.content,
                     createdAt: formatDate(manualData.post.createdAt),
                     updatedAt: manualData.post.updatedAt
                         ? formatDate(manualData.post.updatedAt)
@@ -110,7 +109,7 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
         return manualData?.post
             ? {
                   ...manualData.post,
-                  content: processContentForEditor(manualData.post.content),
+                  content: manualData.post.content,
                   createdAt: formatDate(manualData.post.createdAt),
                   updatedAt: manualData.post.updatedAt ? formatDate(manualData.post.updatedAt) : '',
               }

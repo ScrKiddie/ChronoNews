@@ -9,8 +9,6 @@ import React from 'react';
 import HeadlinePostSkeleton from '../ui/HeadlinePostSkeleton.tsx';
 import SafeImage from '../ui/SafeImage.tsx';
 
-const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
-
 interface HeadlinePostProps {
     headlinePost: Post | null;
     loading: boolean;
@@ -57,7 +55,7 @@ const HeadlinePost: React.FC<HeadlinePostProps> = ({
                         <SafeImage
                             src={
                                 headlinePost.thumbnail
-                                    ? `${apiUri}/post_picture/${headlinePost.thumbnail}`
+                                    ? `${headlinePost.thumbnail}`
                                     : (thumbnail as string)
                             }
                             alt={headlinePost.title}

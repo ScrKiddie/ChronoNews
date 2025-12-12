@@ -2,17 +2,14 @@ import { Post } from '../../types/post.tsx';
 import he from 'he';
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
-const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
 
 export function generatePostHead(post: Post): string {
     const postUrl = `${baseUrl}/post/${post.id}`;
 
-    const imageUrl = post.thumbnail
-        ? `${apiUri}/post_picture/${post.thumbnail}`
-        : `${baseUrl}/thumbnail.svg`;
+    const imageUrl = post.thumbnail ? `${post.thumbnail}` : `${baseUrl}/thumbnail.svg`;
 
     const authorImageUrl = post.user?.profilePicture
-        ? `${apiUri}/profile_picture/${post.user.profilePicture}`
+        ? `${post.user.profilePicture}`
         : `${baseUrl}/profilepicture.svg`;
 
     const publisherLogoUrl = `${baseUrl}/chrononews.svg`;

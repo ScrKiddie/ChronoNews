@@ -9,8 +9,6 @@ import { Menu } from 'primereact/menu';
 import { MenuItem } from 'primereact/menuitem';
 import { ProfileFormData, UserManagementFormData } from '../../types/user.tsx';
 
-const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
-
 interface UserModalProps<T extends ProfileFormData | UserManagementFormData> {
     visible: boolean;
     onClose: () => void;
@@ -131,7 +129,7 @@ const UserModal = <T extends ProfileFormData | UserManagementFormData>({
                                 croppedImage ||
                                 (typeof data?.profilePicture === 'string' &&
                                 data.profilePicture.trim() !== ''
-                                    ? `${apiUri}/profile_picture/${data?.profilePicture}`
+                                    ? `${data?.profilePicture}`
                                     : `${defaultProfilePicture}`)
                             }
                             className="size-[14rem] rounded-full"

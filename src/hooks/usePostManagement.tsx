@@ -7,10 +7,6 @@ import { UserService } from '../lib/api/userService.tsx';
 import { PostCreateSchema, PostUpdateSchema } from '../schemas/postSchema.tsx';
 import { useCropper } from './useCropper';
 import { handleApiError, showSuccessToast } from '../lib/utils/toastHandler.tsx';
-import {
-    processContentForEditor,
-    reverseProcessContentForServer,
-} from '../lib/utils/contentProcessor.tsx';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ToastRef } from '../types/toast.tsx';
 import { ApiPostRequest, DropdownOption, PostFormData } from '../types/post.tsx';
@@ -78,7 +74,7 @@ export const usePostManagement = ({ toastRef, pagination }: UsePostManagementPro
             const postData = await PostService.getPost(selectedPostId);
             return {
                 ...postData,
-                content: processContentForEditor(postData.content || ''),
+                content: postData.content || '',
                 userID: postData.user.id || 0,
                 categoryID: postData.category.id || 0,
                 deleteThumbnail: false,
@@ -308,7 +304,7 @@ export const usePostManagement = ({ toastRef, pagination }: UsePostManagementPro
                 };
                 await createPostMutation.mutateAsync(request);
             } else if (modalMode === 'edit' && selectedPostId) {
-                const cleanedContent = reverseProcessContentForServer(contentToSubmit);
+                const cleanedContent = contentToSubmit;
                 const request: PostFormData = {
                     ...validatedData,
                     content: cleanedContent || '',

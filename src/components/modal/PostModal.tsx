@@ -14,8 +14,6 @@ import { MenuItem } from 'primereact/menuitem';
 import Quill from 'quill';
 import defaultThumbnail from '../../../public/thumbnail.svg';
 
-const apiUri = import.meta.env.VITE_CHRONONEWSAPI_URI;
-
 interface CustomEditorChangeEvent {
     htmlValue: string | null;
     textValue: string;
@@ -282,7 +280,7 @@ const PostModal = ({
     const getThumbnailSource = () => {
         if (croppedImage) return croppedImage;
         if (data?.thumbnail && typeof data.thumbnail === 'string' && data.thumbnail.trim() !== '') {
-            return `${apiUri}/post_picture/${data.thumbnail}`;
+            return `${data.thumbnail}`;
         }
         return defaultThumbnail;
     };

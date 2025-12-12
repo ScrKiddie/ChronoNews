@@ -1,6 +1,5 @@
 import { PostService } from '../api/postService.tsx';
 import { CategoryService } from '../api/categoryService.tsx';
-import { processContentForEditor } from './contentProcessor.tsx';
 import { formatDate, getRelativeTime } from './postUtils.tsx';
 import { slugify } from './slugify.tsx';
 import { getDateRangeInUnix } from './dateUtils.tsx';
@@ -9,7 +8,6 @@ import { InitialDataStructure } from '../../types/initialData.tsx';
 
 export default async function fetchInitialData(pathname: string, searchParams: URLSearchParams) {
     const utils = {
-        processContentForEditor,
         formatDate,
         getRelativeTime,
         slugify,
@@ -42,7 +40,7 @@ export default async function fetchInitialData(pathname: string, searchParams: U
                 if (postData) {
                     mainPost = {
                         ...postData,
-                        content: utils.processContentForEditor(postData.content),
+                        content: postData.content,
                         createdAt: utils.formatDate(postData.createdAt),
                         updatedAt: postData.updatedAt ? utils.formatDate(postData.updatedAt) : '',
                     };
