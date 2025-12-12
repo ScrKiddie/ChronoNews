@@ -327,8 +327,13 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
             (isSearchPage && searchQueryQuery.isSuccess) || (isPostPage && mainPostQuery.isSuccess);
 
         const isCategoriesBroken =
-            (categoriesQuery.isError || !categories || categories.length === 0) &&
-            !categoriesQuery.isFetching;
+            (categoriesQuery.isError || !categories) &&
+            !categoriesQuery.isFetching &&
+            !categoriesQuery.isLoading;
+
+        if (categoriesQuery.isSuccess && categories && categories.length === 0) {
+            return;
+        }
 
         if (isMainContentSafe && isCategoriesBroken) {
             categoriesQuery.refetch();
@@ -349,6 +354,8 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
         mainPostQuery.isSuccess,
         categoriesQuery.isError,
         categoriesQuery.isFetching,
+        categoriesQuery.isLoading,
+        categoriesQuery.isSuccess,
         categories,
         manualData?.generalError,
         categoriesQuery,
