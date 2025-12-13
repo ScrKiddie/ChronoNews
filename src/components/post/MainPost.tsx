@@ -3,13 +3,11 @@ import { Button } from 'primereact/button';
 import { BreadCrumb, BreadCrumbProps } from 'primereact/breadcrumb';
 import defaultProfilePicture from '../../../public/profilepicture.svg';
 import thumbnail from '../../../public/thumbnail.svg';
-import { truncateText } from '../../lib/utils/truncateText.tsx';
 import { Post } from '../../types/post.tsx';
 import MainPostSkeleton from '../ui/MainPostSkeleton.tsx';
-
 import DOMPurify from 'isomorphic-dompurify';
-
-import 'quill/dist/quill.snow.css';
+import { truncateText } from '../../lib/utils/truncateText.tsx';
+import { Editor } from 'primereact/editor';
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -130,13 +128,13 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
 
     return (
         <>
-            <main className={`break-all`}>
+            <main className="break-word">
                 <BreadCrumb model={breadcrumbItems} />
 
                 <h1 className="text-[#475569] font-semibold text-3xl">{mainPost.title}</h1>
                 <small className="text-[#475569] mb-2 mt-2">{mainPost.summary}</small>
 
-                <div className="relative w-full h-0 pb-[56.25%] bg-[#f59e0b] overflow-hidden">
+                <div className="relative w-full aspect-[16/9] bg-[#f59e0b] overflow-hidden">
                     <img
                         src={mainPost?.thumbnail ? mainPost?.thumbnail : (thumbnail as string)}
                         alt={mainPost.title || 'Post Thumbnail'}
@@ -147,12 +145,13 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
                         <span>{mainPost.viewCount}</span>
                     </div>
                 </div>
-                <div className="flex justify-between my-4 flex-row lg:gap-0 ">
+
+                <div className="flex justify-between my-4 flex-row lg:gap-0">
                     <div className="flex gap-2 items-center">
                         <img
                             src={
                                 mainPost.user?.profilePicture
-                                    ? `${mainPost.user.profilePicture}`
+                                    ? mainPost.user.profilePicture
                                     : (defaultProfilePicture as string)
                             }
                             className="size-[2.6rem] lg:size-[3rem] rounded-full"
@@ -167,7 +166,7 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
                                 Diterbitkan: {mainPost.createdAt}
                                 {mainPost.updatedAt && (
                                     <button
-                                        className="bg-transparent border-none outline-none cursor-pointer"
+                                        className="bg-transparent border-none outline-none cursor-pointer flex items-center justify-center"
                                         onClick={toggleUpdatedAt}
                                     >
                                         <i
@@ -203,19 +202,19 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
                     style={{ borderTop: '1px solid #8496af' }}
                 ></div>
 
-                <div className="ql-snow">
-                    <div
-                        className="ql-editor content-view min-h-0 !p-0"
-                        contentEditable={false}
-                        dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-                    />
-                </div>
+                <Editor
+                    key={mainPost.id}
+                    className="content-view min-h-0"
+                    headerTemplate={<></>}
+                    value={sanitizedContent}
+                    readOnly
+                />
 
                 <div
                     className="w-full my-4 opacity-30"
                     style={{ borderTop: '1px solid #8496af' }}
                 ></div>
-                <div id="disqus_thread" className={`mt-8 mb-4`}></div>
+                <div id="disqus_thread" className="mt-8 mb-4"></div>
             </main>
         </>
     );

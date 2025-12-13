@@ -2,7 +2,6 @@ import { DataView } from 'primereact/dataview';
 import { Paginator, PaginatorPageChangeEvent } from 'primereact/paginator';
 import { useNavigate } from 'react-router-dom';
 import thumbnail from '../../../public/thumbnail.svg';
-import { truncateText } from '../../lib/utils/truncateText.tsx';
 import { slugify } from '../../lib/utils/slugify.tsx';
 import { Post } from '../../types/post.tsx';
 import { Pagination } from '../../types/pagination.tsx';
@@ -54,9 +53,9 @@ const RegularPost: React.FC<RegularPostProps> = ({
                 itemTemplate={(item: Post) => (
                     <div
                         key={item.id}
-                        className={`flex mb-3 break-all justify-between h-40 shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg overflow-hidden`}
+                        className="flex mb-4 break-word justify-between h-40 shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg overflow-hidden"
                     >
-                        <div className="relative flex-shrink-0 w-48 sm:w-56 md:w-64 lg:w-72 h-full bg-[#f59e0b] overflow-hidden">
+                        <div className="relative flex-shrink-0 w-48 sm:w-56 md:w-64 lg:w-72 h-full bg-[#f49f14] overflow-hidden">
                             <SafeImage
                                 src={item.thumbnail ? `${item.thumbnail}` : (thumbnail as string)}
                                 alt={item.title}
@@ -68,27 +67,28 @@ const RegularPost: React.FC<RegularPostProps> = ({
                                 <span>{item.viewCount}</span>
                             </div>
                         </div>
-                        <div className="flex-1 flex flex-col lg:p-4 p-3">
+                        <div className="flex-1 flex flex-col p-3 lg:p-4">
                             <h3
-                                className="text-lg md:text-xl font-semibold cursor-pointer w-fit line-clamp-2 text-gray-800"
+                                className="text-lg md:text-xl font-semibold cursor-pointer w-fit line-clamp-2 text-gray-800 mb-1"
                                 onClick={() => handleNavigate(item)}
                             >
                                 {item.title}
                             </h3>
-                            <p className="text-sm md:text-base text-gray-600 mb-1">
+                            <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
                                 <span
-                                    className="no-underline hover:text-gray-600 cursor-pointer"
+                                    className="font-medium cursor-pointer"
                                     onClick={() => {
                                         if (item.category?.name) {
                                             handleCategoryChange(item.category.name.toLowerCase());
                                         }
                                     }}
                                 >
-                                    {truncateText(item.category?.name || '', 13)}
-                                </span>{' '}
-                                - {item.createdAt}
-                            </p>
-                            <p className="md:line-clamp-2 line-clamp-5 text-sm md:text-base break-all text-gray-700">
+                                    {item.category?.name}
+                                </span>
+                                <span className="text-gray-400">•</span>
+                                <time className="text-gray-500">{item.createdAt}</time>
+                            </div>
+                            <p className="text-sm md:text-base line-clamp-2 text-gray-700">
                                 {item.summary}
                             </p>
                         </div>
@@ -103,6 +103,7 @@ const RegularPost: React.FC<RegularPostProps> = ({
                     totalRecords={postPagination.totalItem || 0}
                     onPageChange={(e: PaginatorPageChangeEvent) => handlePageChange(e.page + 1)}
                     template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink"
+                    className="mt-4"
                 />
             )}
         </div>

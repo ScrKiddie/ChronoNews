@@ -11,7 +11,7 @@ const HeadlinePostSkeleton: React.FC = () => {
                         className="absolute top-0 left-0 !rounded-none"
                     />
                 </div>
-                <div className="px-4 pb-6 pt-2">
+                <div className="p-4 ">
                     <Skeleton width="80%" height="2.25rem" className="mb-3" />
                     <Skeleton width="40%" height="1.25rem" className="mb-3" />
                     <div className="flex-grow">

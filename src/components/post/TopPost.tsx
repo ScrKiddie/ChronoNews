@@ -1,7 +1,6 @@
 import { Paginator, PaginatorPageChangeEvent } from 'primereact/paginator';
 import { useNavigate } from 'react-router-dom';
 import thumbnail from '../../../public/thumbnail.svg';
-import { truncateText } from '../../lib/utils/truncateText.tsx';
 import { slugify } from '../../lib/utils/slugify.tsx';
 import { Post } from '../../types/post.tsx';
 import { Pagination } from '../../types/pagination.tsx';
@@ -47,9 +46,9 @@ const TopPost: FC<TopPostProps> = ({
         <div className="mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {topPost.map((post) => (
-                    <div key={post.id} className="break-all">
+                    <div key={post.id} className="break-word">
                         <div className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg flex flex-col h-full">
-                            <div className="relative w-full aspect-[16/9] bg-[#f59e0b] rounded-t-lg overflow-hidden">
+                            <div className="relative w-full aspect-[16/9] bg-[#f49f14] rounded-t-lg overflow-hidden">
                                 <SafeImage
                                     src={
                                         post.thumbnail ? `${post.thumbnail}` : (thumbnail as string)
@@ -65,14 +64,14 @@ const TopPost: FC<TopPostProps> = ({
                             </div>
                             <div className="p-4 flex flex-col flex-grow">
                                 <h3
-                                    className="text-lg md:text-xl font-semibold w-fit cursor-pointer line-clamp-2 text-gray-800"
+                                    className="text-lg md:text-xl font-semibold w-fit cursor-pointer line-clamp-2 text-gray-800 mb-1"
                                     onClick={() => handleNavigate(post)}
                                 >
                                     {post.title}
                                 </h3>
-                                <p className="text-sm md:text-base text-gray-600">
+                                <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
                                     <span
-                                        className="no-underline hover:text-gray-600 cursor-pointer"
+                                        className="font-medium cursor-pointer"
                                         onClick={() => {
                                             if (post.category?.name) {
                                                 handleCategoryChange(
@@ -81,11 +80,12 @@ const TopPost: FC<TopPostProps> = ({
                                             }
                                         }}
                                     >
-                                        {truncateText(post.category?.name || '', 13)}
-                                    </span>{' '}
-                                    - {post.createdAt}
-                                </p>
-                                <p className="mt-1 line-clamp-3 text-sm md:text-base flex-grow text-gray-700">
+                                        {post.category?.name}
+                                    </span>
+                                    <span className="text-gray-400">•</span>
+                                    <time className="text-gray-500">{post.createdAt}</time>
+                                </div>
+                                <p className="text-sm md:text-base line-clamp-3 flex-grow text-gray-700">
                                     {post.summary}
                                 </p>
                             </div>
