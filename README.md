@@ -22,14 +22,15 @@ ChronoNews is a modern news platform with a Hybrid SPA & SSR architecture, deliv
 
 ## Environment Variables
 
-| **Key**                     | **Type** | **Description**                                                                         | **Example**                |
-| --------------------------- | -------- | --------------------------------------------------------------------------------------- | -------------------------- |
-| **NODE_ENV**                | `string` | Defines the application environment (`development` or `production`).                    | `production`               |
-| **PORT**                    | `number` | The port on which the server will run.                                                  | `5137`                     |
-| **VITE_BASE_URL**           | `string` | The public URL of the frontend (Required for SEO, Canonical links, and OG tags).        | `https://yourdomain.com`   |
-| **VITE_TURNSTILE_SITE_KEY** | `string` | Turnstile (reCAPTCHA) site key                                                          | `0x4AAABABA_vmrAXsPDzuG1l` |
-| **VITE_CHRONONEWSAPI_URI**  | `string` | URL of the backend API from [ChronoNewsAPI](https://github.com/ScrKiddie/ChronoNewsAPI) | `http://localhost:6969`    |
-| **VITE_DISQUS_SHORTNAME**   | `string` | Disqus shortname for your site                                                          | `your-shortname`           |
+| **Key**                           | **Type** | **Description**                                                                         | **Example**                 |
+| --------------------------------- | -------- | --------------------------------------------------------------------------------------- | --------------------------- |
+| **NODE_ENV**                      | `string` | Defines the application environment (`development` or `production`).                    | `production`                |
+| **PORT**                          | `number` | The port on which the server will run.                                                  | `5137`                      |
+| **VITE_GOOGLE_VERIFICATION_CODE** | `string` | Code from Google Search Console for domain ownership verification.                      | `Llyo9DGOTzQ5OxYtMCFkIH3_u` |
+| **VITE_BASE_URL**                 | `string` | The public URL of the frontend (Required for SEO, Canonical links, and OG tags).        | `https://yourdomain.com`    |
+| **VITE_TURNSTILE_SITE_KEY**       | `string` | Turnstile (reCAPTCHA) site key                                                          | `0x4AAABABA_vmrAXsPDzuG1l`  |
+| **VITE_CHRONONEWSAPI_URI**        | `string` | URL of the backend API from [ChronoNewsAPI](https://github.com/ScrKiddie/ChronoNewsAPI) | `http://localhost:6969`     |
+| **VITE_DISQUS_SHORTNAME**         | `string` | Disqus shortname for your site                                                          | `your-shortname`            |
 
 ## Setup & Run
 
