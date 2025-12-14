@@ -64,7 +64,23 @@ async function handleRequest(req, res, url, renderFunction, protocol) {
     const templatePath = isProd ? resolve('dist/client/index.html') : resolve('index.html');
     const template = await fs.readFile(templatePath, 'utf-8');
     const htmlTemplate = isProd ? template : await vite.transformIndexHtml(url, template);
-    let html = htmlTemplate.replace('<!--ssr-outlet-->', '');
+
+    let html = htmlTemplate.replace('<!--ssr-head-outlet-->', '');
+
+    let defaultHead = '';
+    try {
+        const entryModule = isProd
+            ? await import('./dist/server/entry-server.js')
+            : await vite.ssrLoadModule('/src/entry-server.tsx');
+
+        if (entryModule.generateDefaultHead) {
+            defaultHead = entryModule.generateDefaultHead();
+        }
+    } catch (e) {
+        console.error(e);
+    }
+
+    html = html.replace('', defaultHead);
 
     if (GOOGLE_VERIFICATION_CODE) {
         html = html.replace('%VITE_GOOGLE_VERIFICATION_CODE%', GOOGLE_VERIFICATION_CODE);

@@ -4,6 +4,8 @@ import App from './App';
 import fetchInitialData from './lib/utils/fetchInitialData.tsx';
 import { generatePostHead, generateDefaultHead } from './lib/utils/generatePostHead.tsx';
 
+export { generateDefaultHead };
+
 interface RenderOptions {
     url: string;
 }

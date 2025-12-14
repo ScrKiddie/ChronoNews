@@ -8,6 +8,7 @@ import { Route, Routes } from 'react-router-dom';
 import GuestRoutes from './routes/GuestRoutes.tsx';
 import AuthRoutes from './routes/AuthRoutes.tsx';
 import { InitialDataStructure } from './types/initialData.tsx';
+import { GlobalHeadManager } from './components/layout/GlobalHeadManager.tsx';
 
 interface AppProps {
     initialData?: InitialDataStructure;
@@ -53,6 +54,7 @@ const App = ({ initialData }: AppProps) => {
             <AuthProvider>
                 <PrimeReactProvider value={primeReactConfig}>
                     <ToastProvider>
+                        <GlobalHeadManager />
                         <Routes>
                             <Route path="/*" element={<GuestRoutes initialData={initialData} />} />
                             <Route path="/admin/*" element={<AuthRoutes />} />

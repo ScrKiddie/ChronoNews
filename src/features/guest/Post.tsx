@@ -20,7 +20,6 @@ import { Dropdown } from 'primereact/dropdown';
 import { Skeleton } from 'primereact/skeleton';
 import SafeImage from '../../components/ui/SafeImage.tsx';
 import { InitialDataStructure } from '../../types/initialData.tsx';
-import { restoreDefaultHead } from '../../lib/utils/restoreHead.tsx';
 import { FadeWrapper } from '../../components/ui/FadeWrapper.tsx';
 
 interface PostProps {
@@ -79,12 +78,6 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
     } = usePost(initialData, isDesktop);
 
     const navigate = useNavigate();
-
-    useEffect(() => {
-        if (!isPostPage) {
-            restoreDefaultHead();
-        }
-    }, [isPostPage]);
 
     const handleRetry = async () => {
         setIsRetrying(true);
