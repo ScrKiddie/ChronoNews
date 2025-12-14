@@ -486,3 +486,22 @@ body .navbar-top {
 .ql-editor li.ql-indent-3 {
     padding-left: 9em;
 }
+
+.custom-button-phone {
+    border-radius: 6px 0px 0px 6px !important;
+}
+
+.custom-button-phone .p-button-label {
+    font-weight: inherit;
+}
+
+.country-picker-panel {
+    min-width: 300px !important;
+    width: 300px !important;
+}
+@media screen and (max-width: 400px) {
+    .country-picker-panel {
+        min-width: 90vw !important;
+        width: 90vw !important;
+    }
+}

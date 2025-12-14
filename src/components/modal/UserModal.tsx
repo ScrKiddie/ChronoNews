@@ -8,6 +8,7 @@ import { useSidebar } from '../../hooks/useSidebar.tsx';
 import { Menu } from 'primereact/menu';
 import { MenuItem } from 'primereact/menuitem';
 import { ProfileFormData, UserManagementFormData } from '../../types/user.tsx';
+import PhoneNumberInput from '../ui/PhoneNumberInput.tsx';
 
 interface UserModalProps<T extends ProfileFormData | UserManagementFormData> {
     visible: boolean;
@@ -218,14 +219,14 @@ const UserModal = <T extends ProfileFormData | UserManagementFormData>({
                     </div>
 
                     <div className="w-full">
-                        <InputGroup
+                        <PhoneNumberInput
                             label="Telepon"
-                            data={data.phoneNumber || ''}
+                            value={data.phoneNumber || ''}
                             error={errors.phoneNumber}
-                            setData={(e: string) =>
+                            onChange={(val) =>
                                 setData((prev) => ({
                                     ...prev,
-                                    phoneNumber: e,
+                                    phoneNumber: val,
                                 }))
                             }
                             setError={(e: string) => {

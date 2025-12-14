@@ -21,10 +21,13 @@ export const validatePhoneNumber = z.string().superRefine((value, ctx) => {
         });
         return;
     }
-    if (value.length > 20) {
+
+    const E164_REGEX = /^\+[1-9]\d{6,14}$/;
+
+    if (!E164_REGEX.test(value)) {
         ctx.addIssue({
             code: 'custom',
-            message: 'Nomor telepon maksimal 20 karakter',
+            message: 'Nomor telepon tidak valid',
         });
     }
 });

@@ -133,13 +133,15 @@ const Home = () => {
                                     className="h-full w-full flex flex-col items-center justify-center"
                                     style={{ fontFamily: 'Poppins' }}
                                 >
-                                    <div className="flex w-full flex-col items-center justify-center h-full text-center">
-                                        <div className="text-xl font-medium mb-4">{item.title}</div>
-                                        {item.icon && (
-                                            <div className="text-4xl mb-4">{item.icon}</div>
-                                        )}
-                                        <div className="text-xl text-center">{item.desc}</div>
+                                    <div className="text-xl font-medium mb-4 flex items-center justify-center">
+                                        {item.title}
                                     </div>
+                                    {item.icon && (
+                                        <div className="text-4xl mb-4 flex items-center justify-center">
+                                            {item.icon}
+                                        </div>
+                                    )}
+                                    <div className="text-xl text-center">{item.desc}</div>
                                 </Card>
                             </div>
                         ))}
