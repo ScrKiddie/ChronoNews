@@ -6,11 +6,6 @@ export default defineConfig({
     server: {
         allowedHosts: ['localhost'],
     },
-    resolve: {
-        alias: {
-            'primereact/api': 'primereact/api/api.esm.js',
-        },
-    },
     ssr: {
         noExternal: ['primereact'],
     },

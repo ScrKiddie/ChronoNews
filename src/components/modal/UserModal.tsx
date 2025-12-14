@@ -4,10 +4,10 @@ import defaultProfilePicture from '../../../public/profilepicture.svg';
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import InputGroup from '../ui/InputGroup.tsx';
 import SubmitButton from '../ui/SubmitButton.tsx';
-import { useSidebar } from '../../hooks/useSidebar.tsx';
+import { useSidebar } from '../../hooks/useSidebar.ts';
 import { Menu } from 'primereact/menu';
 import { MenuItem } from 'primereact/menuitem';
-import { ProfileFormData, UserManagementFormData } from '../../types/user.tsx';
+import { ProfileFormData, UserManagementFormData } from '../../types/user.ts';
 import PhoneNumberInput from '../ui/PhoneNumberInput.tsx';
 
 interface UserModalProps<T extends ProfileFormData | UserManagementFormData> {

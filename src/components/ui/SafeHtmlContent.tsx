@@ -1,5 +1,5 @@
 import React from 'react';
-import parse, { DOMNode, Element, domToReact } from 'html-react-parser';
+import parse, { DOMNode, Element as HTMLElement, domToReact } from 'html-react-parser';
 import ContentSafeImage from './ContentSafeImage';
 
 interface SafeHtmlContentProps {
@@ -8,7 +8,7 @@ interface SafeHtmlContentProps {
 }
 
 const parseStyle = (styleString?: string): React.CSSProperties => {
-    const styleObj: React.CSSProperties = {};
+    const styleObj: Record<string, string> = {};
     if (styleString) {
         styleString.split(';').forEach((styleRule) => {
             const rule = styleRule.trim();
@@ -16,45 +16,45 @@ const parseStyle = (styleString?: string): React.CSSProperties => {
                 const [key, value] = rule.split(':').map((s) => s.trim());
                 if (key && value) {
                     const camelKey = key.replace(/-./g, (x) => x[1].toUpperCase());
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
                     styleObj[camelKey] = value;
                 }
             }
         });
     }
-    return styleObj;
+    return styleObj as React.CSSProperties;
 };
 
 const SafeHtmlContent: React.FC<SafeHtmlContentProps> = ({ content, className }) => {
     const options = {
         replace: (domNode: DOMNode) => {
-            if (domNode instanceof Element) {
-                if (domNode.name === 'p') {
-                    const hasImageChild = domNode.children.some(
-                        (child) => child instanceof Element && child.name === 'img'
+            if ('name' in domNode && 'attribs' in domNode) {
+                const element = domNode as HTMLElement;
+
+                if (element.name === 'p') {
+                    const hasImageChild = element.children.some(
+                        (child) => 'name' in child && (child as HTMLElement).name === 'img'
                     );
 
-                    const originalClass = domNode.attribs.class || '';
-                    const parsedStyle = parseStyle(domNode.attribs.style);
+                    const originalClass = element.attribs.class || '';
+                    const parsedStyle = parseStyle(element.attribs.style);
 
                     if (hasImageChild) {
                         return (
                             <div className={`${originalClass}`} style={parsedStyle}>
-                                {domToReact(domNode.children as DOMNode[], options)}
+                                {domToReact(element.children as DOMNode[], options)}
                             </div>
                         );
                     } else {
                         return (
                             <p className={`${originalClass}`} style={parsedStyle}>
-                                {domToReact(domNode.children as DOMNode[], options)}
+                                {domToReact(element.children as DOMNode[], options)}
                             </p>
                         );
                     }
                 }
 
-                if (domNode.name === 'img') {
-                    const { src, alt, class: imgClass, style, ...otherAttribs } = domNode.attribs;
+                if (element.name === 'img') {
+                    const { src, alt, class: imgClass, style, ...otherAttribs } = element.attribs;
                     const parsedStyle = parseStyle(style);
 
                     return (

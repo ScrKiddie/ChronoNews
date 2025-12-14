@@ -1,8 +1,8 @@
 import ReactDOMServer from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom/server';
 import App from './App';
-import fetchInitialData from './lib/utils/fetchInitialData.tsx';
-import { generatePostHead, generateDefaultHead } from './lib/utils/generatePostHead.tsx';
+import initialDataUtils from './utils/initialDataUtils.ts';
+import { headUtils, generateDefaultHead } from './utils/headUtils.ts';
 
 export { generateDefaultHead };
 
@@ -16,7 +16,7 @@ export async function render(options: RenderOptions) {
     const pathname = urlObj.pathname;
     const searchParams = urlObj.searchParams;
 
-    const dataOrRedirect = await fetchInitialData(pathname, searchParams);
+    const dataOrRedirect = await initialDataUtils(pathname, searchParams);
 
     if ('redirect' in dataOrRedirect) {
         return { redirect: dataOrRedirect.redirect };
@@ -24,7 +24,7 @@ export async function render(options: RenderOptions) {
 
     let headHtml;
     if (dataOrRedirect.post) {
-        headHtml = generatePostHead(dataOrRedirect.post);
+        headHtml = headUtils(dataOrRedirect.post);
     } else {
         headHtml = generateDefaultHead();
     }

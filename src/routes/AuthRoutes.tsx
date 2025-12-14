@@ -1,11 +1,11 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth.tsx';
-import Home from '../features/auth/Home.tsx';
-import Journalist from '../features/auth/Journalist.tsx';
-import NotFound from '../features/guest/NotFound';
+import { useAuth } from '../hooks/useAuth';
+import Home from '../pages/auth/Home.tsx';
+import Journalist from '../pages/auth/Journalist.tsx';
+import NotFound from '../pages/guest/NotFound';
 import SidebarResponsive from '../components/layout/SidebarResponsive.tsx';
-import Category from '../features/auth/Category.tsx';
-import Post from '../features/auth/Post.tsx';
+import Category from '../pages/auth/Category.tsx';
+import Post from '../pages/auth/Post.tsx';
 
 const AuthRoutes = () => {
     const { token, isAuthChecked, role } = useAuth();

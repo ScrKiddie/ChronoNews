@@ -8,14 +8,14 @@ import 'cropperjs/dist/cropper.css';
 import CropImageModal from '../modal/CropImageModal.tsx';
 import UserModal from '../modal/UserModal.tsx';
 import LoadingModal from '../modal/LoadingModal.tsx';
-import { useSidebar } from '../../hooks/useSidebar.tsx';
+import { useSidebar } from '../../hooks/useSidebar';
 import LogoutModal from '../modal/LogoutModal.tsx';
-import { usePassword } from '../../hooks/usePassword.tsx';
+import { usePassword } from '../../hooks/usePassword';
 import PasswordModal from '../modal/PasswordModal.tsx';
-import { useToast } from '../../hooks/useToast.tsx';
-import { useAuth } from '../../hooks/useAuth.tsx';
+import { useToast } from '../../hooks/useToast';
+import { useAuth } from '../../hooks/useAuth';
 import { useLocation } from 'react-router-dom';
-import { useProfile } from '../../hooks/useProfile.tsx';
+import { useProfile } from '../../hooks/useProfile';
 
 interface SidebarResponsiveProps {
     children: ReactNode;

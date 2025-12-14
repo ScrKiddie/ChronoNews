@@ -5,8 +5,8 @@ import './index.css';
 import App from './App.tsx';
 
 const container = document.getElementById('root')!;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const initialData = (window as any).__INITIAL_DATA__;
+
+const initialData = window.__INITIAL_DATA__;
 
 const appElement = (
     <StrictMode>

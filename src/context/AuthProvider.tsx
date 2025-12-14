@@ -1,7 +1,7 @@
 import { ReactNode, useState, useEffect, useCallback } from 'react';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
-import apiClient, { setOnUnauthorized } from '../lib/api/apiClient';
+import apiClientUtils, { setOnUnauthorized } from '../utils/apiClientUtils.ts';
 import { AuthContext, AuthContextType, DecodedToken } from './AuthContext';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 if (decoded.exp < currentTime) {
                     logout();
                 } else {
-                    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                    apiClientUtils.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                     setRole(decoded.role);
                     setSub(decoded.sub);
                 }
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 logout();
             }
         } else {
-            delete apiClient.defaults.headers.common['Authorization'];
+            delete apiClientUtils.defaults.headers.common['Authorization'];
         }
         setIsAuthChecked(true);
     }, [token, logout]);

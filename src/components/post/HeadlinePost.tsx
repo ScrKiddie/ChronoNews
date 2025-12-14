@@ -1,9 +1,9 @@
 import { Paginator, PaginatorPageChangeEvent } from 'primereact/paginator';
 import { useNavigate } from 'react-router-dom';
 import thumbnail from '../../../public/thumbnail.svg';
-import { slugify } from '../../lib/utils/slugify.tsx';
-import { Post } from '../../types/post.tsx';
-import { Pagination } from '../../types/pagination.tsx';
+import { slugify } from '../../utils/postUtils.ts';
+import { Post } from '../../types/post.ts';
+import { Pagination } from '../../types/pagination.ts';
 import React from 'react';
 import HeadlinePostSkeleton from '../ui/HeadlinePostSkeleton.tsx';
 import SafeImage from '../ui/SafeImage.tsx';

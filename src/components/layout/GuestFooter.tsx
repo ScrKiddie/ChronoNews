@@ -1,9 +1,9 @@
 import React from 'react';
 import ChronoNewsLogo from '../../../public/chrononews.svg';
 import { Link } from 'react-router-dom';
-import { truncateText } from '../../lib/utils/truncateText.tsx';
+import { truncateText } from '../../utils/postUtils.ts';
 import SafeImage from '../ui/SafeImage.tsx';
-import { Category } from '../../types/category.tsx';
+import { Category } from '../../types/category.ts';
 
 interface GuestFooterProps {
     quickLinks: Category[];

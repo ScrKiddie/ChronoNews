@@ -1,10 +1,10 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Login from '../features/guest/Login.tsx';
-import NotFound from '../features/guest/NotFound.tsx';
-import Post from '../features/guest/Post.tsx';
-import Reset from '../features/guest/Reset.tsx';
-import Forgot from '../features/guest/ResetRequest.tsx';
-import { InitialDataStructure } from '../types/initialData.tsx';
+import Login from '../pages/guest/Login.tsx';
+import NotFound from '../pages/guest/NotFound.tsx';
+import Post from '../pages/guest/Post.tsx';
+import Reset from '../pages/guest/Reset.tsx';
+import Forgot from '../pages/guest/ResetRequest.tsx';
+import { InitialDataStructure } from '../types/initialData.ts';
 
 interface GuestRoutesProps {
     initialData?: InitialDataStructure;

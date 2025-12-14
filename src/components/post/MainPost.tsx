@@ -3,10 +3,10 @@ import { Button } from 'primereact/button';
 import { BreadCrumb, BreadCrumbProps } from 'primereact/breadcrumb';
 import defaultProfilePicture from '../../../public/profilepicture.svg';
 import thumbnail from '../../../public/thumbnail.svg';
-import { Post } from '../../types/post.tsx';
+import { Post } from '../../types/post.ts';
 import MainPostSkeleton from '../ui/MainPostSkeleton.tsx';
 import DOMPurify from 'isomorphic-dompurify';
-import { truncateText } from '../../lib/utils/truncateText.tsx';
+import { truncateText } from '../../utils/postUtils.ts';
 import SafeImage from '../ui/SafeImage.tsx';
 import { Skeleton } from 'primereact/skeleton';
 import SafeHtmlContent from '../ui/SafeHtmlContent.tsx';
@@ -26,8 +26,8 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
         if (!mainPost?.id) return;
 
         setDisqusReady(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const disqusConfig = function (this: any) {
+
+        const disqusConfig: DisqusConfigFunction = function (this: DisqusConfig) {
             this.page.identifier = mainPost.id!.toString();
             this.page.url = window.location.href;
 
@@ -39,14 +39,12 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
         };
 
         if (window.DISQUS) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (window.DISQUS as any).reset({
+            window.DISQUS.reset({
                 reload: true,
                 config: disqusConfig,
             });
         } else {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (window as any).disqus_config = disqusConfig;
+            window.disqus_config = disqusConfig;
 
             const script = document.createElement('script');
             script.src = `https://${import.meta.env.VITE_DISQUS_SHORTNAME}.disqus.com/embed.js`;

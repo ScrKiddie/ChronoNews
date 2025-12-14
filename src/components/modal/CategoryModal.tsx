@@ -2,7 +2,7 @@ import { Dialog } from 'primereact/dialog';
 import InputGroup from '../ui/InputGroup.tsx';
 import SubmitButton from '../ui/SubmitButton.tsx';
 import React, { Dispatch, SetStateAction } from 'react';
-import { Category } from '../../types/category.tsx';
+import { Category } from '../../types/category.ts';
 
 interface CategoryModalProps {
     visible: boolean;

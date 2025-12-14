@@ -3,7 +3,7 @@ import InputGroup from '../ui/InputGroup.tsx';
 import SubmitButton from '../ui/SubmitButton.tsx';
 import React, { Dispatch, SetStateAction } from 'react';
 import { z } from 'zod';
-import { PasswordSchema } from '../../schemas/passwordSchema.tsx';
+import { PasswordSchema } from '../../schemas/passwordSchema.ts';
 
 type PasswordData = z.infer<typeof PasswordSchema>;
 

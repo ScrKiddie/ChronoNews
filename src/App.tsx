@@ -7,7 +7,7 @@ import { APIOptions, PrimeReactProvider } from 'primereact/api';
 import { Route, Routes } from 'react-router-dom';
 import GuestRoutes from './routes/GuestRoutes.tsx';
 import AuthRoutes from './routes/AuthRoutes.tsx';
-import { InitialDataStructure } from './types/initialData.tsx';
+import { InitialDataStructure } from './types/initialData.ts';
 import { GlobalHeadManager } from './components/layout/GlobalHeadManager.tsx';
 import { useEffect } from 'react';
 
