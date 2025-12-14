@@ -7,7 +7,9 @@ import { Post } from '../../types/post.tsx';
 import MainPostSkeleton from '../ui/MainPostSkeleton.tsx';
 import DOMPurify from 'isomorphic-dompurify';
 import { truncateText } from '../../lib/utils/truncateText.tsx';
-import { Editor } from 'primereact/editor';
+import SafeImage from '../ui/SafeImage.tsx';
+import { Skeleton } from 'primereact/skeleton';
+import SafeHtmlContent from '../ui/SafeHtmlContent.tsx';
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -18,20 +20,34 @@ interface MainPostProps {
 
 const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) => {
     const [showUpdatedAt, setShowUpdatedAt] = useState(false);
+    const [disqusReady, setDisqusReady] = useState(false);
 
     useEffect(() => {
         if (!mainPost?.id) return;
+
+        setDisqusReady(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const disqusConfig = function (this: any) {
+            this.page.identifier = mainPost.id!.toString();
+            this.page.url = window.location.href;
+
+            this.callbacks.onReady = [
+                function () {
+                    setDisqusReady(true);
+                },
+            ];
+        };
 
         if (window.DISQUS) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (window.DISQUS as any).reset({
                 reload: true,
-                config: function () {
-                    this.page.identifier = mainPost.id!.toString();
-                    this.page.url = window.location.href;
-                },
+                config: disqusConfig,
             });
         } else {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (window as any).disqus_config = disqusConfig;
+
             const script = document.createElement('script');
             script.src = `https://${import.meta.env.VITE_DISQUS_SHORTNAME}.disqus.com/embed.js`;
             script.setAttribute('data-timestamp', Date.now().toString());
@@ -97,7 +113,7 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
             label: 'Beranda',
             template: () => (
                 <span
-                    className="text-[#475569]  cursor-pointer font-[600]"
+                    className="text-gray-700  cursor-pointer font-[600]"
                     onClick={() => {
                         handleCategoryChange('beranda');
                     }}
@@ -131,11 +147,11 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
             <main className="break-word">
                 <BreadCrumb model={breadcrumbItems} />
 
-                <h1 className="text-[#475569] font-semibold text-3xl">{mainPost.title}</h1>
-                <small className="text-[#475569] mb-2 mt-2">{mainPost.summary}</small>
+                <h1 className="text-gray-700 font-semibold text-3xl">{mainPost.title}</h1>
+                <small className="text-gray-700 mb-2 mt-2">{mainPost.summary}</small>
 
-                <div className="relative w-full aspect-[16/9] bg-[#f59e0b] overflow-hidden">
-                    <img
+                <div className="relative w-full aspect-[16/9] bg-gray-200 overflow-hidden rounded-xl shadow-sm my-4">
+                    <SafeImage
                         src={mainPost?.thumbnail ? mainPost?.thumbnail : (thumbnail as string)}
                         alt={mainPost.title || 'Post Thumbnail'}
                         className="absolute top-0 left-0 w-full h-full object-cover"
@@ -159,10 +175,10 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
                             alt={mainPost.user?.name || 'Author Profile Picture'}
                         />
                         <div>
-                            <p className="text-[#475569] text:sm md:text-md font-medium flex items-center gap-1 w-fit">
+                            <p className="text-gray-700 text:sm md:text-md font-medium flex items-center gap-1 w-fit">
                                 {mainPost.user?.name}
                             </p>
-                            <p className="text-[#475569] text-xs md:text-sm flex items-center">
+                            <p className="text-gray-700 text-xs md:text-sm flex items-center">
                                 Diterbitkan: {mainPost.createdAt}
                                 {mainPost.updatedAt && (
                                     <button
@@ -180,7 +196,7 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
                                 className={`transition-all duration-300 ease-in-out overflow-hidden ${showUpdatedAt && mainPost.updatedAt ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}
                             >
                                 {mainPost.updatedAt && (
-                                    <p className="text-[#475569] text-xs md:text-sm flex items-center ">
+                                    <p className="text-gray-700 text-xs md:text-sm flex items-center ">
                                         Diperbarui: {mainPost.updatedAt}
                                     </p>
                                 )}
@@ -202,19 +218,22 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
                     style={{ borderTop: '1px solid #8496af' }}
                 ></div>
 
-                <Editor
-                    key={mainPost.id}
-                    className="content-view min-h-0"
-                    headerTemplate={<></>}
-                    value={sanitizedContent}
-                    readOnly
+                <SafeHtmlContent
+                    content={sanitizedContent}
+                    className="content-view min-h-0 ql-editor"
                 />
 
                 <div
                     className="w-full my-4 opacity-30"
                     style={{ borderTop: '1px solid #8496af' }}
                 ></div>
-                <div id="disqus_thread" className="mt-8 mb-4"></div>
+
+                {!disqusReady && <Skeleton width="100%" height="150px" className="mt-8 mb-4" />}
+
+                <div
+                    id="disqus_thread"
+                    className={`mt-8 mb-4 ${!disqusReady ? 'hidden' : ''}`}
+                ></div>
             </main>
         </>
     );

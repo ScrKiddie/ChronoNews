@@ -8,7 +8,6 @@ body {
     padding: 0;
 
     width: 100%;
-    background-color: #f2f2f2;
 }
 
 small {
@@ -132,7 +131,6 @@ p {
 body {
     min-height: 100%;
     overflow-x: hidden;
-    overflow-y: auto;
 }
 
 .ql-tooltip {
@@ -458,4 +456,33 @@ body .navbar-top {
 .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+.ql-editor ol,
+.ql-editor ul {
+    padding-left: 1.5em;
+}
+
+.ql-editor ol li::before {
+    content: none !important;
+}
+
+.ql-editor ol li[data-list='ordered'] {
+    list-style-type: decimal;
+}
+
+.ql-editor ol li[data-list='bullet'] {
+    list-style-type: disc;
+}
+
+.ql-editor li.ql-indent-1 {
+    padding-left: 3em;
+}
+
+.ql-editor li.ql-indent-2 {
+    padding-left: 6em;
+}
+
+.ql-editor li.ql-indent-3 {
+    padding-left: 9em;
 }

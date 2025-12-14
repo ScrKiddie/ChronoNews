@@ -9,6 +9,7 @@ import GuestRoutes from './routes/GuestRoutes.tsx';
 import AuthRoutes from './routes/AuthRoutes.tsx';
 import { InitialDataStructure } from './types/initialData.tsx';
 import { GlobalHeadManager } from './components/layout/GlobalHeadManager.tsx';
+import { useEffect } from 'react';
 
 interface AppProps {
     initialData?: InitialDataStructure;
@@ -49,6 +50,35 @@ const primeReactConfig: Partial<APIOptions> = {
 };
 
 const App = ({ initialData }: AppProps) => {
+    useEffect(() => {
+        const reveal = () => {
+            const root = document.getElementById('root');
+            const antiFouc = document.getElementById('anti-fouc');
+
+            if (root) {
+                requestAnimationFrame(() => {
+                    document.body.style.overflow = 'unset';
+
+                    root.style.opacity = '1';
+                    root.style.pointerEvents = 'auto';
+
+                    if (antiFouc) {
+                        setTimeout(() => {
+                            antiFouc.remove();
+                        }, 500);
+                    }
+                });
+            }
+        };
+
+        if (document.readyState === 'complete') {
+            reveal();
+        } else {
+            window.addEventListener('load', reveal);
+            return () => window.removeEventListener('load', reveal);
+        }
+    }, []);
+
     return (
         <QueryClientProvider client={queryClient}>
             <AuthProvider>

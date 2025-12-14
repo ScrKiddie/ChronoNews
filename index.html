@@ -7,9 +7,13 @@
         <meta name="google-site-verification" content="%VITE_GOOGLE_VERIFICATION_CODE%" />
         <!--ssr-head-outlet-->
         <style id="anti-fouc">
+            body {
+                overflow: hidden;
+            }
             #root {
                 opacity: 0;
                 pointer-events: none;
+                transition: opacity 0.2s ease-in-out;
             }
         </style>
     </head>

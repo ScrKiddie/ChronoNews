@@ -82,13 +82,16 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
 
     useEffect(() => {
         if (tabMenuContainerRef.current) {
-            const activeTab = tabMenuContainerRef.current.querySelector('.p-highlight');
+            const container = tabMenuContainerRef.current;
+            const activeTab = container.querySelector('.p-highlight') as HTMLElement;
 
             if (activeTab) {
-                activeTab.scrollIntoView({
+                const scrollPosition =
+                    activeTab.offsetLeft - container.clientWidth / 2 + activeTab.clientWidth / 2;
+
+                container.scrollTo({
+                    left: scrollPosition,
                     behavior: 'smooth',
-                    block: 'nearest',
-                    inline: 'center',
                 });
             }
         }
@@ -368,7 +371,7 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
                         <div className="flex items-center h-full ml-3">
                             <SafeImage
                                 src={String(ChronoNewsLogo)}
-                                className="xl:w-8 w-11"
+                                className="xl:w-8 xl:h-8 w-11 h-11 object-contain"
                                 alt="ChronoNewsLogo"
                             />
                             <h1

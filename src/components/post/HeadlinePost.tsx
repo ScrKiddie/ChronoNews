@@ -50,7 +50,7 @@ const HeadlinePost: React.FC<HeadlinePostProps> = ({
                     key={headlinePost.id}
                     className="shadow-[0_1px_6px_rgba(0,0,0,0.1)] rounded-lg w-full break-word"
                 >
-                    <div className="relative w-full aspect-[16/9] bg-[#f49f14] rounded-t-lg overflow-hidden">
+                    <div className="relative w-full aspect-[16/9] bg-gray-200 rounded-t-lg overflow-hidden">
                         <SafeImage
                             src={
                                 headlinePost.thumbnail
@@ -69,12 +69,12 @@ const HeadlinePost: React.FC<HeadlinePostProps> = ({
 
                     <div className="p-4">
                         <h3
-                            className="text-lg md:text-2xl font-semibold w-fit cursor-pointer line-clamp-2 text-gray-800 mb-1"
+                            className="text-lg md:text-2xl font-semibold w-fit cursor-pointer line-clamp-2 text-gray-700 mb-1"
                             onClick={() => handleNavigate(headlinePost)}
                         >
                             {headlinePost.title}
                         </h3>
-                        <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                        <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
                             <span
                                 className="font-medium cursor-pointer"
                                 onClick={() => {
@@ -87,8 +87,8 @@ const HeadlinePost: React.FC<HeadlinePostProps> = ({
                             >
                                 {headlinePost.category?.name}
                             </span>
-                            <span className="text-gray-400">•</span>
-                            <time className="text-gray-500">{headlinePost.createdAt}</time>
+                            <span className="text-gray-700">•</span>
+                            <time className="text-gray-700">{headlinePost.createdAt}</time>
                         </div>
                         <p className="text-sm md:text-base line-clamp-3 text-gray-700">
                             {headlinePost.summary}
