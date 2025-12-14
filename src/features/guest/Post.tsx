@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { TabMenu } from 'primereact/tabmenu';
 import { InputText } from 'primereact/inputtext';
 import { Menu } from 'primereact/menu';
@@ -29,6 +29,7 @@ interface PostProps {
 const Post: React.FC<PostProps> = ({ initialData }) => {
     const [isRetrying, setIsRetrying] = useState(false);
     const [isDesktop, setIsDesktop] = useState(false);
+    const tabMenuContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleResize = () => {
@@ -78,6 +79,20 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
     } = usePost(initialData, isDesktop);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (tabMenuContainerRef.current) {
+            const activeTab = tabMenuContainerRef.current.querySelector('.p-highlight');
+
+            if (activeTab) {
+                activeTab.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                    inline: 'center',
+                });
+            }
+        }
+    }, [activeIndex]);
 
     const handleRetry = async () => {
         setIsRetrying(true);
@@ -399,18 +414,24 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
                     </div>
                 </nav>
 
-                <TabMenu
-                    model={isDesktop ? allDesktopCategories : allMobileCategories}
-                    activeIndex={activeIndex}
-                    onTabChange={(e) => {
-                        if (hasLainnyaTab && e.index === lainnyaIndex) {
-                            return;
-                        }
-                        setActiveIndex(e.index);
-                        menuRef.current?.hide(e.originalEvent);
-                    }}
-                    className="lg:h-full overflow-y-hidden h-[58px] w-full"
-                />
+                <div
+                    ref={tabMenuContainerRef}
+                    className="w-full overflow-x-auto hide-scrollbar bg-white"
+                >
+                    <TabMenu
+                        model={isDesktop ? allDesktopCategories : allMobileCategories}
+                        activeIndex={activeIndex}
+                        onTabChange={(e) => {
+                            if (hasLainnyaTab && e.index === lainnyaIndex) {
+                                return;
+                            }
+                            setActiveIndex(e.index);
+                            menuRef.current?.hide(e.originalEvent);
+                        }}
+                        className="lg:h-full h-[58px] min-w-full"
+                        style={{ width: 'max-content' }}
+                    />
+                </div>
             </div>
 
             {error && !isRetrying ? (

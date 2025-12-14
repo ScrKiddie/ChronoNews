@@ -450,3 +450,12 @@ body .navbar-top {
 .animate-fade-in {
     animation: simpleFade 0.2s ease-out forwards;
 }
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
