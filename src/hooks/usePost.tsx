@@ -87,7 +87,11 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
                 updatedAt: postData.updatedAt ? formatDate(postData.updatedAt) : '',
             };
         },
-        enabled: shouldFetchSpecificData('post', 'postError') && isPostPage && !!postId,
+        enabled:
+            (shouldFetchSpecificData('post', 'postError') ||
+                manualData?.post?.id !== parseInt(postId || '0')) &&
+            isPostPage &&
+            !!postId,
         staleTime: 0,
         gcTime: 0,
     });
@@ -228,10 +232,14 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
                 },
                 signal
             ),
-        enabled: shouldFetchSpecificData('posts_search', 'posts_searchError') && isSearchPage,
+        enabled:
+            shouldFetchSpecificData('posts_search', 'posts_searchError') &&
+            isSearchPage &&
+            !!searchQueryFromUrl.trim(),
         staleTime: 0,
         gcTime: 0,
     });
+
     const searchResult = manualData?.posts_search ?? searchQueryQuery.data;
     const searchPosts: Post[] = useMemo(() => {
         const data = searchResult?.data;
@@ -709,10 +717,20 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
         [remainingCategories, handleCategoryChange]
     );
 
-    const notFound = useMemo(
-        () => isPostPage && !mainPostQuery.isLoading && !mainPostQuery.isError && !mainPost,
-        [isPostPage, mainPostQuery.isLoading, mainPostQuery.isError, mainPost]
-    );
+    const notFound = useMemo(() => {
+        if (isSearchPage && (!searchQueryFromUrl || searchQueryFromUrl.trim() === '')) {
+            return true;
+        }
+
+        return isPostPage && !mainPostQuery.isLoading && !mainPostQuery.isError && !mainPost;
+    }, [
+        isSearchPage,
+        searchQueryFromUrl,
+        isPostPage,
+        mainPostQuery.isLoading,
+        mainPostQuery.isError,
+        mainPost,
+    ]);
 
     return {
         categories,
