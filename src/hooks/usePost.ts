@@ -3,15 +3,27 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { PostService } from '../services/postService.ts';
 import { CategoryService } from '../services/categoryService.ts';
-import { truncateText, slugify, getDateRangeInUnix } from '../utils/postUtils.ts';
+import {
+    truncateText,
+    slugify,
+    getDateRangeInUnix,
+    getRelativeTime,
+    formatDate,
+} from '../utils/postUtils.ts';
 import { Menu } from 'primereact/menu';
-import { getRelativeTime, formatDate } from '../utils/postUtils.ts';
 import { Post } from '../types/post.ts';
 import { MenuItem } from 'primereact/menuitem';
 import React from 'react';
 import { Dropdown } from 'primereact/dropdown';
 import { Category } from '../types/category.ts';
 import { InitialDataStructure } from '../types/initialData.ts';
+
+interface ApiError {
+    response?: {
+        status?: number;
+    };
+    status?: number;
+}
 
 const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: boolean) => {
     const { pathname, search, state } = useLocation();
@@ -52,6 +64,18 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
 
     const viewIncrementedRef = useRef(false);
 
+    const prevPostIdRef = useRef<string | undefined>(postId);
+    const isFirstRender = useRef(true);
+
+    const isValidPostId = useMemo(() => {
+        if (!isPostPage || !postId) return false;
+        const isNumeric = /^\d+$/.test(postId);
+        if (!isNumeric) return false;
+        const num = parseInt(postId, 10);
+        const MAX_INT32 = 2147483647;
+        return num > 0 && num <= MAX_INT32;
+    }, [isPostPage, postId]);
+
     const shouldFetchSpecificData = useCallback(
         (dataKey: keyof InitialDataStructure, errorKey: keyof InitialDataStructure) => {
             const hasData = !!manualData?.[dataKey];
@@ -67,6 +91,8 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
             CategoryService.listCategories(signal).then((res) => res.data || []),
         enabled: shouldFetchSpecificData('categories', 'generalError'),
         staleTime: 5 * 60 * 1000,
+        initialData: manualData?.categories,
+        initialDataUpdatedAt: manualData?.categories ? Date.now() : undefined,
     });
 
     const categories = useMemo(() => {
@@ -86,12 +112,20 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
             };
         },
         enabled:
+            isValidPostId &&
+            manualData?.postError !== 404 &&
             (shouldFetchSpecificData('post', 'postError') ||
                 manualData?.post?.id !== parseInt(postId || '0')) &&
             isPostPage &&
             !!postId,
         staleTime: 0,
         gcTime: 0,
+        retry: (failureCount, error) => {
+            const err = error as unknown as ApiError;
+            const status = err?.response?.status || err?.status;
+            if (status === 404) return false;
+            return failureCount < 3;
+        },
     });
 
     const mainPost = useMemo(() => {
@@ -266,47 +300,73 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
 
     const computedError = useMemo(() => {
         if (isAnyFetching) return false;
+        if (manualData?.postError === 404) return false;
+        if (isPostPage && !isValidPostId) return false;
 
         if (isSearchPage) {
-            if (
-                searchQueryQuery.isSuccess ||
-                (manualData?.posts_search?.data && !manualData.posts_searchError)
-            ) {
-                return false;
-            }
+            if (searchQueryQuery.isSuccess) return false;
+            if (manualData?.posts_search?.data && !manualData.posts_searchError) return false;
             return searchQueryQuery.isError || !!manualData?.posts_searchError;
         }
 
         if (isPostPage) {
-            if (mainPostQuery.isSuccess || (manualData?.post && !manualData.postError)) {
-                return false;
+            if (mainPostQuery.isSuccess) return false;
+            if (manualData?.post && !manualData.postError) return false;
+
+            if (mainPostQuery.isError) {
+                const err = mainPostQuery.error as unknown as ApiError;
+                const status = err?.response?.status || err?.status;
+                if (status === 404) return false;
+                return true;
             }
-            if (mainPostQuery.isError || !!manualData?.postError) return true;
+
+            if (manualData?.postError && manualData.postError !== 404) {
+                return true;
+            }
+            return false;
         }
 
-        if (categoriesQuery.isError || manualData?.generalError) return true;
+        const isContentSuccess = regularPostsQuery.isSuccess || headlineQuery.isSuccess;
+        if (isContentSuccess) return false;
 
-        return (
+        const isCategoriesError =
+            categoriesQuery.isError || (!!manualData?.generalError && !categoriesQuery.isSuccess);
+        const isHeadlineError =
             headlineQuery.isError ||
-            !!manualData?.posts_headlineError ||
+            (!!manualData?.posts_headlineError &&
+                !headlineQuery.isSuccess &&
+                manualData.posts_headlineError !== 404);
+        const isTopError =
             topPostsQuery.isError ||
-            !!manualData?.posts_topError ||
+            (!!manualData?.posts_topError &&
+                !topPostsQuery.isSuccess &&
+                manualData.posts_topError !== 404);
+        const isRegularError =
             regularPostsQuery.isError ||
-            !!manualData?.posts_regularError
-        );
+            (!!manualData?.posts_regularError &&
+                !regularPostsQuery.isSuccess &&
+                manualData.posts_regularError !== 404);
+
+        return isCategoriesError || isHeadlineError || isTopError || isRegularError;
     }, [
         isAnyFetching,
         isSearchPage,
         isPostPage,
+        isValidPostId,
         categoriesQuery.isError,
+        categoriesQuery.isSuccess,
         manualData,
         searchQueryQuery.isError,
         searchQueryQuery.isSuccess,
         mainPostQuery.isError,
         mainPostQuery.isSuccess,
+        mainPostQuery.error,
         headlineQuery.isError,
+        headlineQuery.isSuccess,
         topPostsQuery.isError,
+        topPostsQuery.isSuccess,
         regularPostsQuery.isError,
+        regularPostsQuery.isSuccess,
     ]);
 
     const loading = useMemo(
@@ -327,43 +387,154 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
         ]
     );
 
-    useEffect(() => {
-        const isMainContentSafe =
-            (isSearchPage && searchQueryQuery.isSuccess) || (isPostPage && mainPostQuery.isSuccess);
-
-        const isCategoriesBroken =
-            (categoriesQuery.isError || !categories) &&
-            !categoriesQuery.isFetching &&
-            !categoriesQuery.isLoading;
-
-        if (categoriesQuery.isSuccess && categories && categories.length === 0) {
-            return;
+    const notFound = useMemo(() => {
+        if (isSearchPage && (!searchQueryFromUrl || searchQueryFromUrl.trim() === '')) {
+            return true;
         }
+        if (manualData?.postError === 404) {
+            return true;
+        }
+        if (isPostPage) {
+            if (!isValidPostId) return true;
+            const err = mainPostQuery.error as unknown as ApiError;
+            const status = err?.response?.status || err?.status;
+            if (status === 404) return true;
+            if (mainPostQuery.isSuccess && !mainPost) {
+                return true;
+            }
+            if (mainPostQuery.isError && !mainPostQuery.isLoading) {
+                if (status === 404) return true;
+            }
+        }
+        return false;
+    }, [
+        isSearchPage,
+        searchQueryFromUrl,
+        isPostPage,
+        isValidPostId,
+        manualData?.postError,
+        mainPostQuery.error,
+        mainPostQuery.isSuccess,
+        mainPostQuery.isLoading,
+        mainPostQuery.isError,
+        mainPost,
+    ]);
 
-        if (isMainContentSafe && isCategoriesBroken) {
-            categoriesQuery.refetch();
-
-            if (manualData?.generalError) {
+    useEffect(() => {
+        if (isPostPage && mainPostQuery.isError) {
+            const err = mainPostQuery.error as unknown as ApiError;
+            const status = err?.response?.status || err?.status;
+            if (status === 404) {
                 setManualData((prev) => {
-                    if (!prev) return undefined;
-                    const n = { ...prev };
-                    delete n.generalError;
-                    return n;
+                    if (prev?.postError === 404) return prev;
+                    return { ...prev, postError: 404, post: undefined };
                 });
             }
         }
+    }, [isPostPage, mainPostQuery.isError, mainPostQuery.error]);
+
+    useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
+
+        const cachedCategories = queryClient.getQueryData<Category[]>(['categories']);
+
+        const isCategoriesMissing = !cachedCategories || cachedCategories.length === 0;
+        const hasManualError = !!manualData?.generalError;
+        const hasQueryError = categoriesQuery.isError;
+
+        if (isCategoriesMissing || hasManualError || hasQueryError) {
+            queryClient.resetQueries({ queryKey: ['categories'] });
+        }
+
+        setManualData((prev) => {
+            if (!prev) return undefined;
+            const newData = { ...prev };
+
+            delete newData.generalError;
+            delete newData.postError;
+            delete newData.posts_headlineError;
+            delete newData.posts_topError;
+            delete newData.posts_regularError;
+            delete newData.posts_searchError;
+
+            return newData;
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pathname, search]);
+
+    useEffect(() => {
+        if (isPostPage && postId) {
+            if (prevPostIdRef.current !== postId) {
+                setManualData((prevData) => {
+                    if (!prevData) return undefined;
+                    const newData = { ...prevData };
+                    delete newData.post;
+                    delete newData.posts_regular;
+                    delete newData.postError;
+                    delete newData.posts_regularError;
+                    return newData;
+                });
+                viewIncrementedRef.current = false;
+            }
+        } else if (!isPostPage) {
+            if (manualData?.post || manualData?.postError || manualData?.posts_regularError) {
+                setManualData((prev) => {
+                    if (!prev) return undefined;
+                    const newData = { ...prev };
+                    delete newData.post;
+                    delete newData.postError;
+                    delete newData.posts_regular;
+                    delete newData.posts_regularError;
+                    return newData;
+                });
+            }
+        }
+        prevPostIdRef.current = postId;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [postId, isPostPage, manualData?.post, manualData?.postError]);
+
+    useEffect(() => {
+        let hasChanges = false;
+        const newData = manualData ? { ...manualData } : undefined;
+        if (!newData) return;
+
+        if (categoriesQuery.isSuccess && newData.generalError) {
+            delete newData.generalError;
+            hasChanges = true;
+        }
+        if (headlineQuery.isSuccess && newData.posts_headlineError) {
+            delete newData.posts_headlineError;
+            hasChanges = true;
+        }
+        if (topPostsQuery.isSuccess && newData.posts_topError) {
+            delete newData.posts_topError;
+            hasChanges = true;
+        }
+        if (regularPostsQuery.isSuccess && newData.posts_regularError) {
+            delete newData.posts_regularError;
+            hasChanges = true;
+        }
+        if (searchQueryQuery.isSuccess && newData.posts_searchError) {
+            delete newData.posts_searchError;
+            hasChanges = true;
+        }
+        if (mainPostQuery.isSuccess && newData.postError) {
+            delete newData.postError;
+            hasChanges = true;
+        }
+
+        if (hasChanges) setManualData(newData);
     }, [
-        isSearchPage,
-        searchQueryQuery.isSuccess,
-        isPostPage,
-        mainPostQuery.isSuccess,
-        categoriesQuery.isError,
-        categoriesQuery.isFetching,
-        categoriesQuery.isLoading,
         categoriesQuery.isSuccess,
-        categories,
-        manualData?.generalError,
-        categoriesQuery,
+        headlineQuery.isSuccess,
+        topPostsQuery.isSuccess,
+        regularPostsQuery.isSuccess,
+        searchQueryQuery.isSuccess,
+        mainPostQuery.isSuccess,
+        manualData,
     ]);
 
     useEffect(() => {
@@ -372,28 +543,6 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
         }
         dropdownRef.current?.hide();
     }, [pathname, search, state]);
-
-    useEffect(() => {
-        if (isPostPage && postId) {
-            if (manualData?.post?.id !== parseInt(postId)) {
-                setManualData((prevData) => {
-                    if (!prevData) return undefined;
-                    const newData = { ...prevData };
-                    delete newData.post;
-                    delete newData.posts_regular;
-                    return newData;
-                });
-                viewIncrementedRef.current = false;
-            }
-        } else if (!isPostPage && manualData?.post) {
-            setManualData((prev) => {
-                if (!prev) return undefined;
-                const newData = { ...prev };
-                delete newData.post;
-                return newData;
-            });
-        }
-    }, [postId, isPostPage, manualData?.post?.id, manualData?.post]);
 
     useEffect(() => {
         viewIncrementedRef.current = false;
@@ -488,6 +637,7 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
                 delete newData.posts_regular;
                 delete newData.posts_search;
 
+                delete newData.generalError;
                 delete newData.posts_headlineError;
                 delete newData.posts_topError;
                 delete newData.posts_regularError;
@@ -514,13 +664,10 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
         setManualData((prevData) => {
             if (!prevData) return undefined;
             const newData = { ...prevData };
-
             delete newData.posts_top;
             delete newData.posts_regular;
-
             delete newData.posts_topError;
             delete newData.posts_regularError;
-
             return newData;
         });
 
@@ -550,7 +697,6 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
                 setManualData((prevData) => {
                     if (!prevData) return undefined;
                     const newData = { ...prevData };
-
                     delete newData.posts_headline;
                     delete newData.posts_top;
                     delete newData.posts_regular;
@@ -560,7 +706,6 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
                     delete newData.posts_topError;
                     delete newData.posts_regularError;
                     delete newData.posts_searchError;
-
                     return newData;
                 });
             }
@@ -572,95 +717,48 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
 
     const refetchAll = useCallback(
         async (isFullRetry = false) => {
-            if (isFullRetry) {
+            if (manualData) {
                 setManualData((prev) => {
                     if (!prev) return undefined;
-                    if (prev.categories && !prev.generalError) {
-                        return { categories: prev.categories };
+                    const newData = { ...prev };
+
+                    delete newData.generalError;
+                    delete newData.postError;
+                    delete newData.posts_headlineError;
+                    delete newData.posts_topError;
+                    delete newData.posts_regularError;
+                    delete newData.posts_searchError;
+
+                    if (isFullRetry) {
+                        delete newData.categories;
                     }
-                    return undefined;
+
+                    return newData;
                 });
+            }
 
+            if (isFullRetry) {
                 viewIncrementedRef.current = false;
-
                 await queryClient.resetQueries({
                     predicate: (query) => {
                         const key = query.queryKey[0];
-                        if (key === 'post' || key === 'posts') return true;
-                        if (key === 'categories') {
-                            const data = query.state.data as Category[] | undefined;
-                            return query.state.status === 'error' || !data || data.length === 0;
-                        }
+                        if (key === 'post' || key === 'posts' || key === 'categories') return true;
                         return false;
                     },
                 });
                 return;
             }
 
-            if (!manualData) {
-                return queryClient.resetQueries({
-                    predicate: (query) => {
-                        const key = query.queryKey[0];
-                        const status = query.state.status;
-
-                        if (key === 'categories') {
-                            const data = query.state.data as Category[] | undefined;
-                            return status === 'error' || !data || data.length === 0;
-                        }
-
-                        if (key === 'post' || key === 'posts') {
-                            if (status === 'success') return false;
-                            return true;
-                        }
-                        return false;
-                    },
-                });
-            }
-
-            const newManualData = { ...manualData };
-            let hasChanges = false;
-
-            const clearError = (
-                dataKey: keyof InitialDataStructure,
-                errorKey: keyof InitialDataStructure
-            ) => {
-                if (
-                    manualData[errorKey] ||
-                    (dataKey === 'categories' &&
-                        (!manualData[dataKey] || manualData[dataKey]?.length === 0))
-                ) {
-                    if (dataKey === 'categories')
-                        queryClient.resetQueries({ queryKey: ['categories'] });
-                    delete newManualData[errorKey];
-                    delete newManualData[dataKey];
-                    hasChanges = true;
-                }
-            };
-
-            if (
-                manualData.generalError ||
-                !manualData.categories ||
-                manualData.categories.length === 0
-            ) {
-                queryClient.resetQueries({ queryKey: ['categories'] });
-                delete newManualData.generalError;
-                delete newManualData.categories;
-                hasChanges = true;
-            }
-
-            if (manualData.postError) clearError('post', 'postError');
-            if (manualData.posts_headlineError) clearError('posts_headline', 'posts_headlineError');
-            if (manualData.posts_topError) clearError('posts_top', 'posts_topError');
-            if (manualData.posts_regularError) clearError('posts_regular', 'posts_regularError');
-            if (manualData.posts_searchError) clearError('posts_search', 'posts_searchError');
-
-            if (hasChanges)
-                setManualData(Object.keys(newManualData).length > 0 ? newManualData : undefined);
-
             return queryClient.resetQueries({
                 predicate: (query) => {
                     const key = query.queryKey[0];
                     const status = query.state.status;
+
+                    if (key === 'categories') {
+                        const data = query.state.data as Category[] | undefined;
+                        return status === 'error' || !data || data.length === 0;
+                    }
+
                     if (key === 'post' || key === 'posts') {
                         if (status === 'success') return false;
                         return true;
@@ -714,21 +812,6 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
             })),
         [remainingCategories, handleCategoryChange]
     );
-
-    const notFound = useMemo(() => {
-        if (isSearchPage && (!searchQueryFromUrl || searchQueryFromUrl.trim() === '')) {
-            return true;
-        }
-
-        return isPostPage && !mainPostQuery.isLoading && !mainPostQuery.isError && !mainPost;
-    }, [
-        isSearchPage,
-        searchQueryFromUrl,
-        isPostPage,
-        mainPostQuery.isLoading,
-        mainPostQuery.isError,
-        mainPost,
-    ]);
 
     return {
         categories,

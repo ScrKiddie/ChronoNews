@@ -4,15 +4,15 @@ import { Pagination } from './pagination.ts';
 
 export interface InitialDataStructure {
     categories?: Category[];
-    post?: Post;
+    post?: Post | null;
     posts_headline?: { data: Post[]; pagination: Pagination };
     posts_top?: { data: Post[]; pagination: Pagination };
     posts_regular?: { data: Post[]; pagination: Pagination };
     posts_search?: { data: Post[]; pagination: Pagination };
-    postError?: boolean;
-    posts_headlineError?: boolean;
-    posts_topError?: boolean;
-    posts_regularError?: boolean;
-    posts_searchError?: boolean;
+    postError?: number | null;
+    posts_headlineError?: number | null;
+    posts_topError?: number | null;
+    posts_regularError?: number | null;
+    posts_searchError?: number | null;
     generalError?: boolean;
 }

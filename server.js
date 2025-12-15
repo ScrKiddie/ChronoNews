@@ -55,7 +55,13 @@ async function handleRequest(req, res, url, renderFunction, protocol) {
                 `window.__INITIAL_DATA__ = ${safeJsonData};`
             );
 
-        res.statusCode = 200;
+        if (initialData && initialData.postError === 404) {
+            res.statusCode = 404;
+        } else if (initialData && initialData.postError === 500) {
+            res.statusCode = 500;
+        } else {
+            res.statusCode = 200;
+        }
         res.setHeader('Content-Type', 'text/html');
         res.end(html);
         return;

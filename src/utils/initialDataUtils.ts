@@ -1,10 +1,15 @@
 import { PostService } from '../services/postService.ts';
 import { CategoryService } from '../services/categoryService.ts';
-import { formatDate, getRelativeTime } from './postUtils.ts';
-import { slugify } from './postUtils.ts';
-import { getDateRangeInUnix } from './postUtils.ts';
+import { formatDate, getRelativeTime, slugify, getDateRangeInUnix } from './postUtils.ts';
 import { Post } from '../types/post.ts';
 import { InitialDataStructure } from '../types/initialData.ts';
+
+interface ApiError {
+    response?: {
+        status?: number;
+    };
+    status?: number;
+}
 
 export default async function initialDataUtils(pathname: string, searchParams: URLSearchParams) {
     const utils = {
@@ -15,7 +20,7 @@ export default async function initialDataUtils(pathname: string, searchParams: U
     };
 
     const initialData: InitialDataStructure = {};
-    const postIdMatch = pathname.match(/\/post\/(\d+)/);
+    const postIdMatch = pathname.match(/\/post\/([^/]+)/);
     const categoryName = searchParams.get('category')?.toLowerCase() || '';
     const searchQuery = searchParams.get('query') || '';
 
@@ -23,6 +28,14 @@ export default async function initialDataUtils(pathname: string, searchParams: U
     const topPage = parseInt(searchParams.get('top_page') || '1', 10);
     const regularPage = parseInt(searchParams.get('regular_page') || '1', 10);
     const searchPage = parseInt(searchParams.get('search_page') || '1', 10);
+
+    const getStatusCode = (error: unknown): number => {
+        if (typeof error === 'object' && error !== null) {
+            const err = error as ApiError;
+            return err.response?.status || err.status || 500;
+        }
+        return 500;
+    };
 
     try {
         try {
@@ -45,17 +58,22 @@ export default async function initialDataUtils(pathname: string, searchParams: U
                         updatedAt: postData.updatedAt ? utils.formatDate(postData.updatedAt) : '',
                     };
                     initialData.post = mainPost;
+                    initialData.postError = null;
 
                     const correctSlug = utils.slugify(postData.title);
                     if (!pathname.includes(`/post/${postId}/${correctSlug}`)) {
                         return { redirect: { to: `/post/${postId}/${correctSlug}` } };
                     }
                 }
-            } catch {
-                initialData.postError = true;
+            } catch (error) {
+                const status = getStatusCode(error);
+                initialData.post = null;
+                initialData.postError = status;
+                console.error(`SSR Error fetching post ${postId}:`, status);
             }
         } else if (pathname.startsWith('/berita')) {
             const currentCategory = categoryName;
+
             try {
                 const headlineRes = await PostService.searchPost({
                     categoryName: currentCategory,
@@ -72,8 +90,8 @@ export default async function initialDataUtils(pathname: string, searchParams: U
                         : [],
                     pagination: headlineRes.pagination,
                 };
-            } catch {
-                initialData.posts_headlineError = true;
+            } catch (error) {
+                initialData.posts_headlineError = getStatusCode(error);
             }
 
             try {
@@ -101,8 +119,8 @@ export default async function initialDataUtils(pathname: string, searchParams: U
                         : [],
                     pagination: topRes.pagination,
                 };
-            } catch {
-                initialData.posts_topError = true;
+            } catch (error) {
+                initialData.posts_topError = getStatusCode(error);
             }
         } else if (pathname.startsWith('/cari')) {
             try {
@@ -124,8 +142,8 @@ export default async function initialDataUtils(pathname: string, searchParams: U
                         : [],
                     pagination: searchRes.pagination,
                 };
-            } catch {
-                initialData.posts_searchError = true;
+            } catch (error) {
+                initialData.posts_searchError = getStatusCode(error);
             }
         }
     } catch {
@@ -158,8 +176,8 @@ export default async function initialDataUtils(pathname: string, searchParams: U
                     : [],
                 pagination: regularRes.pagination,
             };
-        } catch {
-            initialData.posts_regularError = true;
+        } catch (error) {
+            initialData.posts_regularError = getStatusCode(error);
         }
     }
 

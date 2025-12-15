@@ -1,5 +1,6 @@
 import React from 'react';
 import { Skeleton } from 'primereact/skeleton';
+import DisqusSkeleton from './DisqusSkeleton.tsx';
 
 const MainPostSkeleton: React.FC = () => {
     return (
@@ -47,7 +48,7 @@ const MainPostSkeleton: React.FC = () => {
                 style={{ borderTop: '1px solid #8496af' }}
             ></div>
 
-            <Skeleton width="100%" height="150px" />
+            <DisqusSkeleton />
         </main>
     );
 };
