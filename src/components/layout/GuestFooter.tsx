@@ -15,11 +15,13 @@ const GuestFooter: React.FC<GuestFooterProps> = ({ quickLinks }) => {
             <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
                 <div className="flex flex-col mx-auto items-center">
                     <div className="flex items-center gap-1">
-                        <SafeImage
-                            src={ChronoNewsLogo as string}
-                            className="w-8"
-                            alt="ChronoNewsLogo"
-                        />
+                        <div className="relative w-8 h-8 shrink-0 rounded-md overflow-hidden">
+                            <SafeImage
+                                src={ChronoNewsLogo as string}
+                                className="w-full h-full object-contain"
+                                alt="ChronoNewsLogo"
+                            />
+                        </div>
                         <h1 className="text-white font-bold text-2xl">
                             CHRONO<span className="text-[#f59e0b]">NEWS</span>
                         </h1>

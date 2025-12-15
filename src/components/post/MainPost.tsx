@@ -8,8 +8,8 @@ import MainPostSkeleton from '../ui/MainPostSkeleton.tsx';
 import DOMPurify from 'isomorphic-dompurify';
 import { truncateText } from '../../utils/postUtils.ts';
 import SafeImage from '../ui/SafeImage.tsx';
-import { Skeleton } from 'primereact/skeleton';
 import SafeHtmlContent from '../ui/SafeHtmlContent.tsx';
+import DisqusSkeleton from '../ui/DisqusSkeleton.tsx';
 
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
@@ -111,7 +111,7 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
             label: 'Beranda',
             template: () => (
                 <span
-                    className="text-gray-700  cursor-pointer font-[600]"
+                    className="text-gray-700 cursor-pointer font-[600]"
                     onClick={() => {
                         handleCategoryChange('beranda');
                     }}
@@ -162,16 +162,21 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
 
                 <div className="flex justify-between my-4 flex-row lg:gap-0">
                     <div className="flex gap-2 items-center">
-                        <img
-                            src={
-                                mainPost.user?.profilePicture
-                                    ? mainPost.user.profilePicture
-                                    : (defaultProfilePicture as string)
-                            }
-                            className="size-[2.6rem] lg:size-[3rem] rounded-full"
+                        <div
+                            className="relative size-[2.6rem] lg:size-[3rem] shrink-0 rounded-full overflow-hidden"
                             style={{ border: '1px solid #d1d5db' }}
-                            alt={mainPost.user?.name || 'Author Profile Picture'}
-                        />
+                        >
+                            <SafeImage
+                                src={
+                                    mainPost.user?.profilePicture
+                                        ? mainPost.user.profilePicture
+                                        : (defaultProfilePicture as string)
+                                }
+                                className="w-full h-full object-cover"
+                                alt={mainPost.user?.name || 'Author Profile Picture'}
+                            />
+                        </div>
+
                         <div>
                             <p className="text-gray-700 text:sm md:text-md font-medium flex items-center gap-1 w-fit">
                                 {mainPost.user?.name}
@@ -226,7 +231,7 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
                     style={{ borderTop: '1px solid #8496af' }}
                 ></div>
 
-                {!disqusReady && <Skeleton width="100%" height="150px" className="mt-8 mb-4" />}
+                {!disqusReady && <DisqusSkeleton />}
 
                 <div
                     id="disqus_thread"

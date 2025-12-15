@@ -369,11 +369,16 @@ const Post: React.FC<PostProps> = ({ initialData }) => {
                 <nav className="flex justify-between items-center xl:flex-row flex-col bg-white w-full xl:fixed h-[56px]">
                     <div className="flex xl:block justify-between items-center w-full xl:w-fit mt-2 xl:mt-0">
                         <div className="flex items-center h-full ml-3">
-                            <SafeImage
-                                src={String(ChronoNewsLogo)}
-                                className="xl:w-8 xl:h-8 w-11 h-11 object-contain"
-                                alt="ChronoNewsLogo"
-                            />
+                            {/* --- MODIFIKASI DIMULAI DARI SINI --- */}
+                            <div className="relative xl:w-8 xl:h-8 w-11 h-11 shrink-0 rounded-md overflow-hidden">
+                                <SafeImage
+                                    src={String(ChronoNewsLogo)}
+                                    className="w-full h-full object-contain"
+                                    alt="ChronoNewsLogo"
+                                />
+                            </div>
+                            {/* --- MODIFIKASI BERAKHIR DI SINI --- */}
+
                             <h1
                                 style={{ color: 'var(--surface-600)' }}
                                 className="ml-1 text-[#475569] font-bold text-2xl xl:block hidden"
