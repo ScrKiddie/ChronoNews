@@ -41,12 +41,14 @@ const Login: React.FC = () => {
             navigate('/admin/beranda');
         },
         onError: (error: ApiError) => {
-            handleApiError(error, toastRef);
+            if (error?.status !== 400 && error?.status !== 401) {
+                handleApiError(error, toastRef);
+            }
 
             if (error?.status === 401 || error?.status === 400) {
                 setErrors({
-                    email: error.message,
-                    password: error.message,
+                    email: 'Email atau password salah',
+                    password: 'Email atau password salah',
                 });
             }
 
@@ -57,19 +59,43 @@ const Login: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setErrors({});
 
         try {
             const validatedData = loginSchema.parse(data);
             await loginMutation.mutateAsync(validatedData);
         } catch (error) {
             if (error instanceof z.ZodError) {
-                const formErrors = error.errors.reduce(
-                    (acc, err) => ({ ...acc, [err.path[0]]: err.message }),
-                    {}
+                const hasEmailOrPasswordError = error.errors.some(
+                    (err) => err.path[0] === 'email' || err.path[0] === 'password'
                 );
-                setErrors(formErrors);
+
+                if (hasEmailOrPasswordError) {
+                    setErrors({
+                        email: 'Email atau password salah',
+                        password: 'Email atau password salah',
+                    });
+                } else {
+                    const formErrors = error.errors.reduce(
+                        (acc, err) => ({ ...acc, [err.path[0]]: err.message }),
+                        {}
+                    );
+                    setErrors(formErrors);
+                }
             }
+        }
+    };
+
+    const clearAuthErrors = () => {
+        if (
+            errors.email === 'Email atau password salah' ||
+            errors.password === 'Email atau password salah'
+        ) {
+            setErrors((prev) => {
+                const newErrors = { ...prev };
+                delete newErrors.email;
+                delete newErrors.password;
+                return newErrors;
+            });
         }
     };
 
@@ -81,7 +107,10 @@ const Login: React.FC = () => {
                         label="Email"
                         data={data.email}
                         error={errors.email}
-                        setData={(e) => setData((prev) => ({ ...prev, email: e }))}
+                        setData={(e) => {
+                            setData((prev) => ({ ...prev, email: e }));
+                            clearAuthErrors();
+                        }}
                         setError={(e) => setErrors((prev) => ({ ...prev, email: e }))}
                     />
                 </div>
@@ -91,7 +120,10 @@ const Login: React.FC = () => {
                         label="Password"
                         data={data.password}
                         error={errors.password}
-                        setData={(e) => setData((prev) => ({ ...prev, password: e }))}
+                        setData={(e) => {
+                            setData((prev) => ({ ...prev, password: e }));
+                            clearAuthErrors();
+                        }}
                         setError={(e) => setErrors((prev) => ({ ...prev, password: e }))}
                     />
                 </div>

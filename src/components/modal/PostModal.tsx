@@ -66,6 +66,7 @@ const IsolatedEditor = memo(
                 modules={modules}
                 headerTemplate={headerTemplate}
                 onTextChange={onTextChange}
+                style={{ minHeight: '320px' }}
             />
         );
     },
@@ -324,7 +325,7 @@ const PostModal = ({
             onHide={onClose}
             focusOnShow={false}
         >
-            <form onSubmit={handleSubmit} className="w-full">
+            <form id="post-form" onSubmit={handleSubmit} className="w-full">
                 <div className="flex flex-col p-4 gap-4">
                     <div className="w-full">
                         <InputGroup
@@ -378,9 +379,6 @@ const PostModal = ({
                                 className="h-full w-full object-cover rounded-md border-none z-10"
                                 style={{ border: '1px solid #d1d5db' }}
                                 alt="Thumbnail"
-                                onError={(e) => {
-                                    e.currentTarget.src = defaultThumbnail;
-                                }}
                             />
                             <Button
                                 onClick={toggleMenuVisibility}
@@ -445,11 +443,11 @@ const PostModal = ({
                         {errors.summary && <small className="p-error">{errors.summary}</small>}
                     </div>
 
-                    <div className="w-full ">
+                    <div className="w-full mb-12">
                         <label htmlFor="content" className="block mb-1 font-medium">
                             Konten
                         </label>
-                        <div className={`w-full h-fit relative`}>
+                        <div className={`w-full relative`}>
                             {isUploadingImage && (
                                 <div className="loading-container">
                                     <i
@@ -463,7 +461,7 @@ const PostModal = ({
                         </div>
                         {errors.content && <small className="p-error">{errors.content}</small>}
                     </div>
-
+                    <div className={`my-4 lg:my-1`}></div>
                     <Button
                         disabled={submitLoading || isUploadingImage}
                         className="w-full flex items-center justify-center font-normal"

@@ -37,7 +37,9 @@ const Reset: React.FC = () => {
             navigate('/login');
         },
         onError: (error: ApiError) => {
-            handleApiError(error, toastRef);
+            if (error?.status !== 400) {
+                handleApiError(error, toastRef);
+            }
 
             if (error?.status === 400 && error.message) {
                 setErrors({ code: error.message });
@@ -47,7 +49,6 @@ const Reset: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setErrors({});
 
         try {
             const validatedData = ResetSchema.parse(data);

@@ -79,7 +79,9 @@ export const useProfile = (toastRef: ToastRef) => {
                 );
                 setErrors(formErrors);
             } else {
-                handleApiError(error, toastRef);
+                if (!('status' in error && error.status === 409)) {
+                    handleApiError(error, toastRef);
+                }
 
                 if ('status' in error && error.status === 409 && error.message) {
                     if (error.message.toLowerCase().includes('email')) {
@@ -110,7 +112,6 @@ export const useProfile = (toastRef: ToastRef) => {
     const handleSubmit = useCallback(
         async (e?: React.FormEvent) => {
             e?.preventDefault();
-            setErrors({});
 
             try {
                 const validatedData = ProfileSchema.parse(formData);

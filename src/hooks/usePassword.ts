@@ -27,7 +27,9 @@ export const usePassword = (toastRef: ToastRef) => {
             handleCloseModal();
         },
         onError: (error: ApiError) => {
-            handleApiError(error, toastRef);
+            if (error?.status !== 401) {
+                handleApiError(error, toastRef);
+            }
 
             if (error?.status === 401 && error.message) {
                 setErrors({ oldPassword: error.message });
@@ -47,7 +49,6 @@ export const usePassword = (toastRef: ToastRef) => {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        setErrors({});
 
         try {
             const validatedData = PasswordSchema.parse(data);

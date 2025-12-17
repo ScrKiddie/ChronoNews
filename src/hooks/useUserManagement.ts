@@ -114,23 +114,19 @@ export const useUserManagement = ({ toastRef, pagination }: UseUserManagementPro
                 setErrors(formErrors);
             } else {
                 const apiError = error as ApiError;
-                if (apiError && typeof apiError.message === 'string') {
+                if (apiError?.status !== 409) {
                     handleApiError(apiError, toastRef);
-                    if (apiError.status === 409) {
-                        if (apiError.message.toLowerCase().includes('email')) {
-                            setErrors({ email: apiError.message });
-                        } else if (
-                            apiError.message.toLowerCase().includes('telepon') ||
-                            apiError.message.toLowerCase().includes('phone')
-                        ) {
-                            setErrors({ phoneNumber: apiError.message });
-                        }
+                }
+
+                if (apiError?.status === 409 && apiError.message) {
+                    if (apiError.message.toLowerCase().includes('email')) {
+                        setErrors((prev) => ({ ...prev, email: apiError.message }));
+                    } else if (
+                        apiError.message.toLowerCase().includes('telepon') ||
+                        apiError.message.toLowerCase().includes('phone')
+                    ) {
+                        setErrors((prev) => ({ ...prev, phoneNumber: apiError.message }));
                     }
-                } else {
-                    const fallbackError: ApiError = {
-                        message: 'Terjadi kesalahan yang tidak diketahui.',
-                    };
-                    handleApiError(fallbackError, toastRef);
                 }
             }
         },
@@ -177,7 +173,6 @@ export const useUserManagement = ({ toastRef, pagination }: UseUserManagementPro
     const handleSubmit = useCallback(
         async (e?: FormEvent) => {
             e?.preventDefault();
-            setErrors({});
 
             try {
                 switch (modalMode) {

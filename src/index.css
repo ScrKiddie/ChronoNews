@@ -111,7 +111,7 @@ p {
 
 .ql-editor {
     font-family: 'Poppins';
-    min-height: 320px;
+    min-height: fit-content;
     max-height: fit-content;
 }
 
@@ -504,4 +504,7 @@ body .navbar-top {
         min-width: 90vw !important;
         width: 90vw !important;
     }
+}
+form {
+    margin-bottom: 0px;
 }

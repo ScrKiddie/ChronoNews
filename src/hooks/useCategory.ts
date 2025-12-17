@@ -119,7 +119,14 @@ export const useCategory = ({ toastRef }: UseCategoryProps) => {
                 );
                 setErrors(formErrors);
             } else {
-                handleApiError(error as ApiError, toastRef);
+                const apiError = error as ApiError;
+                if (apiError?.status !== 409) {
+                    handleApiError(apiError, toastRef);
+                }
+
+                if (apiError?.status === 409 && apiError.message) {
+                    setErrors({ name: apiError.message });
+                }
             }
         },
         [toastRef]
@@ -146,7 +153,6 @@ export const useCategory = ({ toastRef }: UseCategoryProps) => {
     const handleSubmit = useCallback(
         async (e?: FormEvent) => {
             e?.preventDefault();
-            setErrors({});
 
             switch (modalMode) {
                 case 'create':
