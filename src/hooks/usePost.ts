@@ -453,6 +453,12 @@ const usePost = (InitialDataProp: InitialDataStructure | undefined, isDesktop: b
             if (!prev) return undefined;
             const newData = { ...prev };
 
+            delete newData.posts_headline;
+            delete newData.posts_top;
+            delete newData.posts_regular;
+            delete newData.posts_search;
+            delete newData.post;
+
             delete newData.generalError;
             delete newData.postError;
             delete newData.posts_headlineError;

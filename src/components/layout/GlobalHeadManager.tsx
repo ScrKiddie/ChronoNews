@@ -7,7 +7,7 @@ export const GlobalHeadManager = () => {
 
     useEffect(() => {
         if (!location.pathname.startsWith('/post/')) {
-            restoreDefaultHead();
+            restoreDefaultHead(location.pathname);
         }
     }, [location]);
 

@@ -19,14 +19,14 @@ const MainPostSkeleton: React.FC = () => {
             </div>
 
             <div className="flex justify-between mb-4 mt-2 flex-row items-center">
-                <div className="flex gap-2 items-center">
-                    <Skeleton shape="circle" size="3rem" />
-                    <div>
-                        <Skeleton height="1.25rem" width="10rem" className="mb-2" />
-                        <Skeleton height="1rem" width="15rem" />
+                <div className="flex gap-2 items-center flex-1 min-w-0">
+                    <Skeleton shape="circle" size="3rem" className="shrink-0" />
+                    <div className="flex-1 min-w-0">
+                        <Skeleton height="1.25rem" width="40%" className="mb-2" />
+                        <Skeleton height="1rem" width="60%" />
                     </div>
                 </div>
-                <Skeleton shape="circle" size="2.5rem" />
+                <Skeleton shape="circle" size="2.5rem" className="shrink-0 ml-2" />
             </div>
 
             <div
