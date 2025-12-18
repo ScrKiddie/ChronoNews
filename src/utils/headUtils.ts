@@ -78,13 +78,14 @@ export function headUtils(post: Post): string {
     `;
 }
 
-export function generateDefaultHead(): string {
+export function generateDefaultHead(path = ''): string {
+    const canonicalUrl = `${baseUrl}${path}`;
     return `
         <title>ChronoNews - Portal Berita Terkini</title>
         <meta name="description" content="Dapatkan berita terkini dan terpercaya dari berbagai kategori hanya di ChronoNews." />
-        <link rel="canonical" href="${baseUrl}" />
+        <link rel="canonical" href="${canonicalUrl}" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="${baseUrl}" />
+        <meta property="og:url" content="${canonicalUrl}" />
         <meta property="og:title" content="ChronoNews - Portal Berita Terkini" />
         <meta property="og:description" content="Dapatkan berita terkini dan terpercaya dari berbagai kategori hanya di ChronoNews." />
         
@@ -92,7 +93,7 @@ export function generateDefaultHead(): string {
         <meta property="og:site_name" content="ChronoNews" />
         
         <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content="${baseUrl}" />
+        <meta property="twitter:url" content="${canonicalUrl}" />
         <meta property="twitter:title" content="ChronoNews - Portal Berita Terkini" />
         <meta property="twitter:description" content="Dapatkan berita terkini dan terpercaya dari berbagai kategori hanya di ChronoNews." />
         <meta property="twitter:image" content="${baseUrl}/chrononews.svg" />
@@ -100,8 +101,8 @@ export function generateDefaultHead(): string {
     `;
 }
 
-export const restoreDefaultHead = () => {
-    const htmlString = generateDefaultHead();
+export const restoreDefaultHead = (path = '') => {
+    const htmlString = generateDefaultHead(path);
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, 'text/html');
 

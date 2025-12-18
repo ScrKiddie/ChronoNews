@@ -27,13 +27,35 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
 
         setDisqusReady(false);
 
+        let checkInterval: number | undefined;
+        let failureTimeout: number | undefined;
+
+        const cleanup = () => {
+            if (checkInterval) clearInterval(checkInterval);
+            if (failureTimeout) clearTimeout(failureTimeout);
+        };
+
         const disqusConfig: DisqusConfigFunction = function (this: DisqusConfig) {
             this.page.identifier = mainPost.id!.toString();
             this.page.url = window.location.href;
 
             this.callbacks.onReady = [
                 function () {
-                    setDisqusReady(true);
+                    const disqusContainer = document.getElementById('disqus_thread');
+                    if (!disqusContainer) return;
+
+                    checkInterval = window.setInterval(() => {
+                        const iframe = disqusContainer.querySelector('iframe');
+                        if (iframe && iframe.clientHeight > 50) {
+                            setDisqusReady(true);
+                            cleanup();
+                        }
+                    }, 100);
+
+                    failureTimeout = window.setTimeout(() => {
+                        setDisqusReady(true);
+                        cleanup();
+                    }, 10000);
                 },
             ];
         };
@@ -46,12 +68,19 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
         } else {
             window.disqus_config = disqusConfig;
 
+            const existingScript = document.querySelector(`script[src*="disqus.com/embed.js"]`);
+            if (existingScript) {
+                existingScript.remove();
+            }
+
             const script = document.createElement('script');
             script.src = `https://${import.meta.env.VITE_DISQUS_SHORTNAME}.disqus.com/embed.js`;
             script.setAttribute('data-timestamp', Date.now().toString());
             script.async = true;
             document.body.appendChild(script);
         }
+
+        return cleanup;
     }, [mainPost?.id]);
 
     useEffect(() => {
@@ -142,7 +171,7 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
 
     return (
         <>
-            <main className="break-word">
+            <main className="break-word relative">
                 <BreadCrumb model={breadcrumbItems} />
 
                 <h1 className="text-gray-700 font-semibold text-3xl">{mainPost.title}</h1>
@@ -235,7 +264,17 @@ const MainPost: React.FC<MainPostProps> = ({ mainPost, handleCategoryChange }) =
 
                 <div
                     id="disqus_thread"
-                    className={`mt-8 mb-4 ${!disqusReady ? 'hidden' : ''}`}
+                    className="mt-8 mb-4"
+                    style={
+                        !disqusReady
+                            ? {
+                                  position: 'absolute',
+                                  visibility: 'hidden',
+                                  width: '100%',
+                                  zIndex: -1,
+                              }
+                            : undefined
+                    }
                 ></div>
             </main>
         </>
